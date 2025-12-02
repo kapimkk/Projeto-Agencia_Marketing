@@ -1,0 +1,5 @@
+flask
+cryptography
+flask-talisman
+python-dotenv
+pandas

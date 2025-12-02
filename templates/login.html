@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Acesso Restrito</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+    <div class="background-blobs"><div class="blob blob-1"></div></div>
+    <div class="glass-card" style="width: 350px; text-align: center;">
+        <h2 style="margin-bottom: 20px; color: var(--text-dark);">Acesso Admin</h2>
+        {% if error %}
+            <div style="color: red; margin-bottom: 10px;">{{ error }}</div>
+        {% endif %}
+        <form method="POST">
+            <input type="password" name="password" placeholder="Chave de Segurança" required>
+            <button type="submit" class="btn-main" style="width: 100%;">Entrar</button>
+        </form>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

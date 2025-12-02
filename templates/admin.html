@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard Pro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Chart.js para Gráficos Interativos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta http-equiv="refresh" content="60"> <!-- Refresh a cada 60s para atualizar dados -->
+</head>
+<body class="admin-body">
+    
+    <div class="admin-layout">
+        
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <h2 style="margin-bottom: 40px; color: var(--text-dark);">ELO<span style="color: var(--accent);">ADMIN</span></h2>
+            
+            <button class="nav-btn active" onclick="openTab(event, 'dashboard')"><i class="fas fa-chart-line"></i> Dashboard</button>
+            <button class="nav-btn" onclick="openTab(event, 'chat')"><i class="fas fa-comments"></i> Chat Suporte</button>
+            <button class="nav-btn" onclick="openTab(event, 'leads')"><i class="fas fa-users"></i> Leads</button>
+            <button class="nav-btn" onclick="openTab(event, 'financeiro')"><i class="fas fa-wallet"></i> Financeiro</button>
+            
+            <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--glass-border);">
+                <button id="theme-toggle" class="theme-btn" title="Tema" style="margin-bottom: 10px;"><i class="fas fa-moon"></i></button>
+                <a href="/" target="_blank" class="view-site"><i class="fas fa-external-link-alt"></i> Ver Site</a>
+                <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Sair</a>
+            </div>
+        </div>
+
+        <div class="main-content">
+            
+            <div id="dashboard" class="tab-content active">
+                <h2 style="margin-bottom: 20px; color: var(--text-dark);">Visão Geral de Performance</h2>
+                
+                <div class="stat-grid">
+                    <div class="admin-card">
+                        <div class="icon-box" style="background: #e0e7ff; color: #667eea;"><i class="fas fa-user-plus"></i></div>
+                        <div><h3>{{ leads|length }}</h3><p>Total Leads</p></div>
+                    </div>
+                    <div class="admin-card">
+                        <div class="icon-box" style="background: #dcfce7; color: #16a34a;"><i class="fas fa-dollar-sign"></i></div>
+                        <div><h3>{{ orders|length }}</h3><p>Vendas</p></div>
+                    </div>
+                    <div class="admin-card">
+                        <div class="icon-box" style="background: #fce7f3; color: #db2777;"><i class="fas fa-comment-dots"></i></div>
+                        <div><h3>{{ sessions|length }}</h3><p>Conversas</p></div>
+                    </div>
+                </div>
+
+                <!-- GRÁFICOS PANDAS/CHARTJS -->
+                <div class="charts-container">
+                    <div class="glass-card" style="flex: 2;">
+                        <h3 style="color: var(--text-dark); margin-bottom: 15px;">Evolução de Leads (Últimos Dias)</h3>
+                        <canvas id="leadsChart"></canvas>
+                    </div>
+                    <div class="glass-card" style="flex: 1;">
+                        <h3 style="color: var(--text-dark); margin-bottom: 15px;">Vendas por Plano</h3>
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div id="chat" class="tab-content">
+                <h2 style="margin-bottom: 20px; color: var(--text-dark);">Atendimento em Tempo Real</h2>
+                <div class="messenger">
+                    <div class="chat-list">
+                        {% for sess in sessions %}
+                        <div class="chat-item {% if sess == active_session %}active{% endif %}" onclick="window.location.href='?session_id={{ sess }}'">
+                            <div style="font-weight: bold;">Cliente #{{ loop.index }}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-grey); margin-top: 5px;">ID: {{ sess[:8] }}...</div>
+                        </div>
+                        {% endfor %}
+                        {% if not sessions %}<div style="padding: 20px; color: var(--text-grey);">Nenhum chat ativo.</div>{% endif %}
+                    </div>
+                    
+                    <div class="chat-view">
+                        <div class="chat-body" style="background: var(--admin-card-bg);">
+                            {% if active_session %}
+                                {% for msg in chat_history %}
+                                    <div class="message {% if msg.remetente in ['admin', 'bot'] %}sent{% else %}received{% endif %}"
+                                         style="{% if msg.remetente == 'bot' %}background: #a78bfa; color: white;{% endif %}">
+                                        {% if msg.remetente == 'bot' %}<small style="display:block;font-size:0.7em;">🤖 Bot</small>{% endif %}
+                                        
+                                        {% if msg.tipo == 'arquivo' %}
+                                            <a href="/static/uploads/{{ msg.conteudo }}" target="_blank" style="color: inherit; text-decoration: underline;"><i class="fas fa-file"></i> Ver Arquivo</a>
+                                        {% elif msg.tipo == 'audio' %}
+                                            <audio controls src="/static/uploads/{{ msg.conteudo }}"></audio>
+                                        {% else %}
+                                            {{ msg.conteudo }}
+                                        {% endif %}
+                                        <div style="font-size: 0.6em; opacity: 0.6; text-align: right; margin-top: 5px;">{{ msg.data }}</div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-grey);">
+                                    Selecione uma conversa para iniciar o atendimento.
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        {% if active_session %}
+                        <form id="replyForm" class="reply-area">
+                            <input type="hidden" name="session_id" value="{{ active_session }}">
+                            <input type="hidden" name="remetente" value="admin">
+                            <input type="text" name="message" placeholder="Digite sua resposta..." required>
+                            <button type="submit" class="btn-main"><i class="fas fa-paper-plane"></i></button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div id="leads" class="tab-content">
+                <h2 style="margin-bottom: 20px; color: var(--text-dark);">Base de Leads</h2>
+                <div class="glass-card" style="padding: 0; overflow: hidden;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Email</th>
+                                <th>Telefone</th>
+                                <th>Projeto</th>
+                                <th>Data</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for lead in leads %}
+                            <tr>
+                                <td>{{ lead.nome }}</td>
+                                <td>{{ lead.email }}</td>
+                                <td>{{ lead.telefone }}</td>
+                                <td>{{ lead.projeto }}</td>
+                                <td>{{ lead.data }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="financeiro" class="tab-content">
+                <h2 style="margin-bottom: 20px; color: var(--text-dark);">Pedidos Recentes</h2>
+                <div class="glass-card" style="padding: 0; overflow: hidden;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Plano</th>
+                                <th>Valor</th>
+                                <th>Método</th>
+                                <th>Parcelas</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                            <tr>
+                                <td>#{{ order.id }}</td>
+                                <td><span class="badge badge-blue">{{ order.plano }}</span></td>
+                                <td>R$ {{ order.preco }}</td>
+                                <td>{{ order.metodo }}</td>
+                                <td>{{ order.parcelas }}</td>
+                                <td><span class="badge badge-yellow">{{ order.status }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+
+        function openTab(evt, tabName) {
+            var i, tabcontent, navbtns;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+                tabcontent[i].classList.remove('active');
+            }
+            navbtns = document.getElementsByClassName("nav-btn");
+            for (i = 0; i < navbtns.length; i++) {
+                navbtns[i].className = navbtns[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            setTimeout(() => document.getElementById(tabName).classList.add('active'), 10);
+            evt.currentTarget.className += " active";
+            
+            localStorage.setItem('activeTab', tabName);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const activeTab = localStorage.getItem('activeTab') || 'dashboard';
+            const btn = document.querySelector(`button[onclick*='${activeTab}']`);
+            if(btn) btn.click();
+        });
+
+        const replyForm = document.getElementById('replyForm');
+        if(replyForm) {
+            replyForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(replyForm);
+                await fetch('/send_chat', { method: 'POST', body: formData });
+                location.reload(); 
+            });
+        }
+
+        const leadsData = JSON.parse('{{ leads_chart|safe }}');
+        const salesData = JSON.parse('{{ sales_chart|safe }}');
+
+        if(document.getElementById('leadsChart')) {
+            new Chart(document.getElementById('leadsChart'), {
+                type: 'line',
+                data: {
+                    labels: leadsData.labels,
+                    datasets: [{
+                        label: 'Novos Leads',
+                        data: leadsData.values,
+                        borderColor: '#764ba2',
+                        backgroundColor: 'rgba(118, 75, 162, 0.2)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            });
+        }
+
+        if(document.getElementById('salesChart')) {
+            new Chart(document.getElementById('salesChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: salesData.labels,
+                    datasets: [{
+                        data: salesData.values,
+                        backgroundColor: ['#667eea', '#764ba2', '#a78bfa']
+                    }]
+                },
+                options: { responsive: true }
+            });
+        }
+    </script>
+</body>
+</html>

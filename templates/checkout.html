@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finalizar Contratação - {{ plano }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .checkout-container { max-width: 1100px; margin: 50px auto; display: grid; grid-template-columns: 1fr 1fr; gap: 50px; }
+        .benefits-list { list-style: none; margin: 30px 0; }
+        .benefits-list li { margin-bottom: 15px; display: flex; align-items: center; gap: 10px; font-size: 1.1rem; color: var(--text-dark); }
+        .benefits-list i { color: #00c851; }
+        
+        .payment-section { 
+            background: var(--glass-bg); 
+            padding: 40px; 
+            border-radius: 20px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1); 
+            display: none; 
+            animation: slideUp 0.5s ease; 
+            border: 1px solid var(--glass-border);
+        }
+        .payment-section.active { display: block; }
+        
+        .step-indicator { display: flex; gap: 10px; margin-bottom: 20px; font-size: 0.9rem; color: var(--text-grey); }
+        .step.active { color: var(--accent); font-weight: bold; }
+        
+        .pay-option { 
+            flex: 1; padding: 12px; 
+            border: 1px solid var(--glass-border); 
+            background: var(--input-bg); 
+            border-radius: 8px; 
+            cursor: pointer; transition: 0.3s; 
+            font-weight: 500; color: var(--text-dark);
+        }
+        .pay-option:hover, .pay-option.active { 
+            background: var(--accent); color: white; border-color: var(--accent); 
+        }
+
+        h1, h2, h3 { color: var(--text-dark); }
+        p { color: var(--text-grey); }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="background-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
+
+    <div class="checkout-container reveal active">
+        
+        <div>
+            <a href="/" style="color: var(--text-grey); text-decoration: none;"><i class="fas fa-arrow-left"></i> Voltar</a>
+            <h1 style="font-size: 3rem; margin: 20px 0; line-height: 1;">Você escolheu o <br><span style="color: var(--accent);">Plano {{ plano }}</span></h1>
+            
+            <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=600&q=80" style="width: 100%; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+            
+            <h3>O que está incluso:</h3>
+            <ul class="benefits-list">
+                <li><i class="fas fa-check-circle"></i> Estratégia de Crescimento Acelerado</li>
+                <li><i class="fas fa-check-circle"></i> Suporte Prioritário via WhatsApp</li>
+                <li><i class="fas fa-check-circle"></i> Relatórios Semanais de Performance</li>
+                <li><i class="fas fa-check-circle"></i> Garantia de 7 Dias ou Dinheiro de Volta</li>
+            </ul>
+
+            <div style="background: var(--glass-bg); padding: 20px; border-radius: 15px; border-left: 4px solid var(--accent); color: var(--text-dark);">
+                <p style="font-style: italic; margin: 0; color: var(--text-grey);">"Este plano é ideal para empresas que buscam escalar suas vendas rapidamente utilizando inteligência de dados."</p>
+            </div>
+        </div>
+
+        <div>
+            <div id="step-1" class="payment-section active">
+                <h2>Investimento</h2>
+                <div style="font-size: 3.5rem; font-weight: 800; color: var(--text-dark); margin: 20px 0;">
+                    R$ {{ preco }} <span style="font-size: 1rem; font-weight: normal; color: var(--text-grey);">/mês</span>
+                </div>
+                <p>Sem fidelidade. Cancele quando quiser.</p>
+                <button class="btn-main" onclick="goToStep(2)" style="width: 100%; margin-top: 30px; font-size: 1.2rem;">Ir para Pagamento &rarr;</button>
+            </div>
+
+            <div id="step-2" class="payment-section">
+                <div class="step-indicator">
+                    <span class="step">1. Resumo</span> &rsaquo; <span class="step active">2. Pagamento</span>
+                </div>
+                
+                <h3>Selecione o Método</h3>
+                <div style="display: flex; gap: 10px; margin: 20px 0;">
+                    <button class="pay-option active" onclick="showMethod('card')"><i class="far fa-credit-card"></i> Cartão</button>
+                    <button class="pay-option" onclick="showMethod('pix')"><i class="fas fa-qrcode"></i> PIX</button>
+                </div>
+
+                <div id="method-card">
+                    <input type="text" placeholder="Número do Cartão" style="width: 100%; margin-bottom: 15px;">
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <input type="text" placeholder="MM/AA" style="width: 50%;">
+                        <input type="text" placeholder="CVV" style="width: 50%;">
+                    </div>
+                    <input type="text" placeholder="Nome no Cartão" style="width: 100%; margin-bottom: 15px;">
+                    
+                    <label style="font-size: 0.9rem; color: var(--text-grey); margin-bottom: 5px; display: block;">Parcelamento:</label>
+                    <select id="parcelas" style="width: 100%; padding: 15px; border: 1px solid var(--glass-border); border-radius: 10px; margin-bottom: 20px; background: var(--input-bg); color: var(--text-dark); outline: none;">
+                        <option value="1x">1x de R$ {{ preco }} (Sem juros)</option>
+                        <option value="2x">2x (Sem juros)</option>
+                        <option value="3x">3x (Sem juros)</option>
+                        <option value="6x">6x (Com juros)</option>
+                        <option value="12x">12x (Com juros)</option>
+                    </select>
+
+                    <button class="btn-main" onclick="finalizar('Cartão')" style="width: 100%;">Pagar Agora</button>
+                </div>
+
+                <div id="method-pix" style="display: none; text-align: center;">
+                    <div style="background: white; padding: 10px; display: inline-block; border-radius: 10px; margin-bottom: 20px;">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=PixExemplo" style="opacity: 0.9;">
+                    </div>
+                    <p>Liberação Imediata</p>
+                    <button class="btn-main" onclick="finalizar('PIX')" style="width: 100%;">Já realizei o PIX</button>
+                </div>
+                
+                <button onclick="goToStep(1)" style="background: none; border: none; color: var(--text-grey); cursor: pointer; margin-top: 20px; text-decoration: underline;">Voltar ao resumo</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        function goToStep(step) {
+            document.querySelectorAll('.payment-section').forEach(el => el.classList.remove('active'));
+            document.getElementById('step-' + step).classList.add('active');
+        }
+
+        function showMethod(method) {
+            document.getElementById('method-card').style.display = method === 'card' ? 'block' : 'none';
+            document.getElementById('method-pix').style.display = method === 'pix' ? 'block' : 'none';
+            
+            document.querySelectorAll('.pay-option').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        async function finalizar(metodo) {
+            const btn = event.target;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+            btn.disabled = true;
+
+            const parcelas = document.getElementById('parcelas') ? document.getElementById('parcelas').value : '1x';
+
+            await fetch('/processar_pagamento', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    plano: "{{ plano }}", 
+                    preco: "{{ preco }}", 
+                    metodo: metodo,
+                    parcelas: metodo === 'Cartão' ? parcelas : '1x'
+                })
+            });
+
+            setTimeout(() => {
+                alert('Pagamento Processado com Sucesso! Bem-vindo à Agência.');
+                window.location.href = '/';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

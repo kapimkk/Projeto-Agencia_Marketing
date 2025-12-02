@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Avaliações e Cases</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="background-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
+    
+    <nav class="glass-nav reveal">
+        <div class="logo">AGÊNCIA <span style="color: var(--accent);">DIGITAL</span></div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><button id="theme-toggle" class="theme-btn"><i class="fas fa-moon"></i></button></li>
+            <li><a href="/#contato" class="btn-main">Orçamento</a></li>
+        </ul>
+    </nav>
+
+    <section class="hero" style="min-height: 50vh;">
+        <div class="glass-card reveal" style="text-align: center; max-width: 800px;">
+            <h1>O Que Dizem <br><span>Nossos Clientes</span></h1>
+            <p style="margin-top: 15px;">Histórias de sucesso de quem confiou na nossa estratégia.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="reveal" style="text-align: center; margin-bottom: 40px;">Alguns Trabalhos</h2>
+        <div class="reveal delay-100" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto;">
+            
+            <div class="glass-card" style="padding: 0; overflow: hidden;">
+                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80" style="width: 100%; height: 200px; object-fit: cover;">
+                <div style="padding: 20px;">
+                    <h3>Gestão de Dashboards</h3>
+                    <p style="font-size: 0.9rem;">Relatórios de performance.</p>
+                </div>
+            </div>
+
+            <div class="glass-card" style="padding: 0; overflow: hidden;">
+                <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=600&q=80" style="width: 100%; height: 200px; object-fit: cover;">
+                <div style="padding: 20px;">
+                    <h3>Branding Corporativo</h3>
+                    <p style="font-size: 0.9rem;">Identidade visual completa.</p>
+                </div>
+            </div>
+
+            <div class="glass-card" style="padding: 0; overflow: hidden;">
+                <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80" style="width: 100%; height: 200px; object-fit: cover;">
+                <div style="padding: 20px;">
+                    <h3>Social Media</h3>
+                    <p style="font-size: 0.9rem;">Gestão de redes.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="pricing-container reveal">
+            <div class="glass-card" style="text-align: left;">
+                <div style="color: #FFD700;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                <p style="font-style: italic;">"Excelente trabalho de tráfego!"</p>
+                <div style="font-weight: bold; margin-top:10px;"> - Ricardo Silva</div>
+            </div>
+            <div class="glass-card" style="text-align: left;">
+                <div style="color: #FFD700;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                <p style="font-style: italic;">"Design impecável."</p>
+                <div style="font-weight: bold; margin-top:10px;"> - Ana Clara</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact" style="display: flex; justify-content: center;">
+        <div class="glass-card reveal" style="width: 100%; max-width: 700px; border: 1px solid var(--accent);">
+            <h2 style="text-align: center; margin-bottom: 10px;">Deixe sua Avaliação</h2>
+            <p style="text-align: center; margin-bottom: 30px; font-size: 0.9rem;">Sua opinião é muito importante para nós.</p>
+            
+            <form id="reviewForm">
+                <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 250px;">
+                        <input type="text" id="rev_nome" placeholder="Seu Nome" required>
+                    </div>
+                    <div style="flex: 1; min-width: 250px;">
+                        <input type="text" id="rev_empresa" placeholder="Sua Empresa" required>
+                    </div>
+                </div>
+                <input type="email" id="rev_email" placeholder="Seu Email" required>
+                
+                <!-- Estrelas Interativas e Funcionais -->
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 5px; color: var(--text-grey);">Quantas estrelas?</label>
+                    <div class="star-rating">
+                        <!-- Nota: A ordem é invertida no HTML (5 a 1) por causa do CSS 'direction: rtl' que permite o efeito de preenchimento -->
+                        <input type="radio" id="star5" name="rating" value="5"/><label for="star5" title="5 estrelas"><i class="fas fa-star"></i></label>
+                        <input type="radio" id="star4" name="rating" value="4"/><label for="star4" title="4 estrelas"><i class="fas fa-star"></i></label>
+                        <input type="radio" id="star3" name="rating" value="3"/><label for="star3" title="3 estrelas"><i class="fas fa-star"></i></label>
+                        <input type="radio" id="star2" name="rating" value="2"/><label for="star2" title="2 estrelas"><i class="fas fa-star"></i></label>
+                        <input type="radio" id="star1" name="rating" value="1"/><label for="star1" title="1 estrela"><i class="fas fa-star"></i></label>
+                    </div>
+                </div>
+
+                <textarea id="rev_texto" placeholder="Conte sua experiência..." rows="4" required></textarea>
+                <!-- BOTÃO CORRIGIDO -->
+                <button type="submit" class="btn-main" style="width: 100%;">Enviar Avaliação</button>
+            </form>
+        </div>
+    </section>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
