@@ -192,17 +192,13 @@
     </div>
 
     <script>
-        // --- 1. Lógica de Abas e Botão Exportar ---
         function openTab(evt, tabName) {
-            // Esconde todas
             var tabcontent = document.getElementsByClassName("tab-content");
             for (var i = 0; i < tabcontent.length; i++) tabcontent[i].style.display = "none";
             
-            // Remove active dos botões
             var navbtns = document.getElementsByClassName("nav-btn");
             for (var i = 0; i < navbtns.length; i++) navbtns[i].classList.remove("active");
             
-            // Mostra a certa
             document.getElementById(tabName).style.display = "block";
             if(evt) evt.currentTarget.classList.add("active");
             
@@ -210,7 +206,6 @@
             updateExportBtn(tabName);
         }
 
-        // Muda link de exportação dinamicamente
         function updateExportBtn(tab) {
             const btn = document.getElementById('exportBtn');
             let type = 'leads';
@@ -221,9 +216,8 @@
             btn.innerHTML = `<i class="fas fa-download"></i> Exportar ${type.charAt(0).toUpperCase() + type.slice(1)}`;
         }
 
-        // --- 2. Excluir Ticket ---
         async function deleteTicket(event, uuid) {
-            event.stopPropagation(); // IMPORTANTE: Não abre o chat ao clicar
+            event.stopPropagation(); 
             if(!confirm("Tem certeza que deseja apagar este histórico permanentemente?")) return;
             
             try {
@@ -234,16 +228,13 @@
             } catch(e) { alert("Erro de conexão"); }
         }
 
-        // --- 3. Inicialização ---
         document.addEventListener('DOMContentLoaded', () => {
             const activeTab = new URLSearchParams(window.location.search).get('tab') || localStorage.getItem('activeTab') || 'dashboard';
             
-            // Simula clique na aba correta
             const btn = document.querySelector(`button[onclick*="'${activeTab}'"]`);
             if(btn) openTab({currentTarget: btn}, activeTab);
             else openTab(null, 'dashboard');
 
-            // Charts
             const leadsData = JSON.parse('{{ leads_chart|safe }}');
             const salesData = JSON.parse('{{ sales_chart|safe }}');
 
@@ -262,13 +253,12 @@
                 });
             }
 
-            // Polling Chat Admin (Ao Vivo)
             {% if active_session %}
             setInterval(async () => {
                 const res = await fetch('/get_messages/{{ active_session }}');
                 const msgs = await res.json();
                 const chatBody = document.getElementById('admin-chat-body');
-                chatBody.innerHTML = ''; // Limpa e redesenha
+                chatBody.innerHTML = ''; 
                 msgs.forEach(m => {
                     let c = m.conteudo;
                     if(m.tipo === 'audio') c = `<audio controls src="/static/uploads/${c}"></audio>`;
@@ -279,15 +269,13 @@
                     div.innerHTML = c;
                     chatBody.appendChild(div);
                 });
-            }, 3000); // 3 segundos
+            }, 3000); 
 
-            // Envio Admin
             document.getElementById('replyForm').addEventListener('submit', async(e) => {
                 e.preventDefault();
                 const fd = new FormData(e.target);
                 await fetch('/send_chat', {method:'POST', body:fd});
                 e.target.reset();
-                // Polling atualizará a tela em breve
             });
             {% endif %}
         });

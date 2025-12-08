@@ -12,20 +12,17 @@ from flask_wtf.csrf import CSRFProtect
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
-# Imports locais
 from models import db, User, Lead, Order, Review, ChatSession, ChatMessage
 from forms import LoginForm
 
 app = Flask(__name__)
 
-# --- CONFIGURAÇÕES ---
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SECRET_KEY'] = 'chave-ultra-secreta-agencia'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'database.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = os.path.join(basedir, 'static', 'uploads')
 
-# Config Email (Mantenha seus dados)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -35,7 +32,6 @@ app.config['MAIL_PASSWORD'] = 'sua_senha_app'
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
-# Inicializações
 db.init_app(app)
 migrate = Migrate(app, db)
 mail = Mail(app)
@@ -44,7 +40,6 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-# --- MODELO EXTRA: VISITAS ---
 class Visit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     page = db.Column(db.String(50))
@@ -58,8 +53,6 @@ def load_user(user_id):
 def format_currency(value):
     try: return f"R$ {float(value):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
     except: return f"R$ {value}"
-
-# --- ROTAS PÚBLICAS ---
 
 @app.route('/')
 def index():
@@ -113,17 +106,12 @@ def submit_review():
         return jsonify({'status': 'success'})
     except: return jsonify({'status': 'error'}), 500
 
-# --- CHAT API ---
-
 @app.route('/init_session', methods=['POST'])
 @csrf.exempt
 def init_session():
-    # Pega a categoria enviada pelo botão (Ex: Financeiro)
     data = request.json
     categoria = data.get('category', 'Geral') if data else 'Geral'
     
-    # Obs: Se você deletou o DB, o modelo ChatSession será recriado com a coluna category.
-    # Se não deletou, vai dar erro. DELETE O ARQUIVO database.db.
     new_session = ChatSession(session_uuid=uuid.uuid4().hex, category=categoria)
     
     db.session.add(new_session)
@@ -179,7 +167,7 @@ def get_messages(session_uuid):
     return jsonify(output)
 
 @app.route('/delete_ticket/<session_uuid>', methods=['DELETE'])
-@csrf.exempt # Importante para o fetch funcionar fácil
+@csrf.exempt 
 @login_required
 def delete_ticket(session_uuid):
     try:
@@ -192,8 +180,6 @@ def delete_ticket(session_uuid):
         return jsonify({'status': 'error', 'msg': 'Não encontrado'}), 404
     except Exception as e:
         return jsonify({'status': 'error', 'msg': str(e)}), 500
-
-# --- ADMIN DASHBOARD ---
 
 @app.route('/admin')
 @login_required
@@ -230,17 +216,15 @@ def admin():
         sess = ChatSession.query.filter_by(session_uuid=active_uuid).first()
         if sess:
             chat_history = ChatMessage.query.filter_by(session_id=sess.id).order_by(ChatMessage.data).all()
-            # Mostra TICKET + CATEGORIA no Admin
-            cat = getattr(sess, 'category', 'Geral') # getattr para segurança
+            cat = getattr(sess, 'category', 'Geral') 
             active_ticket = f"#{sess.id:04d} - {cat}"
     
     for s in sessions: 
         cat = getattr(s, 'category', 'Geral')
         s.ticket = f"#{s.id:04d}"
-        s.full_title = f"#{s.id:04d} - {cat}" # Usaremos isso no HTML
+        s.full_title = f"#{s.id:04d} - {cat}" 
         s.uuid = s.session_uuid
 
-    # Gráficos Mock (para evitar erro se vazio)
     leads_chart = {'labels': ['Seg', 'Ter', 'Qua'], 'values': [0,0,0]}
     sales_chart = {'labels': ['Silver', 'Gold'], 'values': [0,0]}
 
@@ -294,8 +278,6 @@ def logout():
 
 if __name__ == '__main__':
     with app.app_context():
-        # ATUALIZA O MODELO CHAT SESSION COM CATEGORIA
-        # Se não deletar o DB, isso pode dar erro. DELETE O DB.
         db.create_all()
         if not User.query.filter_by(username='admin').first():
             u = User(username='admin')

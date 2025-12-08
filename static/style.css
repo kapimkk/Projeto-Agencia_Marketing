@@ -79,7 +79,6 @@ input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 4px
 .btn-outline { padding: 12px 30px; border: 2px solid var(--text-dark); color: var(--text-dark); border-radius: 50px; font-weight: 600; text-decoration: none; transition: 0.3s; cursor: pointer;}
 .btn-outline:hover { background: var(--text-dark); color: var(--bg-light); }
 
-/* CHAT */
 .chat-widget-container { position: fixed; bottom: 30px; right: 30px; z-index: 9999; }
 .chat-btn { width: 60px; height: 60px; border-radius: 50%; border: none; background: var(--primary-gradient); color: white; font-size: 24px; cursor: pointer; box-shadow: 0 10px 30px rgba(118, 75, 162, 0.4); }
 .chat-box { position: absolute; bottom: 80px; right: 0; width: 350px; height: 500px; background: var(--glass-bg); border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); display: none; flex-direction: column; overflow: hidden; border: 1px solid var(--glass-border); backdrop-filter: blur(20px); }
@@ -168,17 +167,13 @@ section { padding: 80px 5%; }
 .reply-area { padding: 15px; background: var(--admin-card-bg); display: flex; gap: 10px; border-top: 1px solid var(--glass-border); }
 .reply-area input { margin-bottom: 0; }
 
-/* Dica 27: Scroll Suave */
 html { scroll-behavior: smooth; }
 
-/* Dica 25: Variáveis Dark Mode corrigidas no :root e html.dark-mode */
 html.dark-mode body {
-    /* Suas variaveis dark aqui */
     background-color: #0f172a; 
     color: #f1f5f9;
 }
 
-/* Dica 43: Botão WhatsApp */
 .whatsapp-float {
     position: fixed; bottom: 30px; left: 30px; width: 60px; height: 60px;
     background-color: #25d366; color: white; border-radius: 50%;
@@ -188,7 +183,6 @@ html.dark-mode body {
 }
 .whatsapp-float:hover { transform: scale(1.1); background-color: #20ba5a; }
 
-/* Dica 24: Skeleton Loading (para o admin) */
 .skeleton {
     background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
     background-size: 200% 100%;
@@ -197,15 +191,14 @@ html.dark-mode body {
 }
 @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-/* Dica 30: Tabela Mobile Responsiva */
 @media (max-width: 768px) {
-    .glass-card { overflow-x: auto; } /* Permite scroll horizontal */
+    .glass-card { overflow-x: auto; } 
     .admin-table { min-width: 600px; } 
 }
 
 input[type="file"].form-input {
-    padding: 10px; /* Ajuste de padding para ficar igual aos outros */
-    background: var(--input-bg); /* Usa a cor de fundo do tema */
+    padding: 10px; 
+    background: var(--input-bg); 
     color: var(--text-dark); 
     cursor: pointer;
 }
@@ -226,7 +219,6 @@ input[type="file"]::file-selector-button:hover {
     color: white;
     border-color: var(--accent);
 }
-/* TOAST NOTIFICATION (Substitui o Alert) */
 #toast {
     visibility: hidden;
     min-width: 300px;
@@ -260,9 +252,7 @@ input[type="file"]::file-selector-button:hover {
 
 #caps-warning { display: none; color: red; font-size: 0.8rem; margin-top: 5px; }
 
-/* --- CORREÇÃO DASHBOARD PROFISSIONAL --- */
 
-/* Grid do topo (Cards) */
 .stat-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -270,7 +260,6 @@ input[type="file"]::file-selector-button:hover {
     margin-bottom: 30px;
 }
 
-/* Container dos Gráficos */
 .charts-container {
     display: flex;
     gap: 20px;
@@ -278,10 +267,9 @@ input[type="file"]::file-selector-button:hover {
     margin-bottom: 40px;
 }
 
-/* Força altura fixa para os gráficos não estourarem */
 .chart-box {
     position: relative;
-    height: 350px; /* Altura fixa profissional */
+    height: 350px; 
     width: 100%;
 }
 
@@ -292,7 +280,6 @@ input[type="file"]::file-selector-button:hover {
     font-size: 1.1rem;
     color: var(--text-grey);
 }
-/* Correção Dashboard */
 .stat-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -310,7 +297,6 @@ input[type="file"]::file-selector-button:hover {
     width: 100%;
 }
 
-/* Toast (Notificação) */
 #toast {
     visibility: hidden;
     min-width: 250px;
@@ -334,7 +320,6 @@ input[type="file"]::file-selector-button:hover {
 @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
 @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
 
-/* Correção Input File Dark Mode */
 input[type="file"].form-input {
     background: var(--input-bg);
     color: var(--text-dark);

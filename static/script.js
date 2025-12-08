@@ -1,4 +1,3 @@
-/* --- TOAST NOTIFICATION --- */
 function showToast(message, iconClass = 'fa-check-circle') {
     let toast = document.getElementById("toast");
     if (!toast) {
@@ -13,7 +12,6 @@ function showToast(message, iconClass = 'fa-check-circle') {
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- 1. UI E ANIMAÇÕES ---
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) entry.target.classList.add('active');
@@ -21,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-    // --- 2. TEMA DARK/LIGHT ---
     const themeBtn = document.getElementById('theme-toggle');
     function aplicarTema(isDark) {
         if (isDark) document.body.classList.add('dark-mode');
@@ -42,7 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 3. MÁSCARA TELEFONE ---
     const telInputs = document.querySelectorAll('input[type="tel"]');
     telInputs.forEach(input => {
         input.addEventListener('input', (e) => {
@@ -53,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- 4. FORMULÁRIOS ---
     const leadForm = document.getElementById('leadForm');
     if(leadForm) {
         leadForm.addEventListener('submit', async (e) => {
@@ -70,7 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 5. CHAT SYSTEM ---
     const chatBox = document.getElementById('chat-box');
     const chatMenu = document.getElementById('chat-menu');
     const chatInterface = document.getElementById('chat-interface');
@@ -80,17 +74,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatInput = document.getElementById('chat-input');
     const statusText = document.getElementById('chat-status');
 
-    // ABRIR/FECHAR GERAL
     window.toggleChat = function() {
         chatBox.style.display = (chatBox.style.display === 'flex') ? 'none' : 'flex';
-        // Se abrir, verifica se mostra botão continuar
         if(chatBox.style.display === 'flex') {
             if(localStorage.getItem('chatSession')) btnContinue.style.display = 'block';
         }
     }
     if(document.getElementById('chat-toggle')) document.getElementById('chat-toggle').addEventListener('click', toggleChat);
 
-    // BOTÃO VOLTAR
     if(backBtn) {
         backBtn.addEventListener('click', () => {
             chatInterface.style.display = 'none';
@@ -100,18 +91,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // INICIAR TICKET
     window.startTicket = async function(categoria) {
-        // Reset
         localStorage.removeItem('chatSession');
         localStorage.removeItem('chatTicket');
         localStorage.removeItem('chatStep');
         chatBody.innerHTML = '';
         
-        // UI
         chatMenu.style.display = 'none';
         chatInterface.style.display = 'flex';
-        backBtn.style.display = 'block'; // Mostra seta
+        backBtn.style.display = 'block'; 
         statusText.innerText = `Iniciando: ${categoria}...`;
 
         try {
@@ -126,29 +114,26 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('chatTicket', data.ticket);
             statusText.innerText = data.ticket;
 
-            // Mensagens Bot
             appendMessage(`Opção: <b>${categoria}</b>.`, 'received', true);
             appendMessage(`Ticket ${data.ticket} criado.`, 'received');
             setTimeout(() => {
                 appendMessage("Informe seu **Nome e Telefone**:", 'received', true);
             }, 800);
             
-            localStorage.setItem('chatStep', '1'); // Esperando dados
+            localStorage.setItem('chatStep', '1'); 
         } catch(e) { console.error(e); }
     }
 
-    // CONTINUAR TICKET
     window.continueChat = function() {
         chatMenu.style.display = 'none';
         chatInterface.style.display = 'flex';
-        backBtn.style.display = 'block'; // Mostra seta
+        backBtn.style.display = 'block'; 
         
         statusText.innerText = localStorage.getItem('chatTicket') || "Atendimento";
         localStorage.setItem('chatStep', '3');
         loadMessages();
     }
 
-    // ENVIAR MENSAGEM
     async function handleSend() {
         const text = chatInput.value.trim();
         if(!text) return;
@@ -158,17 +143,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const step = localStorage.getItem('chatStep');
         if (step === '1') {
-            // Envia para DB
             const fd = new FormData(); fd.append('message', text);
             await sendMessageBackend(fd);
             
-            // Bot finaliza
             setTimeout(() => {
                 appendMessage("Obrigado! Um atendente irá assumir.", 'received');
-                localStorage.setItem('chatStep', '3'); // Live
+                localStorage.setItem('chatStep', '3'); 
             }, 800);
         } else {
-            // Live
             const fd = new FormData(); fd.append('message', text);
             await sendMessageBackend(fd);
         }
@@ -179,7 +161,6 @@ document.addEventListener('DOMContentLoaded', () => {
         chatInput.addEventListener('keypress', (e)=>{ if(e.key==='Enter') handleSend(); });
     }
 
-    // AUXILIARES
     async function sendMessageBackend(fd) {
         const sess = localStorage.getItem('chatSession');
         if(!sess) return;
@@ -196,12 +177,10 @@ document.addEventListener('DOMContentLoaded', () => {
         chatBody.scrollTop = chatBody.scrollHeight;
     }
 
-    // POLLING (EVITA SUMIR MENSAGEM DO BOT)
     async function loadMessages() {
         const sess = localStorage.getItem('chatSession');
         const step = localStorage.getItem('chatStep');
         
-        // Se estiver no menu (interface hidden) ou ainda no robô (step 1), NÃO atualiza
         if(!sess || chatInterface.style.display === 'none' || step === '1') return;
 
         try {
@@ -221,7 +200,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     setInterval(loadMessages, 3000);
 
-    // AUDIO E ANEXOS
     const btnMic = document.getElementById('btn-mic');
     if(btnMic) {
         let mediaRecorder; let audioChunks=[];
