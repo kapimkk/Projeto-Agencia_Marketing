@@ -4,6 +4,7 @@ import sqlite3
 import os
 import pandas as pd
 import json
+import uuid
 from werkzeug.utils import secure_filename
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
@@ -37,6 +38,7 @@ def get_db():
 def init_db():
     conn = get_db()
     conn.execute('''CREATE TABLE IF NOT EXISTS leads (id INTEGER PRIMARY KEY, nome TEXT, email TEXT, telefone TEXT, projeto TEXT, data TEXT)''')
+    conn.execute('''CREATE TABLE IF NOT EXISTS chat_sessions (id INTEGER PRIMARY KEY AUTOINCREMENT, session_uuid TEXT, created_at TEXT)''')
     conn.execute('''CREATE TABLE IF NOT EXISTS chat_messages (id INTEGER PRIMARY KEY, session_id TEXT, tipo TEXT, conteudo TEXT, remetente TEXT, data TEXT)''')
     conn.execute('''CREATE TABLE IF NOT EXISTS orders (id INTEGER PRIMARY KEY, plano TEXT, preco TEXT, metodo TEXT, parcelas TEXT, status TEXT, data TEXT)''')
     conn.execute('''CREATE TABLE IF NOT EXISTS reviews (id INTEGER PRIMARY KEY, nome TEXT, email TEXT, empresa TEXT, avaliacao TEXT, estrelas INTEGER, data TEXT)''')
@@ -93,6 +95,22 @@ def processar_pagamento():
     conn.close()
     return jsonify({'status': 'success'})
 
+@app.route('/init_session', methods=['POST'])
+def init_session():
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        session_uuid = f"sess_{uuid.uuid4().hex[:12]}"
+        cursor.execute("INSERT INTO chat_sessions (session_uuid, created_at) VALUES (?, ?)", 
+                      (session_uuid, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+        ticket_id = cursor.lastrowid
+        conn.commit()
+        conn.close()
+        ticket_fmt = f"#{ticket_id:06d}"
+        return jsonify({'status': 'success', 'session_id': session_uuid, 'ticket': ticket_fmt})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)})
+
 @app.route('/send_chat', methods=['POST'])
 def send_chat():
     try:
@@ -142,10 +160,12 @@ def admin():
     if not session.get('admin_logged_in'): return redirect(url_for('login'))
     
     conn = get_db()
+    conn.row_factory = sqlite3.Row
     c = conn.cursor()
     
     raw_leads = c.execute("SELECT * FROM leads").fetchall()
     raw_orders = c.execute("SELECT * FROM orders").fetchall()
+    raw_reviews = c.execute("SELECT * FROM reviews ORDER BY id DESC").fetchall()
     
     leads = []
     for l in raw_leads:
@@ -175,16 +195,42 @@ def admin():
         sales_chart_data['labels'] = counts.index.tolist()
         sales_chart_data['values'] = counts.values.tolist()
 
-    sessions_query = "SELECT DISTINCT session_id FROM chat_messages ORDER BY id DESC"
-    sessions = [r[0] for r in c.execute(sessions_query).fetchall()]
-    
-    active_session = request.args.get('session_id')
-    if not active_session and sessions:
-        active_session = sessions[0]
+    reviews_list = []
+    for r in raw_reviews:
+        reviews_list.append({
+            'id': r['id'],
+            'nome': decrypt(r['nome']),
+            'email': decrypt(r['email']),
+            'empresa': decrypt(r['empresa']),
+            'avaliacao': decrypt(r['avaliacao']),
+            'estrelas': r['estrelas'],
+            'data': r['data']
+        })
+
+    raw_sessions = c.execute("SELECT * FROM chat_sessions ORDER BY id DESC").fetchall()
+    sessions_formatted = []
+    for s in raw_sessions:
+        sessions_formatted.append({
+            'uuid': s['session_uuid'],
+            'ticket': f"#{s['id']:06d}",
+            'created_at': s['created_at']
+        })
+
+    active_session_uuid = request.args.get('session_id')
+    active_ticket_display = ""
+
+    if not active_session_uuid and sessions_formatted:
+        active_session_uuid = sessions_formatted[0]['uuid']
+        active_ticket_display = sessions_formatted[0]['ticket']
+    elif active_session_uuid:
+        for s in sessions_formatted:
+            if s['uuid'] == active_session_uuid:
+                active_ticket_display = s['ticket']
+                break
     
     chat_history = []
-    if active_session:
-        msgs = c.execute("SELECT * FROM chat_messages WHERE session_id = ? ORDER BY id ASC", (active_session,)).fetchall()
+    if active_session_uuid:
+        msgs = c.execute("SELECT * FROM chat_messages WHERE session_id = ? ORDER BY id ASC", (active_session_uuid,)).fetchall()
         for m in msgs:
             content = decrypt(m['conteudo']) if m['tipo'] == 'texto' else m['conteudo']
             chat_history.append({'tipo': m['tipo'], 'conteudo': content, 'remetente': m['remetente'], 'data': m['data']})
@@ -194,10 +240,12 @@ def admin():
     return render_template('admin.html', 
                            leads=leads, 
                            orders=raw_orders, 
+                           reviews=reviews_list,
                            leads_chart=json.dumps(leads_chart_data),
                            sales_chart=json.dumps(sales_chart_data),
-                           sessions=sessions, 
-                           active_session=active_session, 
+                           sessions=sessions_formatted, 
+                           active_session=active_session_uuid, 
+                           active_ticket=active_ticket_display,
                            chat_history=chat_history)
 
 @app.route('/logout')

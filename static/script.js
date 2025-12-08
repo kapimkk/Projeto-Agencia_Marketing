@@ -34,12 +34,39 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-    let sessionId = localStorage.getItem('chatSession');
-    if (!sessionId) {
-        sessionId = 'cliente_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('chatSession', sessionId);
-        localStorage.setItem('chatStep', '0'); 
+    async function initChatSession() {
+        let sessionId = localStorage.getItem('chatSession');
+        let ticketNum = localStorage.getItem('chatTicket');
+
+        if (!sessionId) {
+            try {
+                const response = await fetch('/init_session', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    sessionId = data.session_id;
+                    ticketNum = data.ticket;
+                    
+                    localStorage.setItem('chatSession', sessionId);
+                    localStorage.setItem('chatTicket', ticketNum);
+                    localStorage.setItem('chatStep', '0');
+                }
+            } catch (error) {
+                console.error("Erro ao conectar com servidor:", error);
+                sessionId = 'temp_' + Date.now();
+            }
+        }
+        
+        const chatHeaderTitle = document.querySelector('.chat-header p');
+        if(chatHeaderTitle && ticketNum) {
+            chatHeaderTitle.innerText = `Atendimento ${ticketNum}`;
+        }
+
+        return sessionId;
     }
+
+    let globalSessionId = localStorage.getItem('chatSession');
+    initChatSession().then(id => { globalSessionId = id; });
 
     const chatBox = document.getElementById('chat-box');
     const chatInput = document.getElementById('chat-input');
@@ -78,8 +105,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function saveToBackend(text, type='texto', file=null, remetente='user') {
+        if(!globalSessionId) globalSessionId = await initChatSession();
+
         const formData = new FormData();
-        formData.append('session_id', sessionId);
+        formData.append('session_id', globalSessionId);
         formData.append('remetente', remetente);
         
         if (type === 'texto') formData.append('message', text);
@@ -97,7 +126,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (chatBody.children.length === 0) {
             if (step === 0) {
                 botTyping(() => {
-                    const msg = "Olá! Bem-vindo. Qual seu nome e telefone?";
+                    const ticket = localStorage.getItem('chatTicket') || '';
+                    const msg = `Olá! Bem-vindo ao Suporte ${ticket}. Qual seu nome e telefone?`;
                     appendMessage(msg, 'received');
                     saveToBackend(msg, 'texto', null, 'bot');
                 });

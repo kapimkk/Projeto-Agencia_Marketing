@@ -5,15 +5,13 @@
     <title>Admin Dashboard Pro</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Chart.js para Gráficos Interativos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <meta http-equiv="refresh" content="60"> <!-- Refresh a cada 60s para atualizar dados -->
+    <meta http-equiv="refresh" content="60"> 
 </head>
 <body class="admin-body">
     
     <div class="admin-layout">
         
-        <!-- SIDEBAR -->
         <div class="sidebar">
             <h2 style="margin-bottom: 40px; color: var(--text-dark);">ELO<span style="color: var(--accent);">ADMIN</span></h2>
             
@@ -21,6 +19,7 @@
             <button class="nav-btn" onclick="openTab(event, 'chat')"><i class="fas fa-comments"></i> Chat Suporte</button>
             <button class="nav-btn" onclick="openTab(event, 'leads')"><i class="fas fa-users"></i> Leads</button>
             <button class="nav-btn" onclick="openTab(event, 'financeiro')"><i class="fas fa-wallet"></i> Financeiro</button>
+            <button class="nav-btn" onclick="openTab(event, 'reviews')"><i class="fas fa-star"></i> Avaliações</button>
             
             <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--glass-border);">
                 <button id="theme-toggle" class="theme-btn" title="Tema" style="margin-bottom: 10px;"><i class="fas fa-moon"></i></button>
@@ -45,11 +44,14 @@
                     </div>
                     <div class="admin-card">
                         <div class="icon-box" style="background: #fce7f3; color: #db2777;"><i class="fas fa-comment-dots"></i></div>
-                        <div><h3>{{ sessions|length }}</h3><p>Conversas</p></div>
+                        <div><h3>{{ sessions|length }}</h3><p>Atendimentos</p></div>
+                    </div>
+                    <div class="admin-card">
+                        <div class="icon-box" style="background: #fffac8; color: #f59f00;"><i class="fas fa-star"></i></div>
+                        <div><h3>{{ reviews|length }}</h3><p>Avaliações</p></div>
                     </div>
                 </div>
 
-                <!-- GRÁFICOS PANDAS/CHARTJS -->
                 <div class="charts-container">
                     <div class="glass-card" style="flex: 2;">
                         <h3 style="color: var(--text-dark); margin-bottom: 15px;">Evolução de Leads (Últimos Dias)</h3>
@@ -67,21 +69,30 @@
                 <div class="messenger">
                     <div class="chat-list">
                         {% for sess in sessions %}
-                        <div class="chat-item {% if sess == active_session %}active{% endif %}" onclick="window.location.href='?session_id={{ sess }}'">
-                            <div style="font-weight: bold;">Cliente #{{ loop.index }}</div>
-                            <div style="font-size: 0.8rem; color: var(--text-grey); margin-top: 5px;">ID: {{ sess[:8] }}...</div>
+                        <div class="chat-item {% if sess.uuid == active_session %}active{% endif %}" onclick="window.location.href='?session_id={{ sess.uuid }}'">
+                            <div style="font-weight: bold; font-size: 1rem; color: var(--accent);">{{ sess.ticket }}</div>
+                            <div style="font-size: 0.7rem; color: var(--text-grey); margin-top: 5px;">
+                                <i class="far fa-clock"></i> {{ sess.created_at }}
+                            </div>
                         </div>
                         {% endfor %}
-                        {% if not sessions %}<div style="padding: 20px; color: var(--text-grey);">Nenhum chat ativo.</div>{% endif %}
+                        {% if not sessions %}<div style="padding: 20px; color: var(--text-grey);">Nenhum atendimento iniciado.</div>{% endif %}
                     </div>
                     
                     <div class="chat-view">
+                        {% if active_session %}
+                        <div style="padding: 15px; border-bottom: 1px solid var(--glass-border); background: var(--admin-card-bg);">
+                             <h3 style="margin:0; font-size:1.1rem;">Ticket Aberto: <span style="color:var(--accent);">{{ active_ticket }}</span></h3>
+                        </div>
+                        {% endif %}
+
                         <div class="chat-body" style="background: var(--admin-card-bg);">
                             {% if active_session %}
                                 {% for msg in chat_history %}
                                     <div class="message {% if msg.remetente in ['admin', 'bot'] %}sent{% else %}received{% endif %}"
                                          style="{% if msg.remetente == 'bot' %}background: #a78bfa; color: white;{% endif %}">
                                         {% if msg.remetente == 'bot' %}<small style="display:block;font-size:0.7em;">🤖 Bot</small>{% endif %}
+                                        {% if msg.remetente == 'admin' %}<small style="display:block;font-size:0.7em;">👤 Admin</small>{% endif %}
                                         
                                         {% if msg.tipo == 'arquivo' %}
                                             <a href="/static/uploads/{{ msg.conteudo }}" target="_blank" style="color: inherit; text-decoration: underline;"><i class="fas fa-file"></i> Ver Arquivo</a>
@@ -95,7 +106,7 @@
                                 {% endfor %}
                             {% else %}
                                 <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-grey);">
-                                    Selecione uma conversa para iniciar o atendimento.
+                                    Selecione um Ticket ao lado para iniciar.
                                 </div>
                             {% endif %}
                         </div>
@@ -111,6 +122,7 @@
                     </div>
                 </div>
             </div>
+
             <div id="leads" class="tab-content">
                 <h2 style="margin-bottom: 20px; color: var(--text-dark);">Base de Leads</h2>
                 <div class="glass-card" style="padding: 0; overflow: hidden;">
@@ -169,12 +181,41 @@
                 </div>
             </div>
 
+            <div id="reviews" class="tab-content">
+                <h2 style="margin-bottom: 20px; color: var(--text-dark);">Avaliações de Clientes</h2>
+                <div class="glass-card" style="padding: 0; overflow: hidden;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Empresa</th>
+                                <th>Estrelas</th>
+                                <th>Comentário</th>
+                                <th>Data</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rev in reviews %}
+                            <tr>
+                                <td>{{ rev.nome }}</td>
+                                <td>{{ rev.empresa }}</td>
+                                <td style="color: #f59f00;">
+                                    {% for i in range(rev.estrelas) %}<i class="fas fa-star"></i>{% endfor %}
+                                </td>
+                                <td>{{ rev.avaliacao }}</td>
+                                <td>{{ rev.data }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script>
-
         function openTab(evt, tabName) {
             var i, tabcontent, navbtns;
             tabcontent = document.getElementsByClassName("tab-content");
@@ -189,7 +230,6 @@
             document.getElementById(tabName).style.display = "block";
             setTimeout(() => document.getElementById(tabName).classList.add('active'), 10);
             evt.currentTarget.className += " active";
-            
             localStorage.setItem('activeTab', tabName);
         }
 
