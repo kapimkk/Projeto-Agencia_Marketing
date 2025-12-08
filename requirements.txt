@@ -1,5 +1,11 @@
-flask
-cryptography
-flask-talisman
-python-dotenv
-pandas
+Flask
+Flask-SQLAlchemy
+Flask-Login
+Flask-Migrate
+Flask-Mail
+Flask-WTF
+Flask-Limiter
+Flask-Talisman
+Werkzeug
+Bleach
+email-validator

@@ -1,274 +1,265 @@
+/* --- TOAST NOTIFICATION --- */
+function showToast(message, iconClass = 'fa-check-circle') {
+    let toast = document.getElementById("toast");
+    if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "toast";
+        document.body.appendChild(toast);
+    }
+    toast.innerHTML = `<i class="fas ${iconClass}"></i> ${message}`;
+    toast.className = "show";
+    setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    
-    const themeBtn = document.getElementById('theme-toggle');
-    const body = document.body;
-    const savedTheme = localStorage.getItem('theme');
 
-    if (savedTheme === 'dark') {
-        body.classList.add('dark-mode');
-        if (themeBtn) themeBtn.querySelector('i').classList.replace('fa-moon', 'fa-sun');
-    }
-
-    if (themeBtn) {
-        themeBtn.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            const icon = themeBtn.querySelector('i');
-            if (body.classList.contains('dark-mode')) {
-                icon.classList.replace('fa-moon', 'fa-sun');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                icon.classList.replace('fa-sun', 'fa-moon');
-                localStorage.setItem('theme', 'light');
-            }
-        });
-    }
-
-    document.addEventListener('contextmenu', e => e.preventDefault()); 
-    document.onkeydown = function(e) { if(e.keyCode == 123) return false; } 
-
+    // --- 1. UI E ANIMAÇÕES ---
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) entry.target.classList.add('active');
-            else entry.target.classList.remove('active');
         });
     });
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-    async function initChatSession() {
-        let sessionId = localStorage.getItem('chatSession');
-        let ticketNum = localStorage.getItem('chatTicket');
-
-        if (!sessionId) {
-            try {
-                const response = await fetch('/init_session', { method: 'POST' });
-                const data = await response.json();
-                
-                if (data.status === 'success') {
-                    sessionId = data.session_id;
-                    ticketNum = data.ticket;
-                    
-                    localStorage.setItem('chatSession', sessionId);
-                    localStorage.setItem('chatTicket', ticketNum);
-                    localStorage.setItem('chatStep', '0');
-                }
-            } catch (error) {
-                console.error("Erro ao conectar com servidor:", error);
-                sessionId = 'temp_' + Date.now();
-            }
-        }
+    // --- 2. TEMA DARK/LIGHT ---
+    const themeBtn = document.getElementById('theme-toggle');
+    function aplicarTema(isDark) {
+        if (isDark) document.body.classList.add('dark-mode');
+        else document.body.classList.remove('dark-mode');
         
-        const chatHeaderTitle = document.querySelector('.chat-header p');
-        if(chatHeaderTitle && ticketNum) {
-            chatHeaderTitle.innerText = `Atendimento ${ticketNum}`;
-        }
-
-        return sessionId;
-    }
-
-    let globalSessionId = localStorage.getItem('chatSession');
-    initChatSession().then(id => { globalSessionId = id; });
-
-    const chatBox = document.getElementById('chat-box');
-    const chatInput = document.getElementById('chat-input');
-    const chatBody = document.getElementById('chat-body');
-    const fileInput = document.getElementById('file-input');
-
-    if (document.getElementById('chat-toggle')) {
-        document.getElementById('chat-toggle').addEventListener('click', () => {
-            chatBox.style.display = chatBox.style.display === 'flex' ? 'none' : 'flex';
-            if (chatBox.style.display === 'flex') runBot();
-        });
-    }
-
-    function appendMessage(content, type, isHtml = false) {
-        if (!chatBody) return;
-        const div = document.createElement('div');
-        div.classList.add('message', type);
-        if (isHtml) div.innerHTML = content; else div.innerText = content;
-        chatBody.appendChild(div);
-        chatBody.scrollTop = chatBody.scrollHeight;
-    }
-
-    function botTyping(callback) {
-        if (!chatBody) return;
-        const typingDiv = document.createElement('div');
-        typingDiv.className = 'typing-indicator';
-        typingDiv.innerText = 'Digitando...';
-        typingDiv.style.display = 'block';
-        chatBody.appendChild(typingDiv);
-        chatBody.scrollTop = chatBody.scrollHeight;
-
-        setTimeout(() => {
-            typingDiv.remove();
-            callback();
-        }, 1000); 
-    }
-
-    async function saveToBackend(text, type='texto', file=null, remetente='user') {
-        if(!globalSessionId) globalSessionId = await initChatSession();
-
-        const formData = new FormData();
-        formData.append('session_id', globalSessionId);
-        formData.append('remetente', remetente);
-        
-        if (type === 'texto') formData.append('message', text);
-        else if (type === 'arquivo') formData.append('arquivo', file);
-        else if (type === 'audio') formData.append('audio', file, 'voice.webm');
-
-        try { await fetch('/send_chat', { method: 'POST', body: formData }); } 
-        catch(e) { console.error("Erro ao sincronizar chat:", e); }
-    }
-
-    function runBot() {
-        if (!chatBody) return;
-        let step = parseInt(localStorage.getItem('chatStep') || '0');
-        
-        if (chatBody.children.length === 0) {
-            if (step === 0) {
-                botTyping(() => {
-                    const ticket = localStorage.getItem('chatTicket') || '';
-                    const msg = `Olá! Bem-vindo ao Suporte ${ticket}. Qual seu nome e telefone?`;
-                    appendMessage(msg, 'received');
-                    saveToBackend(msg, 'texto', null, 'bot');
-                });
-            } else {
-                appendMessage("Histórico restaurado.", 'received');
-            }
+        if(themeBtn) {
+            const icon = themeBtn.querySelector('i');
+            if(icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
         }
     }
-
-    async function handleUserMessage(text) {
-        appendMessage(text, 'sent');
-        chatInput.value = '';
-        
-        await saveToBackend(text, 'texto', null, 'user');
-
-        let step = parseInt(localStorage.getItem('chatStep') || '0');
-
-        if (step === 0) {
-            botTyping(() => {
-                const msg = `Obrigado! Selecione uma opção abaixo:`;
-                appendMessage(msg, 'received');
-                saveToBackend(msg, 'texto', null, 'bot');
-                showOptions();
-            });
-            localStorage.setItem('chatStep', '1');
-        } 
-        else if (step === 1) {
-            botTyping(() => {
-                const msg = "Entendido. Um especialista vai analisar e te chamar.";
-                appendMessage(msg, 'received');
-                saveToBackend(msg, 'texto', null, 'bot');
-            });
-            localStorage.setItem('chatStep', '2');
-        }
-    }
-
-    function showOptions() {
-        const div = document.createElement('div');
-        div.className = 'chat-options';
-        div.innerHTML = `
-            <button onclick="userClickedOption('Planos')">Planos</button>
-            <button onclick="userClickedOption('Suporte')">Suporte</button>
-            <button onclick="userClickedOption('Financeiro')">Financeiro</button>
-        `;
-        chatBody.appendChild(div);
-        chatBody.scrollTop = chatBody.scrollHeight;
-    }
-
-    window.userClickedOption = function(opt) {
-        const opts = document.querySelector('.chat-options');
-        if(opts) opts.remove();
-        
-        appendMessage(opt, 'sent');
-        saveToBackend(`[Clicou]: ${opt}`, 'texto', null, 'user');
-        
-        botTyping(() => {
-            const msg = "Perfeito! Aguarde um momento.";
-            appendMessage(msg, 'received');
-            saveToBackend(msg, 'texto', null, 'bot');
-        });
-        localStorage.setItem('chatStep', '2');
-    };
-
-
-    if (document.getElementById('btn-send')) {
-        document.getElementById('btn-send').addEventListener('click', () => {
-            const text = chatInput.value.trim();
-            if(text) handleUserMessage(text);
-        });
-        chatInput.addEventListener('keypress', (e) => {
-            if(e.key === 'Enter') {
-                const text = chatInput.value.trim();
-                if(text) handleUserMessage(text);
-            }
+    if (localStorage.getItem('theme') === 'dark') aplicarTema(true);
+    if (themeBtn) {
+        themeBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            aplicarTema(isDark);
         });
     }
 
-
-    if (document.getElementById('btn-attach')) {
-        document.getElementById('btn-attach').addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', async () => {
-            if (fileInput.files.length > 0) {
-                const file = fileInput.files[0];
-                appendMessage(`Enviando ${file.name}...`, 'sent');
-                await saveToBackend(null, 'arquivo', file, 'user');
-                appendMessage("Arquivo enviado com sucesso.", 'sent');
-            }
+    // --- 3. MÁSCARA TELEFONE ---
+    const telInputs = document.querySelectorAll('input[type="tel"]');
+    telInputs.forEach(input => {
+        input.addEventListener('input', (e) => {
+            let v = e.target.value.replace(/\D/g, '');
+            if(v.length > 11) v = v.slice(0, 11);
+            const m = v.match(/^(\d{0,2})(\d{0,5})(\d{0,4})$/);
+            if(m) e.target.value = !m[2] ? m[1] : `(${m[1]}) ${m[2]}${m[3] ? '-' + m[3] : ''}`;
         });
-    }
-    const reviewForm = document.getElementById('reviewForm');
-    if (reviewForm) {
-        reviewForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = reviewForm.querySelector('button');
-            const txt = btn.innerText;
-            btn.innerText = 'Enviando...';
+    });
 
-            const selectedStar = document.querySelector('input[name="rating"]:checked');
-            const rating = selectedStar ? selectedStar.value : 0;
-
-            const data = {
-                nome: document.getElementById('rev_nome').value,
-                email: document.getElementById('rev_email').value,
-                empresa: document.getElementById('rev_empresa').value,
-                avaliacao: document.getElementById('rev_texto').value,
-                estrelas: rating
-            };
-
-            await fetch('/submit_review', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
-            });
-
-            alert('Obrigado pela sua avaliação!');
-            reviewForm.reset();
-            btn.innerText = txt;
-        });
-    }
-
+    // --- 4. FORMULÁRIOS ---
     const leadForm = document.getElementById('leadForm');
     if(leadForm) {
         leadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = leadForm.querySelector('button');
-            const txt = btn.innerText;
-            btn.innerText = 'Enviando...';
-            const data = {
-                nome: document.getElementById('nome').value,
-                email: document.getElementById('email').value,
-                telefone: document.getElementById('telefone').value,
-                projeto: document.getElementById('projeto').value
-            };
-            await fetch('/submit_lead', {
+            const txt = btn.innerText; 
+            btn.innerText='Enviando...'; btn.disabled=true;
+            try {
+                await fetch('/submit_lead', {method:'POST', body: new FormData(leadForm)});
+                showToast('Solicitação enviada!');
+                leadForm.reset();
+            } catch(e) { showToast('Erro ao enviar', 'fa-times'); }
+            finally { btn.innerText=txt; btn.disabled=false; }
+        });
+    }
+
+    // --- 5. CHAT SYSTEM ---
+    const chatBox = document.getElementById('chat-box');
+    const chatMenu = document.getElementById('chat-menu');
+    const chatInterface = document.getElementById('chat-interface');
+    const btnContinue = document.getElementById('btn-continue');
+    const backBtn = document.getElementById('chat-back-btn');
+    const chatBody = document.getElementById('chat-body');
+    const chatInput = document.getElementById('chat-input');
+    const statusText = document.getElementById('chat-status');
+
+    // ABRIR/FECHAR GERAL
+    window.toggleChat = function() {
+        chatBox.style.display = (chatBox.style.display === 'flex') ? 'none' : 'flex';
+        // Se abrir, verifica se mostra botão continuar
+        if(chatBox.style.display === 'flex') {
+            if(localStorage.getItem('chatSession')) btnContinue.style.display = 'block';
+        }
+    }
+    if(document.getElementById('chat-toggle')) document.getElementById('chat-toggle').addEventListener('click', toggleChat);
+
+    // BOTÃO VOLTAR
+    if(backBtn) {
+        backBtn.addEventListener('click', () => {
+            chatInterface.style.display = 'none';
+            chatMenu.style.display = 'flex';
+            backBtn.style.display = 'none';
+            statusText.innerText = "Atendimento Virtual";
+        });
+    }
+
+    // INICIAR TICKET
+    window.startTicket = async function(categoria) {
+        // Reset
+        localStorage.removeItem('chatSession');
+        localStorage.removeItem('chatTicket');
+        localStorage.removeItem('chatStep');
+        chatBody.innerHTML = '';
+        
+        // UI
+        chatMenu.style.display = 'none';
+        chatInterface.style.display = 'flex';
+        backBtn.style.display = 'block'; // Mostra seta
+        statusText.innerText = `Iniciando: ${categoria}...`;
+
+        try {
+            const res = await fetch('/init_session', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
+                body: JSON.stringify({ category: categoria })
             });
-            alert('Recebemos sua proposta!');
-            leadForm.reset();
-            btn.innerText = txt;
+            const data = await res.json();
+            
+            localStorage.setItem('chatSession', data.session_id);
+            localStorage.setItem('chatTicket', data.ticket);
+            statusText.innerText = data.ticket;
+
+            // Mensagens Bot
+            appendMessage(`Opção: <b>${categoria}</b>.`, 'received', true);
+            appendMessage(`Ticket ${data.ticket} criado.`, 'received');
+            setTimeout(() => {
+                appendMessage("Informe seu **Nome e Telefone**:", 'received', true);
+            }, 800);
+            
+            localStorage.setItem('chatStep', '1'); // Esperando dados
+        } catch(e) { console.error(e); }
+    }
+
+    // CONTINUAR TICKET
+    window.continueChat = function() {
+        chatMenu.style.display = 'none';
+        chatInterface.style.display = 'flex';
+        backBtn.style.display = 'block'; // Mostra seta
+        
+        statusText.innerText = localStorage.getItem('chatTicket') || "Atendimento";
+        localStorage.setItem('chatStep', '3');
+        loadMessages();
+    }
+
+    // ENVIAR MENSAGEM
+    async function handleSend() {
+        const text = chatInput.value.trim();
+        if(!text) return;
+        
+        appendMessage(text, 'sent');
+        chatInput.value = '';
+
+        const step = localStorage.getItem('chatStep');
+        if (step === '1') {
+            // Envia para DB
+            const fd = new FormData(); fd.append('message', text);
+            await sendMessageBackend(fd);
+            
+            // Bot finaliza
+            setTimeout(() => {
+                appendMessage("Obrigado! Um atendente irá assumir.", 'received');
+                localStorage.setItem('chatStep', '3'); // Live
+            }, 800);
+        } else {
+            // Live
+            const fd = new FormData(); fd.append('message', text);
+            await sendMessageBackend(fd);
+        }
+    }
+
+    if(document.getElementById('btn-send')) {
+        document.getElementById('btn-send').addEventListener('click', handleSend);
+        chatInput.addEventListener('keypress', (e)=>{ if(e.key==='Enter') handleSend(); });
+    }
+
+    // AUXILIARES
+    async function sendMessageBackend(fd) {
+        const sess = localStorage.getItem('chatSession');
+        if(!sess) return;
+        fd.append('session_id', sess);
+        fd.append('remetente', 'user');
+        await fetch('/send_chat', {method:'POST', body:fd});
+    }
+
+    function appendMessage(content, type, isHtml=false) {
+        const div = document.createElement('div');
+        div.className = `message ${type}`;
+        if(isHtml) div.innerHTML = content; else div.innerText = content;
+        chatBody.appendChild(div);
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    // POLLING (EVITA SUMIR MENSAGEM DO BOT)
+    async function loadMessages() {
+        const sess = localStorage.getItem('chatSession');
+        const step = localStorage.getItem('chatStep');
+        
+        // Se estiver no menu (interface hidden) ou ainda no robô (step 1), NÃO atualiza
+        if(!sess || chatInterface.style.display === 'none' || step === '1') return;
+
+        try {
+            const res = await fetch(`/get_messages/${sess}`);
+            const msgs = await res.json();
+            
+            chatBody.innerHTML = ''; 
+            msgs.forEach(m => {
+                let c = m.conteudo;
+                if(m.tipo === 'audio') c = `<audio controls src="/static/uploads/${c}"></audio>`;
+                if(m.tipo === 'arquivo') c = `<a href="/static/uploads/${c}" target="_blank">Ver Anexo</a>`;
+                
+                const type = m.remetente === 'user' ? 'sent' : 'received';
+                appendMessage(c, type, true);
+            });
+        } catch(e) {}
+    }
+    setInterval(loadMessages, 3000);
+
+    // AUDIO E ANEXOS
+    const btnMic = document.getElementById('btn-mic');
+    if(btnMic) {
+        let mediaRecorder; let audioChunks=[];
+        btnMic.addEventListener('mousedown', async()=>{
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks=[];
+                mediaRecorder.ondataavailable=e=>audioChunks.push(e.data);
+                mediaRecorder.start();
+                btnMic.style.color='red';
+            } catch(e) { showToast('Erro mic', 'fa-times'); }
+        });
+        btnMic.addEventListener('mouseup', ()=>{
+            if(mediaRecorder && mediaRecorder.state!=='inactive'){
+                mediaRecorder.stop(); btnMic.style.color='';
+                mediaRecorder.onstop = async()=>{
+                    const blob = new Blob(audioChunks,{type:'audio/webm'});
+                    const url = URL.createObjectURL(blob);
+                    appendMessage(`<audio controls src="${url}"></audio>`, 'sent', true);
+                    const fd = new FormData(); fd.append('audio', blob, 'voice.webm');
+                    await sendMessageBackend(fd);
+                };
+            }
+        });
+    }
+
+    const fileInput = document.getElementById('file-input');
+    const btnAttach = document.getElementById('btn-attach');
+    if(btnAttach && fileInput) {
+        btnAttach.addEventListener('click', ()=>fileInput.click());
+        fileInput.addEventListener('change', async()=>{
+            if(fileInput.files.length>0) {
+                const file = fileInput.files[0];
+                appendMessage(`Enviando: ${file.name}`, 'sent');
+                const fd = new FormData(); fd.append('arquivo', file);
+                await sendMessageBackend(fd);
+            }
         });
     }
 });

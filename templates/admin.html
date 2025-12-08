@@ -6,144 +6,145 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <meta http-equiv="refresh" content="60"> 
 </head>
 <body class="admin-body">
     
     <div class="admin-layout">
-        
         <div class="sidebar">
-            <h2 style="margin-bottom: 40px; color: var(--text-dark);">ELO<span style="color: var(--accent);">ADMIN</span></h2>
-            
+            <h2 style="margin-bottom: 40px;">PAINEL<span style="color: var(--accent);">ADMIN</span></h2>
             <button class="nav-btn active" onclick="openTab(event, 'dashboard')"><i class="fas fa-chart-line"></i> Dashboard</button>
-            <button class="nav-btn" onclick="openTab(event, 'chat')"><i class="fas fa-comments"></i> Chat Suporte</button>
+            <button class="nav-btn" onclick="openTab(event, 'chat')"><i class="fas fa-comments"></i> Chat Ao Vivo</button>
             <button class="nav-btn" onclick="openTab(event, 'leads')"><i class="fas fa-users"></i> Leads</button>
             <button class="nav-btn" onclick="openTab(event, 'financeiro')"><i class="fas fa-wallet"></i> Financeiro</button>
             <button class="nav-btn" onclick="openTab(event, 'reviews')"><i class="fas fa-star"></i> Avaliações</button>
             
-            <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--glass-border);">
-                <button id="theme-toggle" class="theme-btn" title="Tema" style="margin-bottom: 10px;"><i class="fas fa-moon"></i></button>
-                <a href="/" target="_blank" class="view-site"><i class="fas fa-external-link-alt"></i> Ver Site</a>
+            <div style="margin-top: auto;">
+                <button id="theme-toggle" class="theme-btn" style="width:100%; margin-bottom:10px;"><i class="fas fa-moon"></i> Tema</button>
                 <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Sair</a>
             </div>
         </div>
 
         <div class="main-content">
             
+            <div class="filters" style="background: var(--admin-card-bg); padding: 15px; border-radius: 10px; display: flex; gap: 10px; margin-bottom: 25px; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                <form method="GET" style="display: flex; gap: 10px; flex: 1;">
+                    <input type="text" name="q" placeholder="Buscar..." style="margin:0; padding:10px; border:1px solid #ddd; border-radius:5px;">
+                    <select name="date" onchange="this.form.submit()" style="margin:0; width: auto; border:1px solid #ddd; border-radius:5px;">
+                        <option value="">Todo Período</option>
+                        <option value="today">Hoje</option>
+                        <option value="week">Semana</option>
+                        <option value="month">Mês</option>
+                    </select>
+                </form>
+                <a href="#" id="exportBtn" class="btn-main" style="text-decoration:none; font-size: 0.9rem; padding: 10px 20px;">
+                    <i class="fas fa-download"></i> Exportar
+                </a>
+            </div>
+
             <div id="dashboard" class="tab-content active">
-                <h2 style="margin-bottom: 20px; color: var(--text-dark);">Visão Geral de Performance</h2>
-                
                 <div class="stat-grid">
                     <div class="admin-card">
-                        <div class="icon-box" style="background: #e0e7ff; color: #667eea;"><i class="fas fa-user-plus"></i></div>
-                        <div><h3>{{ leads|length }}</h3><p>Total Leads</p></div>
+                        <div class="icon-box" style="background:#e0e7ff; color:#667eea;"><i class="fas fa-eye"></i></div>
+                        <div><h3>{{ total_visits }}</h3><p>Visitas</p></div>
                     </div>
                     <div class="admin-card">
-                        <div class="icon-box" style="background: #dcfce7; color: #16a34a;"><i class="fas fa-dollar-sign"></i></div>
-                        <div><h3>{{ orders|length }}</h3><p>Vendas</p></div>
+                        <div class="icon-box" style="background:#dcfce7; color:#16a34a;"><i class="fas fa-user-plus"></i></div>
+                        <div><h3>{{ leads|length }}</h3><p>Leads</p></div>
                     </div>
                     <div class="admin-card">
-                        <div class="icon-box" style="background: #fce7f3; color: #db2777;"><i class="fas fa-comment-dots"></i></div>
-                        <div><h3>{{ sessions|length }}</h3><p>Atendimentos</p></div>
-                    </div>
-                    <div class="admin-card">
-                        <div class="icon-box" style="background: #fffac8; color: #f59f00;"><i class="fas fa-star"></i></div>
+                        <div class="icon-box" style="background:#fffac8; color:#f59f00;"><i class="fas fa-star"></i></div>
                         <div><h3>{{ reviews|length }}</h3><p>Avaliações</p></div>
+                    </div>
+                    <div class="admin-card">
+                        <div class="icon-box" style="background:#fce7f3; color:#db2777;"><i class="fas fa-shopping-cart"></i></div>
+                        <div><h3>{{ orders|length }}</h3><p>Vendas</p></div>
                     </div>
                 </div>
 
                 <div class="charts-container">
-                    <div class="glass-card" style="flex: 2;">
-                        <h3 style="color: var(--text-dark); margin-bottom: 15px;">Evolução de Leads (Últimos Dias)</h3>
+                    <div class="glass-card" style="flex: 2; height: 400px; position: relative;">
+                        <h3 style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">Leads (Timeline)</h3>
                         <canvas id="leadsChart"></canvas>
                     </div>
-                    <div class="glass-card" style="flex: 1;">
-                        <h3 style="color: var(--text-dark); margin-bottom: 15px;">Vendas por Plano</h3>
+                    <div class="glass-card" style="flex: 1; height: 400px; position: relative;">
+                        <h3 style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">Vendas</h3>
                         <canvas id="salesChart"></canvas>
                     </div>
                 </div>
             </div>
 
             <div id="chat" class="tab-content">
-                <h2 style="margin-bottom: 20px; color: var(--text-dark);">Atendimento em Tempo Real</h2>
                 <div class="messenger">
                     <div class="chat-list">
                         {% for sess in sessions %}
-                        <div class="chat-item {% if sess.uuid == active_session %}active{% endif %}" onclick="window.location.href='?session_id={{ sess.uuid }}'">
-                            <div style="font-weight: bold; font-size: 1rem; color: var(--accent);">{{ sess.ticket }}</div>
-                            <div style="font-size: 0.7rem; color: var(--text-grey); margin-top: 5px;">
-                                <i class="far fa-clock"></i> {{ sess.created_at }}
+                        <div class="chat-item {% if sess.uuid == active_session %}active{% endif %}" style="position: relative;">
+                            <div onclick="window.location.href='?session_id={{ sess.uuid }}&tab=chat'" style="cursor: pointer;">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <b style="color:var(--accent);">{{ sess.full_title }}</b> 
+                                    <span style="font-size:0.7em; color:#999;">{{ sess.created_at.strftime('%H:%M') }}</span>
+                                </div>
+                                <small style="color:var(--text-grey);">Clique para abrir</small>
                             </div>
+                            
+                            <button onclick="deleteTicket(event, '{{ sess.uuid }}')" title="Excluir Ticket" 
+                                    style="position: absolute; right: 10px; bottom: 8px; background: none; border: none; color: #ff4444; cursor: pointer; padding: 5px;">
+                                <i class="fas fa-trash"></i>
+                            </button>
                         </div>
                         {% endfor %}
-                        {% if not sessions %}<div style="padding: 20px; color: var(--text-grey);">Nenhum atendimento iniciado.</div>{% endif %}
+                        
+                        {% if not sessions %}
+                        <div style="padding:20px; text-align:center; color:#999;">Nenhum chamado aberto.</div>
+                        {% endif %}
                     </div>
-                    
+
                     <div class="chat-view">
                         {% if active_session %}
-                        <div style="padding: 15px; border-bottom: 1px solid var(--glass-border); background: var(--admin-card-bg);">
-                             <h3 style="margin:0; font-size:1.1rem;">Ticket Aberto: <span style="color:var(--accent);">{{ active_ticket }}</span></h3>
+                        <div class="chat-header-admin">
+                            Atendimento <span>{{ active_ticket }}</span>
                         </div>
-                        {% endif %}
-
-                        <div class="chat-body" style="background: var(--admin-card-bg);">
-                            {% if active_session %}
-                                {% for msg in chat_history %}
-                                    <div class="message {% if msg.remetente in ['admin', 'bot'] %}sent{% else %}received{% endif %}"
-                                         style="{% if msg.remetente == 'bot' %}background: #a78bfa; color: white;{% endif %}">
-                                        {% if msg.remetente == 'bot' %}<small style="display:block;font-size:0.7em;">🤖 Bot</small>{% endif %}
-                                        {% if msg.remetente == 'admin' %}<small style="display:block;font-size:0.7em;">👤 Admin</small>{% endif %}
-                                        
-                                        {% if msg.tipo == 'arquivo' %}
-                                            <a href="/static/uploads/{{ msg.conteudo }}" target="_blank" style="color: inherit; text-decoration: underline;"><i class="fas fa-file"></i> Ver Arquivo</a>
-                                        {% elif msg.tipo == 'audio' %}
-                                            <audio controls src="/static/uploads/{{ msg.conteudo }}"></audio>
-                                        {% else %}
-                                            {{ msg.conteudo }}
-                                        {% endif %}
-                                        <div style="font-size: 0.6em; opacity: 0.6; text-align: right; margin-top: 5px;">{{ msg.data }}</div>
-                                    </div>
-                                {% endfor %}
-                            {% else %}
-                                <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-grey);">
-                                    Selecione um Ticket ao lado para iniciar.
+                        <div class="chat-body" id="admin-chat-body">
+                            {% for msg in chat_history %}
+                                <div class="message {% if msg.remetente == 'admin' %}sent{% else %}received{% endif %}">
+                                    {% if msg.remetente == 'admin' %}<small>Você</small><br>{% endif %}
+                                    {% if msg.tipo == 'audio' %}
+                                        <audio controls src="/static/uploads/{{ msg.conteudo }}"></audio>
+                                    {% elif msg.tipo == 'arquivo' %}
+                                        <a href="/static/uploads/{{ msg.conteudo }}" target="_blank" style="color:inherit;"><i class="fas fa-paperclip"></i> Ver Anexo</a>
+                                    {% else %}
+                                        {{ msg.conteudo }}
+                                    {% endif %}
                                 </div>
-                            {% endif %}
+                            {% endfor %}
                         </div>
-                        
-                        {% if active_session %}
                         <form id="replyForm" class="reply-area">
                             <input type="hidden" name="session_id" value="{{ active_session }}">
                             <input type="hidden" name="remetente" value="admin">
                             <input type="text" name="message" placeholder="Digite sua resposta..." required>
-                            <button type="submit" class="btn-main"><i class="fas fa-paper-plane"></i></button>
+                            <button class="btn-main"><i class="fas fa-paper-plane"></i></button>
                         </form>
+                        {% else %}
+                        <div style="display:flex; align-items:center; justify-content:center; height:100%; color:#aaa; flex-direction: column;">
+                            <i class="fas fa-comments" style="font-size: 3rem; margin-bottom: 10px;"></i>
+                            <p>Selecione um atendimento na lista lateral.</p>
+                        </div>
                         {% endif %}
                     </div>
                 </div>
             </div>
 
             <div id="leads" class="tab-content">
-                <h2 style="margin-bottom: 20px; color: var(--text-dark);">Base de Leads</h2>
-                <div class="glass-card" style="padding: 0; overflow: hidden;">
+                <div class="glass-card" style="padding:0; overflow-x:auto;">
                     <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th>Email</th>
-                                <th>Telefone</th>
-                                <th>Projeto</th>
-                                <th>Data</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th>Data</th><th>Nome</th><th>Email</th><th>Telefone</th><th>Projeto / Anexo</th></tr></thead>
                         <tbody>
                             {% for lead in leads %}
                             <tr>
+                                <td>{{ lead.data.strftime('%d/%m') }}</td>
                                 <td>{{ lead.nome }}</td>
                                 <td>{{ lead.email }}</td>
                                 <td>{{ lead.telefone }}</td>
-                                <td>{{ lead.projeto }}</td>
-                                <td>{{ lead.data }}</td>
+                                <td style="font-size:0.9em;">{{ lead.projeto }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -152,28 +153,16 @@
             </div>
 
             <div id="financeiro" class="tab-content">
-                <h2 style="margin-bottom: 20px; color: var(--text-dark);">Pedidos Recentes</h2>
-                <div class="glass-card" style="padding: 0; overflow: hidden;">
+                <div class="glass-card" style="padding:0; overflow-x:auto;">
                     <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Plano</th>
-                                <th>Valor</th>
-                                <th>Método</th>
-                                <th>Parcelas</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th>ID</th><th>Plano</th><th>Valor</th><th>Status</th></tr></thead>
                         <tbody>
                             {% for order in orders %}
                             <tr>
-                                <td>#{{ order.id }}</td>
-                                <td><span class="badge badge-blue">{{ order.plano }}</span></td>
+                                <td>#{{ order.id[:8] }}</td>
+                                <td><span class="badge" style="background:#e0e7ff; color:#4338ca;">{{ order.plano }}</span></td>
                                 <td>R$ {{ order.preco }}</td>
-                                <td>{{ order.metodo }}</td>
-                                <td>{{ order.parcelas }}</td>
-                                <td><span class="badge badge-yellow">{{ order.status }}</span></td>
+                                <td>{{ order.status }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -182,28 +171,16 @@
             </div>
 
             <div id="reviews" class="tab-content">
-                <h2 style="margin-bottom: 20px; color: var(--text-dark);">Avaliações de Clientes</h2>
-                <div class="glass-card" style="padding: 0; overflow: hidden;">
+                <div class="glass-card" style="padding:0; overflow-x:auto;">
                     <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th>Empresa</th>
-                                <th>Estrelas</th>
-                                <th>Comentário</th>
-                                <th>Data</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th>Nome</th><th>Empresa</th><th>Nota</th><th>Texto</th></tr></thead>
                         <tbody>
                             {% for rev in reviews %}
                             <tr>
                                 <td>{{ rev.nome }}</td>
                                 <td>{{ rev.empresa }}</td>
-                                <td style="color: #f59f00;">
-                                    {% for i in range(rev.estrelas) %}<i class="fas fa-star"></i>{% endfor %}
-                                </td>
+                                <td style="color: gold;">{% for i in range(rev.estrelas) %}<i class="fas fa-star"></i>{% endfor %}</td>
                                 <td>{{ rev.avaliacao }}</td>
-                                <td>{{ rev.data }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -214,75 +191,106 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script>
+        // --- 1. Lógica de Abas e Botão Exportar ---
         function openTab(evt, tabName) {
-            var i, tabcontent, navbtns;
-            tabcontent = document.getElementsByClassName("tab-content");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-                tabcontent[i].classList.remove('active');
-            }
-            navbtns = document.getElementsByClassName("nav-btn");
-            for (i = 0; i < navbtns.length; i++) {
-                navbtns[i].className = navbtns[i].className.replace(" active", "");
-            }
+            // Esconde todas
+            var tabcontent = document.getElementsByClassName("tab-content");
+            for (var i = 0; i < tabcontent.length; i++) tabcontent[i].style.display = "none";
+            
+            // Remove active dos botões
+            var navbtns = document.getElementsByClassName("nav-btn");
+            for (var i = 0; i < navbtns.length; i++) navbtns[i].classList.remove("active");
+            
+            // Mostra a certa
             document.getElementById(tabName).style.display = "block";
-            setTimeout(() => document.getElementById(tabName).classList.add('active'), 10);
-            evt.currentTarget.className += " active";
+            if(evt) evt.currentTarget.classList.add("active");
+            
             localStorage.setItem('activeTab', tabName);
+            updateExportBtn(tabName);
         }
 
+        // Muda link de exportação dinamicamente
+        function updateExportBtn(tab) {
+            const btn = document.getElementById('exportBtn');
+            let type = 'leads';
+            if(tab === 'financeiro') type = 'financeiro';
+            if(tab === 'reviews') type = 'reviews';
+            
+            btn.href = `/admin/export/${type}`;
+            btn.innerHTML = `<i class="fas fa-download"></i> Exportar ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+        }
+
+        // --- 2. Excluir Ticket ---
+        async function deleteTicket(event, uuid) {
+            event.stopPropagation(); // IMPORTANTE: Não abre o chat ao clicar
+            if(!confirm("Tem certeza que deseja apagar este histórico permanentemente?")) return;
+            
+            try {
+                const res = await fetch(`/delete_ticket/${uuid}`, { method: 'DELETE' });
+                const data = await res.json();
+                if(data.status === 'success') location.reload();
+                else alert("Erro ao excluir");
+            } catch(e) { alert("Erro de conexão"); }
+        }
+
+        // --- 3. Inicialização ---
         document.addEventListener('DOMContentLoaded', () => {
-            const activeTab = localStorage.getItem('activeTab') || 'dashboard';
-            const btn = document.querySelector(`button[onclick*='${activeTab}']`);
-            if(btn) btn.click();
-        });
+            const activeTab = new URLSearchParams(window.location.search).get('tab') || localStorage.getItem('activeTab') || 'dashboard';
+            
+            // Simula clique na aba correta
+            const btn = document.querySelector(`button[onclick*="'${activeTab}'"]`);
+            if(btn) openTab({currentTarget: btn}, activeTab);
+            else openTab(null, 'dashboard');
 
-        const replyForm = document.getElementById('replyForm');
-        if(replyForm) {
-            replyForm.addEventListener('submit', async (e) => {
+            // Charts
+            const leadsData = JSON.parse('{{ leads_chart|safe }}');
+            const salesData = JSON.parse('{{ sales_chart|safe }}');
+
+            if(document.getElementById('leadsChart')) {
+                new Chart(document.getElementById('leadsChart'), {
+                    type: 'line',
+                    data: { labels: leadsData.labels, datasets: [{ label: 'Novos Leads', data: leadsData.values, borderColor: '#764ba2', fill: true, backgroundColor: 'rgba(118, 75, 162, 0.1)' }] },
+                    options: { maintainAspectRatio: false }
+                });
+            }
+            if(document.getElementById('salesChart')) {
+                new Chart(document.getElementById('salesChart'), {
+                    type: 'doughnut',
+                    data: { labels: salesData.labels, datasets: [{ data: salesData.values, backgroundColor: ['#c0c0c0', '#ffd700', '#e0115f'] }] },
+                    options: { maintainAspectRatio: false }
+                });
+            }
+
+            // Polling Chat Admin (Ao Vivo)
+            {% if active_session %}
+            setInterval(async () => {
+                const res = await fetch('/get_messages/{{ active_session }}');
+                const msgs = await res.json();
+                const chatBody = document.getElementById('admin-chat-body');
+                chatBody.innerHTML = ''; // Limpa e redesenha
+                msgs.forEach(m => {
+                    let c = m.conteudo;
+                    if(m.tipo === 'audio') c = `<audio controls src="/static/uploads/${c}"></audio>`;
+                    if(m.tipo === 'arquivo') c = `<a href="/static/uploads/${c}" target="_blank">Ver Anexo</a>`;
+                    
+                    const div = document.createElement('div');
+                    div.className = `message ${m.remetente === 'admin' ? 'sent' : 'received'}`;
+                    div.innerHTML = c;
+                    chatBody.appendChild(div);
+                });
+            }, 3000); // 3 segundos
+
+            // Envio Admin
+            document.getElementById('replyForm').addEventListener('submit', async(e) => {
                 e.preventDefault();
-                const formData = new FormData(replyForm);
-                await fetch('/send_chat', { method: 'POST', body: formData });
-                location.reload(); 
+                const fd = new FormData(e.target);
+                await fetch('/send_chat', {method:'POST', body:fd});
+                e.target.reset();
+                // Polling atualizará a tela em breve
             });
-        }
-
-        const leadsData = JSON.parse('{{ leads_chart|safe }}');
-        const salesData = JSON.parse('{{ sales_chart|safe }}');
-
-        if(document.getElementById('leadsChart')) {
-            new Chart(document.getElementById('leadsChart'), {
-                type: 'line',
-                data: {
-                    labels: leadsData.labels,
-                    datasets: [{
-                        label: 'Novos Leads',
-                        data: leadsData.values,
-                        borderColor: '#764ba2',
-                        backgroundColor: 'rgba(118, 75, 162, 0.2)',
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: { responsive: true, plugins: { legend: { display: false } } }
-            });
-        }
-
-        if(document.getElementById('salesChart')) {
-            new Chart(document.getElementById('salesChart'), {
-                type: 'doughnut',
-                data: {
-                    labels: salesData.labels,
-                    datasets: [{
-                        data: salesData.values,
-                        backgroundColor: ['#667eea', '#764ba2', '#a78bfa']
-                    }]
-                },
-                options: { responsive: true }
-            });
-        }
+            {% endif %}
+        });
     </script>
 </body>
 </html>

@@ -167,3 +167,175 @@ section { padding: 80px 5%; }
 
 .reply-area { padding: 15px; background: var(--admin-card-bg); display: flex; gap: 10px; border-top: 1px solid var(--glass-border); }
 .reply-area input { margin-bottom: 0; }
+
+/* Dica 27: Scroll Suave */
+html { scroll-behavior: smooth; }
+
+/* Dica 25: Variáveis Dark Mode corrigidas no :root e html.dark-mode */
+html.dark-mode body {
+    /* Suas variaveis dark aqui */
+    background-color: #0f172a; 
+    color: #f1f5f9;
+}
+
+/* Dica 43: Botão WhatsApp */
+.whatsapp-float {
+    position: fixed; bottom: 30px; left: 30px; width: 60px; height: 60px;
+    background-color: #25d366; color: white; border-radius: 50%;
+    text-align: center; font-size: 30px; box-shadow: 2px 2px 3px #999;
+    z-index: 10000; display: flex; align-items: center; justify-content: center;
+    transition: 0.3s;
+}
+.whatsapp-float:hover { transform: scale(1.1); background-color: #20ba5a; }
+
+/* Dica 24: Skeleton Loading (para o admin) */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 4px; opacity: 0.7;
+}
+@keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* Dica 30: Tabela Mobile Responsiva */
+@media (max-width: 768px) {
+    .glass-card { overflow-x: auto; } /* Permite scroll horizontal */
+    .admin-table { min-width: 600px; } 
+}
+
+input[type="file"].form-input {
+    padding: 10px; /* Ajuste de padding para ficar igual aos outros */
+    background: var(--input-bg); /* Usa a cor de fundo do tema */
+    color: var(--text-dark); 
+    cursor: pointer;
+}
+
+input[type="file"]::file-selector-button {
+    padding: 8px 12px;
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    background: var(--bg-light);
+    color: var(--text-dark);
+    cursor: pointer;
+    transition: 0.3s;
+    margin-right: 10px;
+}
+
+input[type="file"]::file-selector-button:hover {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+/* TOAST NOTIFICATION (Substitui o Alert) */
+#toast {
+    visibility: hidden;
+    min-width: 300px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    padding: 16px;
+    position: fixed;
+    z-index: 9999;
+    left: 50%;
+    bottom: 30px;
+    transform: translateX(-50%);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+#toast.show {
+    visibility: visible;
+    animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+@keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+@keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+
+.badge { padding: 5px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: bold; color: white;}
+.badge-green { background-color: #28a745; }
+.badge-yellow { background-color: #ffc107; color: #333; }
+
+#caps-warning { display: none; color: red; font-size: 0.8rem; margin-top: 5px; }
+
+/* --- CORREÇÃO DASHBOARD PROFISSIONAL --- */
+
+/* Grid do topo (Cards) */
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+/* Container dos Gráficos */
+.charts-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+}
+
+/* Força altura fixa para os gráficos não estourarem */
+.chart-box {
+    position: relative;
+    height: 350px; /* Altura fixa profissional */
+    width: 100%;
+}
+
+.glass-card h3 {
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    color: var(--text-grey);
+}
+/* Correção Dashboard */
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+.charts-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+}
+.glass-card canvas {
+    max-height: 100%;
+    width: 100%;
+}
+
+/* Toast (Notificação) */
+#toast {
+    visibility: hidden;
+    min-width: 250px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    padding: 16px;
+    position: fixed;
+    z-index: 10000;
+    left: 50%;
+    bottom: 30px;
+    transform: translateX(-50%);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+#toast.show {
+    visibility: visible;
+    animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+@keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+@keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+
+/* Correção Input File Dark Mode */
+input[type="file"].form-input {
+    background: var(--input-bg);
+    color: var(--text-dark);
+}

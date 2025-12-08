@@ -3,54 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agência de Marketing Digital</title>
+    <title>Agência Digital</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-
-    <div class="background-blobs">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-    </div>
+    <div class="background-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
 
     <nav class="glass-nav reveal">
         <div class="logo">AGÊNCIA <span style="color: var(--accent);">DIGITAL</span></div>
         <ul class="nav-links">
             <li><a href="#servicos">Serviços</a></li>
-            <li><a href="/avaliacoes">Cases & Avaliações</a></li>
             <li><a href="#planos">Planos</a></li>
-            <li><button id="theme-toggle" class="theme-btn" title="Alternar Tema"><i class="fas fa-moon"></i></button></li>
-            <li><a href="#contato" class="btn-main" style="padding: 8px 25px;">Orçamento</a></li>
+            <li><a href="/avaliacoes">Avaliações</a></li>
+            <li><button id="theme-toggle" class="theme-btn" title="Mudar Tema"><i class="fas fa-moon"></i></button></li>
+            <li><a href="#contato" class="btn-main">Orçamento</a></li>
         </ul>
     </nav>
 
     <section id="home" class="hero">
-        <div class="glass-card reveal" style="max-width: 900px;">
-            <h1>Marketing de <br> <span>Alta Performance</span></h1>
-            <p style="margin: 20px 0;">Estratégias baseadas em dados para escalar suas vendas.</p>
+        <div class="glass-card reveal">
+            <h1>Marketing de <br><span>Alta Performance</span></h1>
+            <p>Estratégias baseadas em dados para escalar suas vendas.</p>
             <br>
-            <div class="reveal delay-200">
+            <div style="display:flex; gap:10px; justify-content:center;">
                 <a href="#planos" class="btn-main">Ver Planos</a>
-                <a href="/avaliacoes" class="btn-outline">Ver Portfólio</a>
+                <a href="#contato" class="btn-outline">Falar Conosco</a>
             </div>
         </div>
     </section>
 
     <section id="servicos">
-        <div class="reveal"><h2>Nossas Especialidades</h2></div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto;">
-            <div class="glass-card reveal delay-100" style="text-align: center;">
+        <div class="reveal"><h2 style="text-align:center;">Nossas Especialidades</h2></div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; max-width: 1200px; margin: 40px auto;">
+            <div class="glass-card reveal" style="text-align: center;">
                 <i class="fas fa-bullseye" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 20px;"></i>
                 <h3>Tráfego Pago</h3>
                 <p>Anúncios que vendem no Google e Facebook.</p>
             </div>
-            <div class="glass-card reveal delay-200" style="text-align: center;">
+            <div class="glass-card reveal" style="text-align: center;">
                 <i class="fas fa-paint-brush" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 20px;"></i>
                 <h3>Design Líquido</h3>
                 <p>Identidade visual moderna e responsiva.</p>
             </div>
-            <div class="glass-card reveal delay-200" style="text-align: center;">
+            <div class="glass-card reveal" style="text-align: center;">
                 <i class="fas fa-robot" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 20px;"></i>
                 <h3>Automação</h3>
                 <p>Atendimento 24/7 com inteligência artificial.</p>
@@ -59,78 +55,91 @@
     </section>
 
     <section id="planos">
-        <h2 class="reveal">Planos de Crescimento</h2>
-        <div class="pricing-container reveal delay-100">
-            <!-- Silver -->
+        <h2 class="reveal" style="text-align:center;">Planos de Crescimento</h2>
+        <div class="pricing-container reveal" style="margin-top:40px;">
             <div class="glass-card pricing-card">
-                <div>
-                    <h3>Silver</h3>
-                    <div class="price">R$ 1.500</div>
-                    <ul>
-                        <li><i class="fas fa-check"></i> Social Media (2 posts/sem)</li>
-                        <li><i class="fas fa-check"></i> Tráfego Básico</li>
-                        <li><i class="fas fa-check"></i> Relatório Mensal</li>
-                    </ul>
-                </div>
+                <h3>Silver</h3>
+                <div class="price">R$ 1.500</div>
+                <ul><li>Social Media</li><li>Tráfego Básico</li></ul>
                 <a href="/checkout/Silver" class="btn-outline">Assinar</a>
             </div>
-
             <div class="glass-card pricing-card featured">
-                <div>
-                    <div style="background: var(--accent); color: white; display: inline-block; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; margin-bottom: 10px;">Recomendado</div>
-                    <h3>Gold</h3>
-                    <div class="price">R$ 3.200</div>
-                    <ul>
-                        <li><i class="fas fa-check"></i> Social Media (4 posts/sem)</li>
-                        <li><i class="fas fa-check"></i> Tráfego Avançado</li>
-                        <li><i class="fas fa-check"></i> Landing Page</li>
-                    </ul>
-                </div>
+                <div style="background:var(--accent); color:white; padding:5px 15px; border-radius:20px; font-size:0.8rem; margin-bottom:10px; display:inline-block;">Recomendado</div>
+                <h3>Gold</h3>
+                <div class="price">R$ 3.200</div>
+                <ul><li>Tráfego Avançado</li><li>Landing Page</li></ul>
                 <a href="/checkout/Gold" class="btn-main">Assinar</a>
             </div>
-
             <div class="glass-card pricing-card">
-                <div>
-                    <h3>Rubi</h3>
-                    <div class="price">R$ 7.000</div>
-                    <ul>
-                        <li><i class="fas fa-check"></i> Gestão Completa 360º</li>
-                        <li><i class="fas fa-check"></i> Automação IA</li>
-                        <li><i class="fas fa-check"></i> Consultoria Semanal</li>
-                    </ul>
-                </div>
+                <h3>Rubi</h3>
+                <div class="price">R$ 7.000</div>
+                <ul><li>Gestão 360º</li><li>Consultoria Semanal</li></ul>
                 <a href="/checkout/Rubi" class="btn-outline">Assinar</a>
             </div>
         </div>
     </section>
 
     <section id="contato" class="contact">
-        <div class="glass-card reveal" style="width: 100%; max-width: 600px;">
+        <div class="glass-card reveal" style="width: 100%; max-width: 600px; margin: 0 auto;">
             <h2 style="text-align: center; margin-bottom: 20px;">Pedir Orçamento</h2>
-            <form id="leadForm">
-                <input type="text" id="nome" placeholder="Nome Completo" required>
-                <input type="email" id="email" placeholder="Email Corporativo" required>
-                <input type="tel" id="telefone" placeholder="Telefone / WhatsApp" required>
-                <textarea id="projeto" placeholder="Descreva seu projeto..." rows="4"></textarea>
+            <form id="leadForm" enctype="multipart/form-data">
+                <input type="text" id="nome" name="nome" placeholder="Nome Completo" required>
+                <input type="email" id="email" name="email" placeholder="Email Corporativo" required>
+                <input type="tel" id="telefone" name="telefone" placeholder="Telefone / WhatsApp" required>
+                
+                <label style="font-size: 0.9rem; color: var(--text-grey); margin-left: 5px; display: block; margin-bottom: 5px;">Anexar Documento:</label>
+                <input type="file" id="arquivo" name="arquivo" class="form-input">
+
+                <textarea id="projeto" name="projeto" placeholder="Descreva seu projeto..." rows="4"></textarea>
                 <button type="submit" class="btn-main" style="width: 100%;">Solicitar Proposta</button>
             </form>
         </div>
     </section>
 
-    <div class="chat-widget-container reveal delay-200">
+    <div class="chat-widget-container">
         <button id="chat-toggle" class="chat-btn"><i class="fas fa-comment-dots"></i></button>
+        
         <div class="chat-box" id="chat-box">
-            <div class="chat-header">
-                <h3>Suporte Online</h3>
-                <p style="font-size: 0.8rem; opacity: 0.9;">Bot de Atendimento</p>
+            <div class="chat-header" style="display: flex; align-items: center; gap: 15px;">
+                <i class="fas fa-arrow-left" id="chat-back-btn" style="cursor: pointer; display: none; font-size: 1.2rem;" title="Voltar ao Menu"></i>
+                <div>
+                    <h3 style="margin: 0; font-size: 1.1rem;">Suporte Online</h3>
+                    <p id="chat-status" style="margin: 0; font-size: 0.8rem; opacity: 0.9;">Atendimento Virtual</p>
+                </div>
             </div>
-            <div class="chat-body" id="chat-body"></div>
-            <div class="chat-footer">
-                <input type="text" id="chat-input" placeholder="Digite...">
-                <input type="file" id="file-input" style="display: none;">
-                <i class="fas fa-paperclip" id="btn-attach" title="Anexar"></i>
-                <i class="fas fa-microphone" id="btn-mic" title="Gravar"></i>
-                <i class="fas fa-paper-plane" id="btn-send" title="Enviar"></i>
+
+            <div id="chat-menu" style="display: flex; flex-direction: column; height: 100%; padding: 20px; gap: 10px; background: var(--bg-light); color: var(--text-dark); overflow-y: auto;">
+                <p style="text-align: center; margin-bottom: 10px;">Olá! Selecione um departamento:</p>
+                
+                <button onclick="startTicket('Financeiro')" class="btn-outline" style="text-align:left; padding:12px; border-radius:10px;">
+                    <i class="fas fa-wallet" style="color:var(--accent); margin-right:10px;"></i> Financeiro
+                </button>
+                <button onclick="startTicket('Projetos')" class="btn-outline" style="text-align:left; padding:12px; border-radius:10px;">
+                    <i class="fas fa-project-diagram" style="color:var(--accent); margin-right:10px;"></i> Projetos
+                </button>
+                <button onclick="startTicket('Suporte Técnico')" class="btn-outline" style="text-align:left; padding:12px; border-radius:10px;">
+                    <i class="fas fa-tools" style="color:var(--accent); margin-right:10px;"></i> Suporte Técnico
+                </button>
+                <button onclick="startTicket('Outros')" class="btn-outline" style="text-align:left; padding:12px; border-radius:10px;">
+                    <i class="fas fa-question-circle" style="color:var(--accent); margin-right:10px;"></i> Outros Assuntos
+                </button>
+
+                <div style="border-top:1px solid #ddd; margin-top:10px; padding-top:10px; text-align:center;">
+                    <button onclick="continueChat()" id="btn-continue" style="background:none; border:none; color:var(--text-grey); cursor:pointer; font-size:0.9rem; text-decoration:underline; display:none;">
+                        Ver Meus Chamados Antigos
+                    </button>
+                </div>
+            </div>
+
+            <div id="chat-interface" style="display: none; flex-direction: column; height: 100%;">
+                <div class="chat-body" id="chat-body"></div>
+                <div class="chat-footer">
+                    <input type="text" id="chat-input" placeholder="Digite sua mensagem...">
+                    <input type="file" id="file-input" style="display: none;">
+                    <i class="fas fa-paperclip" id="btn-attach" title="Anexar"></i>
+                    <i class="fas fa-microphone" id="btn-mic" title="Gravar"></i>
+                    <i class="fas fa-paper-plane" id="btn-send" title="Enviar"></i>
+                </div>
             </div>
         </div>
     </div>

@@ -7,16 +7,31 @@
 </head>
 <body style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
     <div class="background-blobs"><div class="blob blob-1"></div></div>
+    
     <div class="glass-card" style="width: 350px; text-align: center;">
         <h2 style="margin-bottom: 20px; color: var(--text-dark);">Acesso Admin</h2>
-        {% if error %}
-            <div style="color: red; margin-bottom: 10px;">{{ error }}</div>
-        {% endif %}
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div style="color: red; margin-bottom: 15px; padding: 10px; background: rgba(255,0,0,0.1); border-radius: 8px;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
         <form method="POST">
-            <input type="password" name="password" placeholder="Chave de Segurança" required>
+            {{ form.hidden_tag() }}
+            
+            <input type="text" name="username" placeholder="Usuário (admin)" required style="margin-bottom: 10px;">
+            
+            <input type="password" name="password" placeholder="Senha" required>
+            
             <button type="submit" class="btn-main" style="width: 100%;">Entrar</button>
         </form>
     </div>
+
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
