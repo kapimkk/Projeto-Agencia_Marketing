@@ -2,36 +2,47 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Acesso Restrito</title>
+    <title>Acesso Restrito - Studio Indexa</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
-    <div class="background-blobs"><div class="blob blob-1"></div></div>
+    </head>
+<body style="display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px;">
     
-    <div class="glass-card" style="width: 350px; text-align: center;">
-        <h2 style="margin-bottom: 20px; color: var(--text-dark);">Acesso Admin</h2>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+    
+    <div class="glass-card" style="width: 100%; max-width: 400px; text-align: center; padding: 50px 30px;">
+        <h2 style="margin-bottom: 30px; color: var(--text-dark);">Acesso Admin</h2>
         
-        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% with messages = get_flashed_messages() %}
             {% if messages %}
-                {% for category, message in messages %}
-                    <div style="color: red; margin-bottom: 15px; padding: 10px; background: rgba(255,0,0,0.1); border-radius: 8px;">
-                        {{ message }}
-                    </div>
-                {% endfor %}
+                <div style="background: rgba(231, 76, 60, 0.2); color: #c0392b; padding: 10px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(231, 76, 60, 0.3);">
+                    {% for message in messages %}
+                        <div>{{ message }}</div>
+                    {% endfor %}
+                </div>
             {% endif %}
         {% endwith %}
 
         <form method="POST">
             {{ form.hidden_tag() }}
             
-            <input type="text" name="username" placeholder="Usuário (admin)" required style="margin-bottom: 10px;">
+            <div style="margin-bottom: 15px;">
+                <input type="text" name="username" placeholder="Usuário" required style="margin-bottom: 0;">
+            </div>
             
-            <input type="password" name="password" placeholder="Senha" required>
+            <div style="margin-bottom: 30px;">
+                <input type="password" name="password" placeholder="Senha" required style="margin-bottom: 0;">
+            </div>
             
-            <button type="submit" class="btn-main" style="width: 100%;">Entrar</button>
+            <button type="submit" class="btn-main" style="width: 100%; justify-content: center;">Entrar no Painel</button>
         </form>
+        
+        <p style="margin-top: 20px; font-size: 0.8rem;">
+            <a href="/" style="color: var(--text-dark); text-decoration: none;">&larr; Voltar ao site</a>
+        </p>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

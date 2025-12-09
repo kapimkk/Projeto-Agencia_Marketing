@@ -3,147 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agência Digital</title>
+    <title>Studio Indexa</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
+    <script src="https://unpkg.com/typed.js@2.0.16/dist/typed.umd.js"></script>
 </head>
 <body>
-    <div class="background-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
+    <div class="cursor"></div>
+    <div class="cursor2"></div>
+    <div id="particles-js" style="position: fixed; width: 100%; height: 100%; z-index: -1; top: 0; left: 0;"></div>
 
     <nav class="glass-nav reveal">
-        <div class="logo">AGÊNCIA <span style="color: var(--accent);">DIGITAL</span></div>
+        <div class="logo">STUDIO INDEXA</div>
         <ul class="nav-links">
-            <li><a href="#servicos">Serviços</a></li>
-            <li><a href="#planos">Planos</a></li>
+            <li><a href="/#servicos">Serviços</a></li>
+            <li><a href="/#planos">Planos</a></li>
             <li><a href="/avaliacoes">Avaliações</a></li>
-            <li><button id="theme-toggle" class="theme-btn" title="Mudar Tema"><i class="fas fa-moon"></i></button></li>
-            <li><a href="#contato" class="btn-main">Orçamento</a></li>
+            <li><a href="/#contato" class="btn-main">Orçamento <i class="fas fa-arrow-right"></i></a></li>
         </ul>
     </nav>
 
     <section id="home" class="hero">
-        <div class="glass-card reveal">
-            <h1>Marketing de <br><span>Alta Performance</span></h1>
-            <p>Estratégias baseadas em dados para escalar suas vendas.</p>
-            <br>
-            <div style="display:flex; gap:10px; justify-content:center;">
-                <a href="#planos" class="btn-main">Ver Planos</a>
-                <a href="#contato" class="btn-outline">Falar Conosco</a>
+        <div class="glass-card reveal" data-tilt data-tilt-max="5" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2" style="display: inline-block; max-width: 800px;">
+            <h1 style="font-size: 3.5rem; line-height: 1.2; margin-bottom: 20px;">
+                Transforme Dados em <br>
+                <span id="typed-output" style="background: linear-gradient(45deg, #1a1a1a, #555); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></span>
+            </h1>
+            <p style="font-size: 1.2rem; margin-bottom: 30px; color: var(--text-grey);">Marketing de performance e design estratégico para escalar seu negócio.</p>
+            <div style="display:flex; gap:15px; justify-content:center;">
+                <a href="/#planos" class="btn-main">Ver Planos</a>
+                <a href="/#contato" class="btn-outline">Falar com Especialista</a>
             </div>
         </div>
     </section>
 
     <section id="servicos">
-        <div class="reveal"><h2 style="text-align:center;">Nossas Especialidades</h2></div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; max-width: 1200px; margin: 40px auto;">
-            <div class="glass-card reveal" style="text-align: center;">
-                <i class="fas fa-bullseye" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 20px;"></i>
+        <div class="reveal"><h2 style="text-align:center; font-size: 2.5rem; margin-bottom: 50px;">Nossas Soluções</h2></div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto;">
+            <div class="glass-card reveal" data-tilt style="text-align: center;">
+                <i class="fas fa-rocket" style="font-size: 2.5rem; color: var(--text-dark); margin-bottom: 20px;"></i>
                 <h3>Tráfego Pago</h3>
-                <p>Anúncios que vendem no Google e Facebook.</p>
+                <p style="margin-top: 10px; color: var(--text-grey);">Campanhas otimizadas no Google e Meta Ads para maximizar seu ROI.</p>
             </div>
-            <div class="glass-card reveal" style="text-align: center;">
-                <i class="fas fa-paint-brush" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 20px;"></i>
-                <h3>Design Líquido</h3>
-                <p>Identidade visual moderna e responsiva.</p>
+            <div class="glass-card reveal" data-tilt style="text-align: center;">
+                <i class="fas fa-layer-group" style="font-size: 2.5rem; color: var(--text-dark); margin-bottom: 20px;"></i>
+                <h3>Design & UI</h3>
+                <p style="margin-top: 10px; color: var(--text-grey);">Interfaces modernas e identidades visuais que conectam marcas a pessoas.</p>
             </div>
-            <div class="glass-card reveal" style="text-align: center;">
-                <i class="fas fa-robot" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 20px;"></i>
-                <h3>Automação</h3>
-                <p>Atendimento 24/7 com inteligência artificial.</p>
+            <div class="glass-card reveal" data-tilt style="text-align: center;">
+                <i class="fas fa-chart-pie" style="font-size: 2.5rem; color: var(--text-dark); margin-bottom: 20px;"></i>
+                <h3>Data Analytics</h3>
+                <p style="margin-top: 10px; color: var(--text-grey);">Decisões baseadas em dados com dashboards interativos em tempo real.</p>
             </div>
         </div>
     </section>
 
     <section id="planos">
-        <h2 class="reveal" style="text-align:center;">Planos de Crescimento</h2>
-        <div class="pricing-container reveal" style="margin-top:40px;">
-            <div class="glass-card pricing-card">
-                <h3>Silver</h3>
+        <h2 class="reveal" style="text-align:center; font-size: 2.5rem;">Investimento Inteligente</h2>
+        <div class="pricing-container reveal">
+            <div class="glass-card pricing-card" data-tilt>
+                <h3>Start</h3>
                 <div class="price">R$ 1.500</div>
-                <ul><li>Social Media</li><li>Tráfego Básico</li></ul>
-                <a href="/checkout/Silver" class="btn-outline">Assinar</a>
+                <ul>
+                    <li><i class="fas fa-check"></i> Gestão de Redes Sociais</li>
+                    <li><i class="fas fa-check"></i> Tráfego Pago Básico</li>
+                    <li><i class="fas fa-check"></i> Relatório Mensal</li>
+                </ul>
+                <a href="/checkout/Start" class="btn-outline" style="margin-top: auto;">Iniciar com Start</a>
             </div>
-            <div class="glass-card pricing-card featured">
-                <div style="background:var(--accent); color:white; padding:5px 15px; border-radius:20px; font-size:0.8rem; margin-bottom:10px; display:inline-block;">Recomendado</div>
-                <h3>Gold</h3>
+            <div class="glass-card pricing-card featured" data-tilt>
+                <div style="background:var(--text-dark); color:white; padding:5px 15px; border-radius:20px; font-size:0.8rem; margin-bottom:15px; display:inline-block;">Mais Popular</div>
+                <h3>Growth</h3>
                 <div class="price">R$ 3.200</div>
-                <ul><li>Tráfego Avançado</li><li>Landing Page</li></ul>
-                <a href="/checkout/Gold" class="btn-main">Assinar</a>
+                <ul>
+                    <li><i class="fas fa-check"></i> Tráfego Avançado (Google/Face)</li>
+                    <li><i class="fas fa-check"></i> Landing Page Alta Conversão</li>
+                    <li><i class="fas fa-check"></i> Dashboard em Tempo Real</li>
+                </ul>
+                <a href="/checkout/Growth" class="btn-main" style="width: 100%; justify-content: center;">Quero Growth</a>
             </div>
-            <div class="glass-card pricing-card">
-                <h3>Rubi</h3>
+            <div class="glass-card pricing-card" data-tilt>
+                <h3>Scale</h3>
                 <div class="price">R$ 7.000</div>
-                <ul><li>Gestão 360º</li><li>Consultoria Semanal</li></ul>
-                <a href="/checkout/Rubi" class="btn-outline">Assinar</a>
+                <ul>
+                    <li><i class="fas fa-check"></i> Gestão 360º Completa</li>
+                    <li><i class="fas fa-check"></i> Consultoria Semanal</li>
+                    <li><i class="fas fa-check"></i> Time Dedicado</li>
+                </ul>
+                <a href="/checkout/Scale" class="btn-outline" style="margin-top: auto;">Escolher Scale</a>
             </div>
         </div>
     </section>
 
     <section id="contato" class="contact">
         <div class="glass-card reveal" style="width: 100%; max-width: 600px; margin: 0 auto;">
-            <h2 style="text-align: center; margin-bottom: 20px;">Pedir Orçamento</h2>
+            <h2 style="text-align: center; margin-bottom: 30px;">Solicite um Orçamento</h2>
             <form id="leadForm" enctype="multipart/form-data">
                 <input type="text" id="nome" name="nome" placeholder="Nome Completo" required>
                 <input type="email" id="email" name="email" placeholder="Email Corporativo" required>
                 <input type="tel" id="telefone" name="telefone" placeholder="Telefone / WhatsApp" required>
-                
-                <label style="font-size: 0.9rem; color: var(--text-grey); margin-left: 5px; display: block; margin-bottom: 5px;">Anexar Documento:</label>
-                <input type="file" id="arquivo" name="arquivo" class="form-input">
-
-                <textarea id="projeto" name="projeto" placeholder="Descreva seu projeto..." rows="4"></textarea>
-                <button type="submit" class="btn-main" style="width: 100%;">Solicitar Proposta</button>
+                <label style="font-size: 0.9rem; color: var(--text-grey); margin-left: 5px; display: block; margin-bottom: 8px;">Possui algum briefing?</label>
+                <input type="file" id="arquivo" name="arquivo">
+                <textarea id="projeto" name="projeto" placeholder="Conte-nos sobre seu projeto..." rows="4"></textarea>
+                <button type="submit" class="btn-main" style="width: 100%; justify-content: center;">Enviar Solicitação</button>
             </form>
         </div>
     </section>
+
+    <a href="https://wa.me/5511999999999" class="whatsapp-float" target="_blank"><i class="fab fa-whatsapp"></i></a>
 
     <div class="chat-widget-container">
         <button id="chat-toggle" class="chat-btn"><i class="fas fa-comment-dots"></i></button>
         
         <div class="chat-box" id="chat-box">
-            <div class="chat-header" style="display: flex; align-items: center; gap: 15px;">
-                <i class="fas fa-arrow-left" id="chat-back-btn" style="cursor: pointer; display: none; font-size: 1.2rem;" title="Voltar ao Menu"></i>
-                <div>
-                    <h3 style="margin: 0; font-size: 1.1rem;">Suporte Online</h3>
-                    <p id="chat-status" style="margin: 0; font-size: 0.8rem; opacity: 0.9;">Atendimento Virtual</p>
+            <div class="chat-header">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-arrow-left" id="chat-back-btn" style="cursor: pointer; display: none;" title="Voltar"></i>
+                        <h3 style="margin: 0; font-size: 1.1rem; color: white;">Suporte</h3>
+                    </div>
+                    <i class="fas fa-times" onclick="toggleChat()" style="cursor: pointer;"></i>
+                </div>
+                <p id="chat-status" style="margin: 5px 0 0 0; font-size: 0.8rem; opacity: 0.8; color: white;">Suporte Online</p>
+            </div>
+
+            <div id="chat-menu" style="display: flex; flex-direction: column; padding: 20px; gap: 10px; overflow-y: auto;">
+                <p style="text-align: center; margin-bottom: 10px; color: var(--text-dark);">Como podemos ajudar hoje?</p>
+                <button onclick="checkAndStart('Financeiro')" class="btn-outline" style="text-align:left; padding:15px; border-radius:15px;">
+                    <i class="fas fa-file-invoice-dollar" style="margin-right:10px;"></i> Financeiro
+                </button>
+                <button onclick="checkAndStart('Projetos')" class="btn-outline" style="text-align:left; padding:15px; border-radius:15px;">
+                    <i class="fas fa-tasks" style="margin-right:10px;"></i> Projetos
+                </button>
+                <button onclick="checkAndStart('Suporte')" class="btn-outline" style="text-align:left; padding:15px; border-radius:15px;">
+                    <i class="fas fa-headset" style="margin-right:10px;"></i> Suporte Técnico
+                </button>
+                <button onclick="checkAndStart('Comercial')" class="btn-outline" style="text-align:left; padding:15px; border-radius:15px;">
+                    <i class="fas fa-coffee" style="margin-right:10px;"></i> Comercial
+                </button>
+
+                <div style="text-align:center; margin-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 15px;">
+                    <button onclick="showOldTickets()" style="background:none; border:none; color:var(--text-grey); cursor:pointer; font-size:0.9rem; text-decoration:underline;">
+                        <i class="fas fa-history"></i> Ver meus chamados
+                    </button>
                 </div>
             </div>
 
-            <div id="chat-menu" style="display: flex; flex-direction: column; height: 100%; padding: 20px; gap: 10px; background: var(--bg-light); color: var(--text-dark); overflow-y: auto;">
-                <p style="text-align: center; margin-bottom: 10px;">Olá! Selecione um departamento:</p>
-                
-                <button onclick="startTicket('Financeiro')" class="btn-outline" style="text-align:left; padding:12px; border-radius:10px;">
-                    <i class="fas fa-wallet" style="color:var(--accent); margin-right:10px;"></i> Financeiro
-                </button>
-                <button onclick="startTicket('Projetos')" class="btn-outline" style="text-align:left; padding:12px; border-radius:10px;">
-                    <i class="fas fa-project-diagram" style="color:var(--accent); margin-right:10px;"></i> Projetos
-                </button>
-                <button onclick="startTicket('Suporte Técnico')" class="btn-outline" style="text-align:left; padding:12px; border-radius:10px;">
-                    <i class="fas fa-tools" style="color:var(--accent); margin-right:10px;"></i> Suporte Técnico
-                </button>
-                <button onclick="startTicket('Outros')" class="btn-outline" style="text-align:left; padding:12px; border-radius:10px;">
-                    <i class="fas fa-question-circle" style="color:var(--accent); margin-right:10px;"></i> Outros Assuntos
-                </button>
-
-                <div style="border-top:1px solid #ddd; margin-top:10px; padding-top:10px; text-align:center;">
-                    <button onclick="continueChat()" id="btn-continue" style="background:none; border:none; color:var(--text-grey); cursor:pointer; font-size:0.9rem; text-decoration:underline; display:none;">
-                        Ver Meus Chamados Antigos
-                    </button>
-                </div>
+            <div id="chat-history-view" style="display: none; flex-direction: column; height: 100%;">
+                <div id="history-list" style="flex:1; overflow-y:auto; padding: 10px;"></div>
+                <button onclick="resetToMenu()" style="border:none; background:transparent; color: var(--text-dark); cursor:pointer; padding:10px;">Voltar</button>
             </div>
 
             <div id="chat-interface" style="display: none; flex-direction: column; height: 100%;">
                 <div class="chat-body" id="chat-body"></div>
                 <div class="chat-footer">
-                    <input type="text" id="chat-input" placeholder="Digite sua mensagem...">
+                    <input type="text" id="chat-input" placeholder="Digite..." style="margin:0; padding: 10px;">
                     <input type="file" id="file-input" style="display: none;">
-                    <i class="fas fa-paperclip" id="btn-attach" title="Anexar"></i>
-                    <i class="fas fa-microphone" id="btn-mic" title="Gravar"></i>
-                    <i class="fas fa-paper-plane" id="btn-send" title="Enviar"></i>
+                    <i class="fas fa-paperclip" id="btn-attach" title="Anexar Arquivo" style="color: var(--text-dark); cursor: pointer;"></i>
+                    <i class="fas fa-microphone" id="btn-mic" title="Gravar Áudio" style="color: var(--text-dark); cursor: pointer;"></i>
+                    <i class="fas fa-paper-plane" id="btn-send" style="color: var(--text-dark); cursor: pointer;"></i>
                 </div>
             </div>
         </div>
     </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        // Inicializa o Efeito de Digitação
+        var typed = new Typed('#typed-output', {
+            strings: ['Resultados Reais', 'Vendas', 'Lucro', 'Performance'],
+            typeSpeed: 50,
+            backSpeed: 30,
+            backDelay: 2000,
+            loop: true
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script>
+    particlesJS("particles-js", {
+      "particles": {
+        "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+        "color": { "value": "#1d1d1d" }, // Cor dos pontos (seu cinza escuro)
+        "shape": { "type": "circle" },
+        "opacity": { "value": 0.5, "random": false },
+        "size": { "value": 3, "random": true },
+        "line_linked": { "enable": true, "distance": 150, "color": "#1d1d1d", "opacity": 0.4, "width": 1 },
+        "move": { "enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
+      },
+      "interactivity": {
+        "detect_on": "canvas",
+        "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" } },
+        "modes": { "grab": { "distance": 140, "line_linked": { "opacity": 1 } } }
+      },
+      "retina_detect": true
+    });
+</script>
 </body>
 </html>

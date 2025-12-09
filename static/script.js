@@ -1,44 +1,41 @@
-function showToast(message, iconClass = 'fa-check-circle') {
-    let toast = document.getElementById("toast");
-    if (!toast) {
-        toast = document.createElement("div");
-        toast.id = "toast";
-        document.body.appendChild(toast);
+// Configuração do "Toast" usando SweetAlert2
+const Toast = Swal.mixin({
+    toast: true,
+    position: 'bottom-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    background: 'rgba(255, 255, 255, 0.9)',
+    color: '#1d1d1d',
+    didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
     }
-    toast.innerHTML = `<i class="fas ${iconClass}"></i> ${message}`;
-    toast.className = "show";
-    setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+});
+
+function showToast(message, icon = 'success') {
+    Toast.fire({ icon: icon, title: message });
+}
+
+function showAlert(title, text) {
+    Swal.fire({
+        title: title,
+        text: text,
+        icon: 'warning',
+        confirmButtonColor: '#1d1d1d',
+        background: 'rgba(255, 255, 255, 0.95)',
+        backdrop: `rgba(0,0,0,0.4)`
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-
+    // Reveal
     const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) entry.target.classList.add('active');
-        });
+        entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('active'); });
     });
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-    const themeBtn = document.getElementById('theme-toggle');
-    function aplicarTema(isDark) {
-        if (isDark) document.body.classList.add('dark-mode');
-        else document.body.classList.remove('dark-mode');
-        
-        if(themeBtn) {
-            const icon = themeBtn.querySelector('i');
-            if(icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
-        }
-    }
-    if (localStorage.getItem('theme') === 'dark') aplicarTema(true);
-    if (themeBtn) {
-        themeBtn.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            aplicarTema(isDark);
-        });
-    }
-
+    // Telefone Mask
     const telInputs = document.querySelectorAll('input[type="tel"]');
     telInputs.forEach(input => {
         input.addEventListener('input', (e) => {
@@ -49,110 +46,143 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Lead Form
     const leadForm = document.getElementById('leadForm');
     if(leadForm) {
         leadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = leadForm.querySelector('button');
-            const txt = btn.innerText; 
-            btn.innerText='Enviando...'; btn.disabled=true;
+            const txt = btn.innerText; btn.innerText='Enviando...'; btn.disabled=true;
             try {
-                await fetch('/submit_lead', {method:'POST', body: new FormData(leadForm)});
-                showToast('Solicitação enviada!');
-                leadForm.reset();
-            } catch(e) { showToast('Erro ao enviar', 'fa-times'); }
+                const res = await fetch('/submit_lead', {method:'POST', body: new FormData(leadForm)});
+                if(res.ok) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Recebemos seu projeto!',
+                        text: 'Nossa equipe entrará em contato em breve.',
+                        confirmButtonColor: '#1d1d1d',
+                        background: 'rgba(255,255,255,0.95)'
+                    });
+                    leadForm.reset();
+                } else throw new Error();
+            } catch(e) { showToast('Erro ao enviar', 'error'); }
             finally { btn.innerText=txt; btn.disabled=false; }
         });
     }
 
+    // Review Form
+    const reviewForm = document.getElementById('reviewForm');
+    if(reviewForm) {
+        reviewForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const star = document.querySelector('input[name="rating"]:checked');
+            if(!star) return Swal.fire('Atenção', 'Selecione uma estrela!', 'warning');
+            
+            const btn = reviewForm.querySelector('button');
+            btn.disabled = true;
+            const dados = {
+                nome: document.getElementById('rev_nome').value,
+                empresa: document.getElementById('rev_empresa').value,
+                email: document.getElementById('rev_email').value,
+                avaliacao: document.getElementById('rev_texto').value,
+                estrelas: star.value
+            };
+            try {
+                const res = await fetch('/submit_review', {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify(dados)
+                });
+                if(res.ok) {
+                    Swal.fire('Obrigado!', 'Avaliação enviada.', 'success');
+                    reviewForm.reset();
+                }
+            } catch(e) { showToast('Erro', 'error'); }
+            finally { btn.disabled = false; }
+        });
+    }
+
+    // CHAT LOGIC
     const chatBox = document.getElementById('chat-box');
     const chatMenu = document.getElementById('chat-menu');
     const chatInterface = document.getElementById('chat-interface');
-    const btnContinue = document.getElementById('btn-continue');
+    const chatHistoryView = document.getElementById('chat-history-view');
     const backBtn = document.getElementById('chat-back-btn');
     const chatBody = document.getElementById('chat-body');
     const chatInput = document.getElementById('chat-input');
     const statusText = document.getElementById('chat-status');
+    const historyList = document.getElementById('history-list');
+
+    let botState = 'idle';
+    let tempCategory = '', tempName = '';
 
     window.toggleChat = function() {
         chatBox.style.display = (chatBox.style.display === 'flex') ? 'none' : 'flex';
-        if(chatBox.style.display === 'flex') {
-            if(localStorage.getItem('chatSession')) btnContinue.style.display = 'block';
-        }
+        if(chatBox.style.display === 'flex') resetToMenu();
     }
     if(document.getElementById('chat-toggle')) document.getElementById('chat-toggle').addEventListener('click', toggleChat);
 
-    if(backBtn) {
-        backBtn.addEventListener('click', () => {
-            chatInterface.style.display = 'none';
-            chatMenu.style.display = 'flex';
-            backBtn.style.display = 'none';
-            statusText.innerText = "Atendimento Virtual";
-        });
+    // Adicionei ao window para ser acessível do botão voltar no histórico
+    window.resetToMenu = function() {
+        chatMenu.style.display = 'flex'; chatInterface.style.display = 'none';
+        if(chatHistoryView) chatHistoryView.style.display = 'none';
+        backBtn.style.display = 'none'; statusText.innerText = "Suporte Online";
+        botState = 'idle'; localStorage.removeItem('activeSession');
+    }
+    if(backBtn) backBtn.addEventListener('click', () => window.resetToMenu());
+
+    window.checkAndStart = async function(categoria) {
+        const history = JSON.parse(localStorage.getItem('ticketHistory') || '[]');
+        if (history.length > 0) {
+            try {
+                const res = await fetch('/my_tickets', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ uuids: history }) });
+                const tickets = await res.json();
+                const openTicket = tickets.find(t => t.category === categoria && t.status === 'Aberto');
+                if (openTicket) {
+                    showAlert('Ticket Aberto', `Você já possui um atendimento em ${categoria}.`);
+                    return;
+                }
+            } catch(e) {}
+        }
+        window.startBotFlow(categoria);
     }
 
-    window.startTicket = async function(categoria) {
-        localStorage.removeItem('chatSession');
-        localStorage.removeItem('chatTicket');
-        localStorage.removeItem('chatStep');
-        chatBody.innerHTML = '';
-        
-        chatMenu.style.display = 'none';
-        chatInterface.style.display = 'flex';
-        backBtn.style.display = 'block'; 
-        statusText.innerText = `Iniciando: ${categoria}...`;
-
-        try {
-            const res = await fetch('/init_session', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ category: categoria })
-            });
-            const data = await res.json();
-            
-            localStorage.setItem('chatSession', data.session_id);
-            localStorage.setItem('chatTicket', data.ticket);
-            statusText.innerText = data.ticket;
-
-            appendMessage(`Opção: <b>${categoria}</b>.`, 'received', true);
-            appendMessage(`Ticket ${data.ticket} criado.`, 'received');
-            setTimeout(() => {
-                appendMessage("Informe seu **Nome e Telefone**:", 'received', true);
-            }, 800);
-            
-            localStorage.setItem('chatStep', '1'); 
-        } catch(e) { console.error(e); }
-    }
-
-    window.continueChat = function() {
-        chatMenu.style.display = 'none';
-        chatInterface.style.display = 'flex';
-        backBtn.style.display = 'block'; 
-        
-        statusText.innerText = localStorage.getItem('chatTicket') || "Atendimento";
-        localStorage.setItem('chatStep', '3');
-        loadMessages();
+    window.startBotFlow = function(categoria) {
+        chatMenu.style.display = 'none'; chatInterface.style.display = 'flex';
+        backBtn.style.display = 'block'; chatBody.innerHTML = ''; 
+        localStorage.removeItem('activeSession'); chatInput.disabled = false; chatInput.placeholder = "Digite...";
+        tempCategory = categoria; botState = 'waiting_name';
+        statusText.innerText = "Atendimento Virtual";
+        appendMessage("Olá! Sou o assistente virtual.", 'received');
+        setTimeout(() => {
+            appendMessage(`Opção: <b>${categoria}</b>. Qual seu **Nome**?`, 'received', true);
+        }, 800);
     }
 
     async function handleSend() {
         const text = chatInput.value.trim();
         if(!text) return;
-        
-        appendMessage(text, 'sent');
-        chatInput.value = '';
+        appendMessage(text, 'sent'); chatInput.value = '';
 
-        const step = localStorage.getItem('chatStep');
-        if (step === '1') {
-            const fd = new FormData(); fd.append('message', text);
-            await sendMessageBackend(fd);
-            
-            setTimeout(() => {
-                appendMessage("Obrigado! Um atendente irá assumir.", 'received');
-                localStorage.setItem('chatStep', '3'); 
-            }, 800);
-        } else {
-            const fd = new FormData(); fd.append('message', text);
-            await sendMessageBackend(fd);
+        if (botState === 'waiting_name') {
+            tempName = text; botState = 'waiting_phone';
+            setTimeout(() => appendMessage(`Prazer ${tempName}. Qual seu **Telefone**?`, 'received', true), 600);
+        } else if (botState === 'waiting_phone') {
+            const phone = text; botState = 'creating_ticket';
+            appendMessage("Criando ticket...", 'received');
+            try {
+                const res = await fetch('/init_session', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ category: tempCategory, name: tempName, phone: phone }) });
+                const data = await res.json();
+                saveTicketToLocal(data.session_id); localStorage.setItem('activeSession', data.session_id);
+                statusText.innerText = data.ticket;
+                setTimeout(() => { appendMessage(`Ticket ${data.ticket} criado!`, 'received'); botState = 'chatting'; }, 1000);
+            } catch(e) { botState = 'idle'; }
+        } else if (botState === 'chatting') {
+            const sess = localStorage.getItem('activeSession');
+            if(sess) {
+                const fd = new FormData(); fd.append('message', text);
+                sendMessageBackend(fd, sess);
+            }
         }
     }
 
@@ -161,83 +191,91 @@ document.addEventListener('DOMContentLoaded', () => {
         chatInput.addEventListener('keypress', (e)=>{ if(e.key==='Enter') handleSend(); });
     }
 
-    async function sendMessageBackend(fd) {
-        const sess = localStorage.getItem('chatSession');
-        if(!sess) return;
-        fd.append('session_id', sess);
-        fd.append('remetente', 'user');
-        await fetch('/send_chat', {method:'POST', body:fd});
-    }
-
-    function appendMessage(content, type, isHtml=false) {
-        const div = document.createElement('div');
-        div.className = `message ${type}`;
-        if(isHtml) div.innerHTML = content; else div.innerText = content;
-        chatBody.appendChild(div);
-        chatBody.scrollTop = chatBody.scrollHeight;
-    }
-
-    async function loadMessages() {
-        const sess = localStorage.getItem('chatSession');
-        const step = localStorage.getItem('chatStep');
-        
-        if(!sess || chatInterface.style.display === 'none' || step === '1') return;
-
-        try {
-            const res = await fetch(`/get_messages/${sess}`);
-            const msgs = await res.json();
-            
-            chatBody.innerHTML = ''; 
-            msgs.forEach(m => {
-                let c = m.conteudo;
-                if(m.tipo === 'audio') c = `<audio controls src="/static/uploads/${c}"></audio>`;
-                if(m.tipo === 'arquivo') c = `<a href="/static/uploads/${c}" target="_blank">Ver Anexo</a>`;
-                
-                const type = m.remetente === 'user' ? 'sent' : 'received';
-                appendMessage(c, type, true);
-            });
-        } catch(e) {}
-    }
-    setInterval(loadMessages, 3000);
-
-    const btnMic = document.getElementById('btn-mic');
-    if(btnMic) {
-        let mediaRecorder; let audioChunks=[];
-        btnMic.addEventListener('mousedown', async()=>{
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({audio:true});
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks=[];
-                mediaRecorder.ondataavailable=e=>audioChunks.push(e.data);
-                mediaRecorder.start();
-                btnMic.style.color='red';
-            } catch(e) { showToast('Erro mic', 'fa-times'); }
-        });
-        btnMic.addEventListener('mouseup', ()=>{
-            if(mediaRecorder && mediaRecorder.state!=='inactive'){
-                mediaRecorder.stop(); btnMic.style.color='';
-                mediaRecorder.onstop = async()=>{
-                    const blob = new Blob(audioChunks,{type:'audio/webm'});
-                    const url = URL.createObjectURL(blob);
-                    appendMessage(`<audio controls src="${url}"></audio>`, 'sent', true);
-                    const fd = new FormData(); fd.append('audio', blob, 'voice.webm');
-                    await sendMessageBackend(fd);
-                };
-            }
-        });
-    }
-
     const fileInput = document.getElementById('file-input');
     const btnAttach = document.getElementById('btn-attach');
     if(btnAttach && fileInput) {
-        btnAttach.addEventListener('click', ()=>fileInput.click());
-        fileInput.addEventListener('change', async()=>{
-            if(fileInput.files.length>0) {
-                const file = fileInput.files[0];
-                appendMessage(`Enviando: ${file.name}`, 'sent');
-                const fd = new FormData(); fd.append('arquivo', file);
-                await sendMessageBackend(fd);
+        btnAttach.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', async () => {
+            const sess = localStorage.getItem('activeSession');
+            if(fileInput.files.length > 0 && sess) {
+                const fd = new FormData(); fd.append('arquivo', fileInput.files[0]);
+                appendMessage(`Arquivo: ${fileInput.files[0].name}`, 'sent');
+                await sendMessageBackend(fd, sess);
             }
         });
     }
+
+    const btnMic = document.getElementById('btn-mic');
+    let mediaRecorder, audioChunks = [];
+    if(btnMic) {
+        btnMic.addEventListener('mousedown', async () => {
+            if(!localStorage.getItem('activeSession')) return Swal.fire('Ops', 'Inicie um chat primeiro.', 'warning');
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream); audioChunks = [];
+                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                mediaRecorder.onstop = async () => {
+                    const blob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const url = URL.createObjectURL(blob);
+                    appendMessage(`<audio controls src="${url}"></audio>`, 'sent', true);
+                    const fd = new FormData(); fd.append('audio', blob, 'rec.webm');
+                    await sendMessageBackend(fd, localStorage.getItem('activeSession'));
+                };
+                mediaRecorder.start(); btnMic.classList.add('mic-active');
+            } catch(e) { Swal.fire('Erro', 'Microfone bloqueado.', 'error'); }
+        });
+        btnMic.addEventListener('mouseup', () => { if(mediaRecorder) { mediaRecorder.stop(); btnMic.classList.remove('mic-active'); } });
+    }
+
+    function saveTicketToLocal(uuid) {
+        let history = JSON.parse(localStorage.getItem('ticketHistory') || '[]');
+        if(!history.includes(uuid)) { history.push(uuid); localStorage.setItem('ticketHistory', JSON.stringify(history)); }
+    }
+
+    async function sendMessageBackend(fd, sess) {
+        fd.append('session_id', sess); fd.append('remetente', 'user');
+        const res = await fetch('/send_chat', {method:'POST', body:fd});
+        const data = await res.json();
+        if(data.status === 'closed') { appendMessage(data.msg, 'received'); chatInput.disabled = true; }
+    }
+
+    function appendMessage(c, t, h=false) {
+        const d = document.createElement('div'); d.className = `message ${t}`;
+        if(h) d.innerHTML = c; else d.innerText = c;
+        chatBody.appendChild(d); chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    window.showOldTickets = async function() {
+        chatMenu.style.display = 'none'; chatHistoryView.style.display = 'flex'; backBtn.style.display = 'block';
+        const history = JSON.parse(localStorage.getItem('ticketHistory') || '[]');
+        try {
+            const res = await fetch('/my_tickets', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ uuids: history }) });
+            const data = await res.json();
+            historyList.innerHTML = '';
+            data.forEach(t => {
+                const d = document.createElement('div');
+                d.style.cssText = "padding:15px; border-bottom:1px solid #ddd; cursor:pointer;";
+                d.innerHTML = `<b>${t.ticket}</b> <span class="badge" style="background:${t.status=='Aberto'?'green':'grey'}">${t.status}</span><br><small>${t.category}</small>`;
+                d.onclick = () => { chatHistoryView.style.display='none'; chatInterface.style.display='flex'; localStorage.setItem('activeSession', t.uuid); statusText.innerText=t.ticket; botState='chatting'; loadMessages(); };
+                historyList.appendChild(d);
+            });
+        } catch(e){}
+    }
+
+    async function loadMessages() {
+        const sess = localStorage.getItem('activeSession');
+        if(!sess || chatInterface.style.display === 'none') return;
+        try {
+            const res = await fetch(`/get_messages/${sess}`); const data = await res.json();
+            chatBody.innerHTML = '';
+            data.messages.forEach(m => {
+                let c = m.conteudo;
+                if(m.tipo === 'audio') c = `<audio controls src="/static/uploads/${c}"></audio>`;
+                if(m.tipo === 'arquivo') c = `<a href="/static/uploads/${c}" target="_blank">Ver Arquivo</a>`;
+                appendMessage(c, m.remetente === 'user' ? 'sent' : 'received', true);
+            });
+            if(data.status === 'Encerrado') chatInput.disabled = true; else chatInput.disabled = false;
+        } catch(e){}
+    }
+    setInterval(loadMessages, 3000);
 });

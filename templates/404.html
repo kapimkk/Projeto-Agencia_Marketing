@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página não encontrada - Studio Indexa</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body style="display: flex; align-items: center; justify-content: center; min-height: 100vh; text-align: center;">
+
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <div class="glass-card reveal active" style="max-width: 500px; padding: 60px 40px;">
+        <i class="fas fa-ghost" style="font-size: 4rem; color: var(--text-dark); margin-bottom: 20px;"></i>
+        <h1 style="font-size: 4rem; margin: 0; line-height: 1;">404</h1>
+        <h2 style="margin-bottom: 20px; font-weight: normal; color: var(--text-grey);">Página não encontrada</h2>
+        
+        <p style="margin-bottom: 30px; color: var(--text-grey);">
+            O link que você tentou acessar pode ter sido removido ou o endereço está incorreto.
+        </p>
+
+        <a href="/" class="btn-main">
+            <i class="fas fa-arrow-left"></i> Voltar ao Início
+        </a>
+    </div>
+
+</body>
+</html>
