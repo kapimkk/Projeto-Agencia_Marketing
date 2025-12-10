@@ -13,15 +13,12 @@
     <div class="admin-layout">
         <div class="sidebar">
             <h2 style="margin-bottom: 40px; text-align: center; color:white;">PAINEL <span style="color: #999;">ADMIN</span></h2>
-            <button class="nav-btn active" onclick="openTab(event, 'dashboard')"><i class="fas fa-chart-line"></i> Dashboard</button>
-            <button class="nav-btn" onclick="openTab(event, 'chat')"><i class="fas fa-comments"></i> Chat Ao Vivo</button>
+            <button class="nav-btn active" onclick="openTab(event, 'dashboard')"><i class="fas fa-chart-pie"></i> Dashboard</button>
+            <button class="nav-btn" onclick="openTab(event, 'chat')"><i class="fas fa-comments"></i> Chat ({{ sessions.total }})</button>
             <button class="nav-btn" onclick="openTab(event, 'leads')"><i class="fas fa-users"></i> Leads</button>
             <button class="nav-btn" onclick="openTab(event, 'financeiro')"><i class="fas fa-wallet"></i> Financeiro</button>
             <button class="nav-btn" onclick="openTab(event, 'reviews')"><i class="fas fa-star"></i> Avaliações</button>
-            
-            <div style="margin-top: auto;">
-                <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Sair</a>
-            </div>
+            <div style="margin-top: auto;"><a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Sair</a></div>
         </div>
 
         <div class="main-content">
@@ -29,54 +26,32 @@
             <div class="filters" style="background: var(--admin-card-bg); padding: 15px; border-radius: 10px; display: flex; gap: 10px; margin-bottom: 25px; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
                 <form method="GET" style="display: flex; gap: 10px; flex: 1; align-items: center;">
                     <input type="hidden" name="tab" id="activeTabInput" value="dashboard">
-                    
                     <input type="text" name="q" placeholder="Buscar (Nome, Email, ID)..." style="margin:0; padding:10px; border:1px solid #ddd; border-radius:5px; flex: 1;">
-                    
                     <select name="date" style="margin:0; width: auto; border:1px solid #ddd; border-radius:5px; padding: 10px;">
-                        <option value="">Todo Período</option>
-                        <option value="today">Hoje</option>
-                        <option value="week">Semana</option>
-                        <option value="month">Mês</option>
+                        <option value="">Período</option><option value="today">Hoje</option><option value="week">Semana</option><option value="month">Mês</option>
                     </select>
-
                     <select name="status" style="margin:0; width: auto; border:1px solid #ddd; border-radius:5px; padding: 10px;">
-                        <option value="">Todos Status</option>
-                        <option value="Aberto">Abertos</option>
-                        <option value="Encerrado">Encerrados</option>
+                        <option value="">Status</option><option value="Aberto">Aberto</option><option value="Encerrado">Encerrado</option>
                     </select>
-                    
                     <button type="submit" class="btn-main" style="min-width: auto; padding: 10px 20px; font-size: 0.9rem;">Filtrar</button>
                 </form>
             </div>
 
             <div id="dashboard" class="tab-content active">
                 <div class="stat-grid">
-                    <div class="admin-card">
-                        <div class="icon-box" style="background:#e0e7ff; color:#667eea;"><i class="fas fa-eye"></i></div>
-                        <div><h3>{{ total_visits }}</h3><p>Visitas</p></div>
-                    </div>
-                    <div class="admin-card">
-                        <div class="icon-box" style="background:#dcfce7; color:#16a34a;"><i class="fas fa-user-plus"></i></div>
-                        <div><h3>{{ leads|length }}</h3><p>Leads</p></div>
-                    </div>
-                    <div class="admin-card">
-                        <div class="icon-box" style="background:#fffac8; color:#f59f00;"><i class="fas fa-star"></i></div>
-                        <div><h3>{{ reviews|length }}</h3><p>Avaliações</p></div>
-                    </div>
-                    <div class="admin-card">
-                        <div class="icon-box" style="background:#fce7f3; color:#db2777;"><i class="fas fa-shopping-cart"></i></div>
-                        <div><h3>{{ orders|length }}</h3><p>Vendas</p></div>
-                    </div>
+                    <div class="admin-card"><div class="icon-box" style="background:#e0e7ff; color:#667eea;"><i class="fas fa-eye"></i></div><div><h3>{{ total_visits }}</h3><p>Visitas</p></div></div>
+                    <div class="admin-card"><div class="icon-box" style="background:#dcfce7; color:#16a34a;"><i class="fas fa-user-plus"></i></div><div><h3>{{ total_leads }}</h3><p>Leads Totais</p></div></div>
+                    <div class="admin-card"><div class="icon-box" style="background:#fce7f3; color:#db2777;"><i class="fas fa-shopping-cart"></i></div><div><h3>{{ total_sales }}</h3><p>Vendas</p></div></div>
                 </div>
 
-                <div class="charts-container">
-                    <div class="glass-card" style="flex: 2; height: 400px; position: relative;">
-                        <h3 style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">Leads (Timeline)</h3>
+                <div class="charts-container" style="display:flex; gap:20px; flex-wrap:wrap;">
+                    <div class="glass-card" style="flex: 2; min-width: 300px; height: 400px; position: relative;">
+                        <h3 style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">Evolução de Leads (7 Dias)</h3>
                         <canvas id="leadsChart"></canvas>
                     </div>
-                    <div class="glass-card" style="flex: 1; height: 400px; position: relative;">
-                        <h3 style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">Vendas</h3>
-                        <canvas id="salesChart"></canvas>
+                    <div class="glass-card" style="flex: 1; min-width: 300px; height: 400px; position: relative;">
+                        <h3 style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">Status dos Chamados</h3>
+                        <canvas id="statusChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -84,32 +59,24 @@
             <div id="chat" class="tab-content">
                 <div class="messenger">
                     <div class="chat-list">
-                        {% for sess in sessions %}
+                        {% for sess in sessions.items %}
                         <div class="chat-item {% if sess.uuid == active_session %}active{% endif %}" style="position: relative;">
-                            <div onclick="window.location.href='?session_id={{ sess.uuid }}&tab=chat'" style="cursor: pointer;">
+                            <div onclick="window.location.href='?session_id={{ sess.uuid }}&tab=chat&page={{ sessions.page }}'" style="cursor: pointer;">
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
                                     <b style="color:var(--accent);">{{ sess.full_title }}</b> 
-                                    {% if sess.status == 'Aberto' %}
-                                        <span class="badge" style="background:#2ecc71; color:white; padding:2px 6px; font-size:0.7em; border-radius:4px;">ON</span>
-                                    {% else %}
-                                        <span class="badge" style="background:#95a5a6; color:white; padding:2px 6px; font-size:0.7em; border-radius:4px;">OFF</span>
-                                    {% endif %}
+                                    <span class="badge" style="background:{{ 'green' if sess.status=='Aberto' else '#999' }}; color:white; padding:2px 6px; font-size:0.7em; border-radius:4px;">{{ sess.status }}</span>
                                 </div>
-                                <div style="font-size:0.8em; color:#666; margin-top:5px;">
-                                    {{ sess.category }} • {{ sess.created_at.strftime('%d/%m %H:%M') }}
-                                </div>
+                                <div style="font-size:0.8em; color:#666; margin-top:5px;">{{ sess.category }} • {{ sess.created_at.strftime('%d/%m %H:%M') }}</div>
                             </div>
-                            
-                            <button onclick="deleteTicket(event, '{{ sess.uuid }}')" title="Excluir Ticket" 
-                                    style="position: absolute; right: 10px; bottom: 8px; background: none; border: none; color: #ff4444; cursor: pointer; padding: 5px;">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                            <button onclick="deleteTicket(event, '{{ sess.uuid }}')" style="position: absolute; right: 10px; bottom: 8px; background: none; border: none; color: #ff4444; cursor: pointer;"><i class="fas fa-trash"></i></button>
                         </div>
                         {% endfor %}
                         
-                        {% if not sessions %}
-                        <div style="padding:20px; text-align:center; color:#999;">Nenhum chamado encontrado.</div>
-                        {% endif %}
+                        <div style="padding: 10px; text-align: center; border-top: 1px solid #eee;">
+                            {% if sessions.has_prev %}<a href="?page={{ sessions.prev_num }}&tab=chat" class="btn-outline" style="padding: 5px 10px; font-size:0.8rem;">&larr; Ant</a>{% endif %}
+                            <span style="margin: 0 10px; font-size: 0.8rem;">Pág {{ sessions.page }}</span>
+                            {% if sessions.has_next %}<a href="?page={{ sessions.next_num }}&tab=chat" class="btn-outline" style="padding: 5px 10px; font-size:0.8rem;">Próx &rarr;</a>{% endif %}
+                        </div>
                     </div>
 
                     <div class="chat-view">
@@ -117,11 +84,9 @@
                         <div class="chat-header-admin" style="display: flex; justify-content: space-between; align-items: center;">
                             <span>Atendimento: <b>{{ active_ticket }}</b></span>
                             {% if active_ticket_status == 'Aberto' %}
-                                <button onclick="closeTicket('{{ active_session }}')" style="background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 0.9rem;">
-                                    <i class="fas fa-times-circle"></i> Encerrar Chamado
-                                </button>
+                                <button onclick="closeTicket('{{ active_session }}')" style="background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;"><i class="fas fa-times-circle"></i> Encerrar</button>
                             {% else %}
-                                <span style="color: #e74c3c; font-weight: bold; border: 1px solid #e74c3c; padding: 5px 10px; border-radius: 5px;">CHAMADO ENCERRADO</span>
+                                <span style="color: #e74c3c; font-weight: bold; border: 1px solid #e74c3c; padding: 5px 10px; border-radius: 5px;">ENCERRADO</span>
                             {% endif %}
                         </div>
                         <div class="chat-body" id="admin-chat-body">
@@ -129,17 +94,12 @@
                                 <div class="message {% if msg.remetente == 'admin' or msg.remetente == 'system' %}sent{% else %}received{% endif %}" 
                                      style="{% if msg.remetente == 'system' %}background:#f1c40f; color:#333; align-self:center; width:auto;{% endif %}">
                                     {% if msg.remetente == 'system' %}<b>Sistema:</b> {% endif %}
-                                    {% if msg.tipo == 'audio' %}
-                                        <audio controls src="/static/uploads/{{ msg.conteudo }}"></audio>
-                                    {% elif msg.tipo == 'arquivo' %}
-                                        <a href="/static/uploads/{{ msg.conteudo }}" target="_blank" style="color:inherit;"><i class="fas fa-paperclip"></i> Ver Anexo</a>
-                                    {% else %}
-                                        {{ msg.conteudo }}
-                                    {% endif %}
+                                    {% if msg.tipo == 'audio' %}<audio controls src="/static/uploads/{{ msg.conteudo }}"></audio>
+                                    {% elif msg.tipo == 'arquivo' %}<a href="/static/uploads/{{ msg.conteudo }}" target="_blank"><i class="fas fa-paperclip"></i> Ver Anexo</a>
+                                    {% else %}{{ msg.conteudo }}{% endif %}
                                 </div>
                             {% endfor %}
                         </div>
-                        
                         {% if active_ticket_status == 'Aberto' %}
                         <form id="replyForm" class="reply-area">
                             <input type="hidden" name="session_id" value="{{ active_session }}">
@@ -148,11 +108,9 @@
                             <button class="btn-main" style="min-width: auto;"><i class="fas fa-paper-plane"></i></button>
                         </form>
                         {% endif %}
-
                         {% else %}
                         <div style="display:flex; align-items:center; justify-content:center; height:100%; color:#aaa; flex-direction: column;">
-                            <i class="fas fa-comments" style="font-size: 3rem; margin-bottom: 10px;"></i>
-                            <p>Selecione um atendimento na lista lateral.</p>
+                            <i class="fas fa-comments" style="font-size: 3rem; margin-bottom: 10px;"></i><p>Selecione um atendimento.</p>
                         </div>
                         {% endif %}
                     </div>
@@ -162,19 +120,18 @@
             <div id="leads" class="tab-content">
                 <div class="glass-card" style="padding:0; overflow-x:auto;">
                     <table class="admin-table">
-                        <thead><tr><th>Data</th><th>Nome</th><th>Email</th><th>Telefone</th><th>Projeto / Anexo</th></tr></thead>
+                        <thead><tr><th>Data</th><th>Nome</th><th>Email</th><th>Telefone</th><th>Projeto</th></tr></thead>
                         <tbody>
-                            {% for lead in leads %}
-                            <tr>
-                                <td>{{ lead.data.strftime('%d/%m') }}</td>
-                                <td>{{ lead.nome }}</td>
-                                <td>{{ lead.email }}</td>
-                                <td>{{ lead.telefone }}</td>
-                                <td style="font-size:0.9em;">{{ lead.projeto }}</td>
-                            </tr>
+                            {% for lead in leads.items %}
+                            <tr><td>{{ lead.data.strftime('%d/%m') }}</td><td>{{ lead.nome }}</td><td>{{ lead.email }}</td><td>{{ lead.telefone }}</td><td style="font-size:0.9em;">{{ lead.projeto }}</td></tr>
                             {% endfor %}
                         </tbody>
                     </table>
+                    <div style="padding: 15px; text-align: center;">
+                        {% if leads.has_prev %}<a href="?page={{ leads.prev_num }}&tab=leads" class="btn-outline">Anterior</a>{% endif %}
+                        <span style="margin: 0 10px;">Página {{ leads.page }}</span>
+                        {% if leads.has_next %}<a href="?page={{ leads.next_num }}&tab=leads" class="btn-outline">Próxima</a>{% endif %}
+                    </div>
                 </div>
             </div>
 
@@ -183,13 +140,8 @@
                     <table class="admin-table">
                         <thead><tr><th>ID</th><th>Plano</th><th>Valor</th><th>Status</th></tr></thead>
                         <tbody>
-                            {% for order in orders %}
-                            <tr>
-                                <td>#{{ order.id[:8] }}</td>
-                                <td><span class="badge" style="background:#e0e7ff; color:#4338ca;">{{ order.plano }}</span></td>
-                                <td>R$ {{ order.preco }}</td>
-                                <td>{{ order.status }}</td>
-                            </tr>
+                            {% for order in orders.items %}
+                            <tr><td>#{{ order.id[:8] }}</td><td><span class="badge" style="background:#e0e7ff; color:#4338ca;">{{ order.plano }}</span></td><td>R$ {{ order.preco }}</td><td>{{ order.status }}</td></tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -202,12 +154,7 @@
                         <thead><tr><th>Nome</th><th>Empresa</th><th>Nota</th><th>Texto</th></tr></thead>
                         <tbody>
                             {% for rev in reviews %}
-                            <tr>
-                                <td>{{ rev.nome }}</td>
-                                <td>{{ rev.empresa }}</td>
-                                <td style="color: gold;">{% for i in range(rev.estrelas) %}<i class="fas fa-star"></i>{% endfor %}</td>
-                                <td>{{ rev.avaliacao }}</td>
-                            </tr>
+                            <tr><td>{{ rev.nome }}</td><td>{{ rev.empresa }}</td><td style="color: gold;">{% for i in range(rev.estrelas) %}<i class="fas fa-star"></i>{% endfor %}</td><td>{{ rev.avaliacao }}</td></tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -221,89 +168,69 @@
         function openTab(evt, tabName) {
             var tabcontent = document.getElementsByClassName("tab-content");
             for (var i = 0; i < tabcontent.length; i++) tabcontent[i].style.display = "none";
-            
             var navbtns = document.getElementsByClassName("nav-btn");
             for (var i = 0; i < navbtns.length; i++) navbtns[i].classList.remove("active");
-            
             document.getElementById(tabName).style.display = "block";
             if(evt) evt.currentTarget.classList.add("active");
-            
             document.getElementById('activeTabInput').value = tabName;
             localStorage.setItem('activeTab', tabName);
         }
 
-        // Funções atualizadas com SweetAlert2
         async function closeTicket(uuid) {
-            const result = await Swal.fire({
-                title: 'Encerrar Atendimento?',
-                text: "O chat será fechado para o cliente.",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sim, encerrar!',
-                cancelButtonText: 'Cancelar'
-            });
-
-            if (result.isConfirmed) {
-                await fetch(`/close_ticket/${uuid}`, { method: 'POST' });
-                location.reload();
-            }
+            const result = await Swal.fire({title: 'Encerrar?', icon: 'question', showCancelButton: true});
+            if (result.isConfirmed) { await fetch(`/close_ticket/${uuid}`, { method: 'POST' }); location.reload(); }
         }
 
         async function deleteTicket(event, uuid) {
             event.stopPropagation(); 
-            
-            const result = await Swal.fire({
-                title: 'Tem certeza?',
-                text: "Você não poderá reverter isso! O histórico será apagado.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Sim, apagar!',
-                cancelButtonText: 'Cancelar'
-            });
-
+            const result = await Swal.fire({title: 'Apagar?', text: "Irreversível.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33'});
             if (result.isConfirmed) {
-                try {
-                    const res = await fetch(`/delete_ticket/${uuid}`, { method: 'DELETE' });
-                    const data = await res.json();
-                    if(data.status === 'success') {
-                        await Swal.fire('Apagado!', 'O histórico foi removido.', 'success');
-                        location.reload();
-                    } else {
-                        Swal.fire('Erro', 'Erro ao excluir.', 'error');
-                    }
-                } catch(e) { 
-                    Swal.fire('Erro', 'Erro de conexão.', 'error'); 
-                }
+                const res = await fetch(`/delete_ticket/${uuid}`, { method: 'DELETE' });
+                if(res.ok) location.reload(); else Swal.fire('Erro', 'Falha ao excluir', 'error');
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             const params = new URLSearchParams(window.location.search);
             const activeTab = params.get('tab') || localStorage.getItem('activeTab') || 'dashboard';
-            
             const btn = document.querySelector(`button[onclick*="'${activeTab}'"]`);
-            if(btn) openTab({currentTarget: btn}, activeTab);
-            else openTab(null, 'dashboard');
+            if(btn) openTab({currentTarget: btn}, activeTab); else openTab(null, 'dashboard');
 
+            // --- GRÁFICOS MELHORADOS ---
             const leadsData = JSON.parse('{{ leads_chart|safe }}');
-            const salesData = JSON.parse('{{ sales_chart|safe }}');
+            const statusData = JSON.parse('{{ status_chart|safe }}');
 
+            // Gráfico de Barras para Leads (Melhor visualização de volume)
             if(document.getElementById('leadsChart')) {
                 new Chart(document.getElementById('leadsChart'), {
-                    type: 'line',
-                    data: { labels: leadsData.labels, datasets: [{ label: 'Novos Leads', data: leadsData.values, borderColor: '#764ba2', fill: true, backgroundColor: 'rgba(118, 75, 162, 0.1)' }] },
-                    options: { maintainAspectRatio: false }
+                    type: 'bar', // Mudado para barra
+                    data: { 
+                        labels: leadsData.labels, 
+                        datasets: [{ 
+                            label: 'Novos Leads', 
+                            data: leadsData.values, 
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)', 
+                            borderColor: 'rgba(54, 162, 235, 1)', 
+                            borderWidth: 1 
+                        }] 
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
                 });
             }
-            if(document.getElementById('salesChart')) {
-                new Chart(document.getElementById('salesChart'), {
+
+            // Gráfico de Pizza (Donut) para Status
+            if(document.getElementById('statusChart')) {
+                new Chart(document.getElementById('statusChart'), {
                     type: 'doughnut',
-                    data: { labels: salesData.labels, datasets: [{ data: salesData.values, backgroundColor: ['#c0c0c0', '#ffd700', '#e0115f'] }] },
-                    options: { maintainAspectRatio: false }
+                    data: { 
+                        labels: statusData.labels, 
+                        datasets: [{ 
+                            data: statusData.values, 
+                            backgroundColor: ['#2ecc71', '#95a5a6'], // Verde para Aberto, Cinza para Fechado
+                            hoverOffset: 4
+                        }] 
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
                 });
             }
 
@@ -316,8 +243,7 @@
                 data.messages.forEach(m => {
                     let c = m.conteudo;
                     if(m.tipo === 'audio') c = `<audio controls src="/static/uploads/${c}"></audio>`;
-                    if(m.tipo === 'arquivo') c = `<a href="/static/uploads/${c}" target="_blank" style="color:inherit;"><i class="fas fa-paperclip"></i> Ver Anexo</a>`;
-                    
+                    if(m.tipo === 'arquivo') c = `<a href="/static/uploads/${c}" target="_blank">Ver Anexo</a>`;
                     const div = document.createElement('div');
                     div.className = `message ${m.remetente === 'admin' || m.remetente === 'system' ? 'sent' : 'received'}`;
                     if(m.remetente === 'system') div.style.cssText = "background:#f1c40f; color:#333; align-self:center; width:auto;";
@@ -327,8 +253,7 @@
             }, 3000); 
 
             document.getElementById('replyForm').addEventListener('submit', async(e) => {
-                e.preventDefault();
-                const fd = new FormData(e.target);
+                e.preventDefault(); const fd = new FormData(e.target);
                 await fetch('/send_chat', {method:'POST', body:fd});
                 e.target.reset();
                 const div = document.createElement('div'); div.className='message sent'; div.innerText=fd.get('message');

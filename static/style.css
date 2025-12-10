@@ -4,7 +4,7 @@
     /* --- CORES SITE PÚBLICO (LIQUID GLASS) --- */
     --bg-light: #B6B6B4;
     --text-dark: #1D1D1D;
-    --text-grey: #4a4a4a;
+    --text-grey: #242323;
     --accent: #1D1D1D;
     
     /* Efeito Vidro */
@@ -33,6 +33,28 @@ body {
     transition: 0.5s; 
     overflow-x: hidden;
     padding-top: 100px; /* Espaço para a navbar fixa */
+}
+/* Animação de Entrada Suave */
+@keyframes fadeInPage {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: none translateY(0); }
+    
+}
+    
+body { 
+    background-color: var(--bg-light); 
+    color: var(--text-dark); 
+    min-height: 100vh; 
+    transition: 0.5s; 
+    overflow-x: hidden;
+    padding-top: 0;
+
+}
+
+#site-wrapper {
+    animation: fadeInPage 0.8s ease-out forwards;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 /* O Admin remove o padding do topo pois tem layout próprio */
@@ -133,13 +155,39 @@ input::placeholder, textarea::placeholder { color: var(--text-grey); opacity: 0.
 .btn-outline:hover { background: var(--accent); color: #ffffff; transform: translateY(-2px); }
 
 /* --- CHAT WIDGET --- */
-.chat-widget-container { position: fixed; bottom: 30px; right: 30px; z-index: 9999; }
+.chat-widget-container { 
+    position: fixed !important; /* Agora vai funcionar! */
+    bottom: 30px; 
+    right: 30px; 
+    z-index: 999999; 
+    display: block;
+    animation: float 3s ease-in-out infinite;
+}
 .chat-btn { 
     width: 60px; height: 60px; border-radius: 50%; border: none; 
     background: var(--accent); color: #ffffff; font-size: 24px; 
     cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.25); 
     transition: 0.3s; display: flex; align-items: center; justify-content: center;
+
+    animation: float 3s ease-in-out infinite;
 }
+
+
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+        box-shadow: 0 5px 15px 0px rgba(0,0,0,0.2);
+    }
+    50% {
+        transform: translateY(-10px); /* Sobe 10px */
+        box-shadow: 0 25px 15px 0px rgba(0,0,0,0.1); /* Sombra muda */
+    }
+    100% {
+        transform: translateY(0px);
+        box-shadow: 0 5px 15px 0px rgba(0,0,0,0.2);
+    }
+}
+
 .chat-btn:hover { transform: scale(1.1); background: #000; }
 .chat-box { 
     position: absolute; bottom: 80px; right: 0; width: 350px; height: 500px; 
@@ -311,7 +359,7 @@ input::placeholder, textarea::placeholder { color: var(--text-grey); opacity: 0.
 
 /* Utilitários Gerais */
 section { padding: 80px 5%; }
-.hero { padding-top: 60px; } 
+.hero { padding-top: 150px; } 
 .reveal { opacity: 0; transform: translateY(30px); transition: 1s; }
 .reveal.active { opacity: 1; transform: translateY(0); }
 
@@ -444,4 +492,22 @@ body.hovering .cursor2 {
     transform: scale(1.5) translateX(-35%) translateY(-35%);
     background-color: rgba(29, 29, 29, 0.1);
     border-color: transparent;
+}
+/* Fundo Animado Aurora */
+.animated-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }

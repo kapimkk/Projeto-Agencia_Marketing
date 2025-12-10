@@ -279,3 +279,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     setInterval(loadMessages, 3000);
 });
+document.addEventListener('DOMContentLoaded', () => {
+    // ... seus outros códigos ...
+
+    // Inicializa o Vanta.js (Ondas)
+    VANTA.WAVES({
+        el: "#vanta-bg",
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200.00,
+        minWidth: 200.00,
+        scale: 1.00,
+        scaleMobile: 1.00,
+        color: 0x111111,      // Cor da onda (Preto/Cinza escuro)
+        shininess: 35.00,     // Brilho
+        waveHeight: 15.00,    // Altura da onda
+        waveSpeed: 0.80,      // Velocidade (Lento é mais elegante)
+        zoom: 0.85
+    });
+});
