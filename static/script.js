@@ -1,4 +1,3 @@
-// Configuração do "Toast" usando SweetAlert2
 const Toast = Swal.mixin({
     toast: true,
     position: 'bottom-end',
@@ -28,14 +27,80 @@ function showAlert(title, text) {
     });
 }
 
+function toggleComparison() {
+    const section = document.getElementById('comparison-section');
+    if (section.style.display === 'none' || section.style.display === '') {
+        section.style.display = 'block';
+        section.classList.add('active');
+        window.scrollTo({
+            top: section.offsetTop - 100,
+            behavior: 'smooth'
+        });
+    } else {
+        section.style.display = 'none';
+    }
+}
+
+function initROIChart() {
+    const ctx = document.getElementById('roiChart');
+    if(!ctx) return;
+    
+    if (window.roiChartInstance) {
+        window.roiChartInstance.destroy();
+    }
+    
+    window.roiChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Mês 1', 'Mês 2', 'Mês 3', 'Mês 4', 'Mês 5', 'Mês 6'],
+            datasets: [{
+                label: 'Crescimento de Faturamento (R$)',
+                data: [10000, 18000, 29000, 45000, 68000, 95000],
+                borderColor: '#1D1D1D',
+                backgroundColor: 'rgba(29, 29, 29, 0.05)',
+                tension: 0.4,
+                fill: true,
+                pointRadius: 5,
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { labels: { font: { family: 'Poppins' } } }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { callback: function(value) { return 'R$ ' + value/1000 + 'k'; } }
+                }
+            },
+            animation: {
+                duration: 2000,
+                easing: 'easeOutQuart'
+            }
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    // Reveal
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('active'); });
     });
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    
+    const chartObserver = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if(e.isIntersecting) {
+                initROIChart();
+                chartObserver.unobserve(e.target);
+            }
+        });
+    });
+    const roiSection = document.getElementById('results-graph');
+    if(roiSection) chartObserver.observe(roiSection);
 
-    // Telefone Mask
     const telInputs = document.querySelectorAll('input[type="tel"]');
     telInputs.forEach(input => {
         input.addEventListener('input', (e) => {
@@ -46,7 +111,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Lead Form
     const leadForm = document.getElementById('leadForm');
     if(leadForm) {
         leadForm.addEventListener('submit', async (e) => {
@@ -70,7 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Review Form
     const reviewForm = document.getElementById('reviewForm');
     if(reviewForm) {
         reviewForm.addEventListener('submit', async (e) => {
@@ -102,7 +165,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // CHAT LOGIC
     const chatBox = document.getElementById('chat-box');
     const chatMenu = document.getElementById('chat-menu');
     const chatInterface = document.getElementById('chat-interface');
@@ -115,6 +177,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let botState = 'idle';
     let tempCategory = '', tempName = '';
+    let currentMessageCount = 0;
+    let isUploadingAudio = false;
 
     window.toggleChat = function() {
         chatBox.style.display = (chatBox.style.display === 'flex') ? 'none' : 'flex';
@@ -122,12 +186,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if(document.getElementById('chat-toggle')) document.getElementById('chat-toggle').addEventListener('click', toggleChat);
 
-    // Adicionei ao window para ser acessível do botão voltar no histórico
     window.resetToMenu = function() {
         chatMenu.style.display = 'flex'; chatInterface.style.display = 'none';
         if(chatHistoryView) chatHistoryView.style.display = 'none';
         backBtn.style.display = 'none'; statusText.innerText = "Suporte Online";
         botState = 'idle'; localStorage.removeItem('activeSession');
+        currentMessageCount = 0;
+        isUploadingAudio = false;
     }
     if(backBtn) backBtn.addEventListener('click', () => window.resetToMenu());
 
@@ -153,6 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('activeSession'); chatInput.disabled = false; chatInput.placeholder = "Digite...";
         tempCategory = categoria; botState = 'waiting_name';
         statusText.innerText = "Atendimento Virtual";
+        currentMessageCount = 0;
         appendMessage("Olá! Sou o assistente virtual.", 'received');
         setTimeout(() => {
             appendMessage(`Opção: <b>${categoria}</b>. Qual seu **Nome**?`, 'received', true);
@@ -162,26 +228,36 @@ document.addEventListener('DOMContentLoaded', () => {
     async function handleSend() {
         const text = chatInput.value.trim();
         if(!text) return;
-        appendMessage(text, 'sent'); chatInput.value = '';
+        
+        if(isUploadingAudio) return;
 
-        if (botState === 'waiting_name') {
-            tempName = text; botState = 'waiting_phone';
-            setTimeout(() => appendMessage(`Prazer ${tempName}. Qual seu **Telefone**?`, 'received', true), 600);
-        } else if (botState === 'waiting_phone') {
-            const phone = text; botState = 'creating_ticket';
-            appendMessage("Criando ticket...", 'received');
-            try {
-                const res = await fetch('/init_session', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ category: tempCategory, name: tempName, phone: phone }) });
-                const data = await res.json();
-                saveTicketToLocal(data.session_id); localStorage.setItem('activeSession', data.session_id);
-                statusText.innerText = data.ticket;
-                setTimeout(() => { appendMessage(`Ticket ${data.ticket} criado!`, 'received'); botState = 'chatting'; }, 1000);
-            } catch(e) { botState = 'idle'; }
-        } else if (botState === 'chatting') {
+        if (botState === 'chatting') {
             const sess = localStorage.getItem('activeSession');
             if(sess) {
+                appendMessage(text, 'sent');
+                chatInput.value = ''; 
                 const fd = new FormData(); fd.append('message', text);
-                sendMessageBackend(fd, sess);
+                
+                try {
+                    await sendMessageBackend(fd, sess);
+                    currentMessageCount++; 
+                } catch(e) { console.error("Erro ao enviar", e); }
+            }
+        } else {
+            appendMessage(text, 'sent'); chatInput.value = '';
+            if (botState === 'waiting_name') {
+                tempName = text; botState = 'waiting_phone';
+                setTimeout(() => appendMessage(`Prazer ${tempName}. Qual seu **Telefone**?`, 'received', true), 600);
+            } else if (botState === 'waiting_phone') {
+                const phone = text; botState = 'creating_ticket';
+                appendMessage("Criando ticket...", 'received');
+                try {
+                    const res = await fetch('/init_session', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ category: tempCategory, name: tempName, phone: phone }) });
+                    const data = await res.json();
+                    saveTicketToLocal(data.session_id); localStorage.setItem('activeSession', data.session_id);
+                    statusText.innerText = data.ticket;
+                    setTimeout(() => { appendMessage(`Ticket ${data.ticket} criado!`, 'received'); botState = 'chatting'; }, 1000);
+                } catch(e) { botState = 'idle'; }
             }
         }
     }
@@ -200,31 +276,126 @@ document.addEventListener('DOMContentLoaded', () => {
             if(fileInput.files.length > 0 && sess) {
                 const fd = new FormData(); fd.append('arquivo', fileInput.files[0]);
                 appendMessage(`Arquivo: ${fileInput.files[0].name}`, 'sent');
-                await sendMessageBackend(fd, sess);
+                
+                isUploadingAudio = true;
+                chatInput.disabled = true;
+                chatInput.placeholder = "Enviando arquivo...";
+                
+                try {
+                    await sendMessageBackend(fd, sess);
+                    currentMessageCount++;
+                } finally {
+                    isUploadingAudio = false;
+                    chatInput.disabled = false;
+                    chatInput.placeholder = "Digite...";
+                    chatInput.focus();
+                }
             }
         });
     }
 
     const btnMic = document.getElementById('btn-mic');
-    let mediaRecorder, audioChunks = [];
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+    let lastMicClick = 0; 
+    let recordingStartTime = 0; 
+
     if(btnMic) {
-        btnMic.addEventListener('mousedown', async () => {
+        btnMic.addEventListener('click', async () => {
             if(!localStorage.getItem('activeSession')) return Swal.fire('Ops', 'Inicie um chat primeiro.', 'warning');
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream); audioChunks = [];
-                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-                mediaRecorder.onstop = async () => {
-                    const blob = new Blob(audioChunks, { type: 'audio/webm' });
-                    const url = URL.createObjectURL(blob);
-                    appendMessage(`<audio controls src="${url}"></audio>`, 'sent', true);
-                    const fd = new FormData(); fd.append('audio', blob, 'rec.webm');
-                    await sendMessageBackend(fd, localStorage.getItem('activeSession'));
-                };
-                mediaRecorder.start(); btnMic.classList.add('mic-active');
-            } catch(e) { Swal.fire('Erro', 'Microfone bloqueado.', 'error'); }
+            
+            const now = Date.now();
+            if (now - lastMicClick < 1000) return;
+            lastMicClick = now;
+
+            if(isUploadingAudio) return;
+
+            const icon = btnMic.querySelector('i');
+
+            if (!isRecording) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    
+                    mediaRecorder.ondataavailable = e => {
+                        if (e.data.size > 0) audioChunks.push(e.data);
+                    };
+                    
+                    mediaRecorder.onstop = async () => {
+                        const duration = Date.now() - recordingStartTime;
+                        if (duration < 1500) {
+                            showToast('Áudio muito curto!', 'warning');
+                            isUploadingAudio = false;
+                            isRecording = false;
+                            btnMic.classList.remove('recording-now');
+                            if(icon) icon.className = 'fas fa-microphone';
+                            return; 
+                        }
+
+                        isUploadingAudio = true;
+                        
+                        const tempId = 'temp-audio-' + Date.now();
+                        const uploadingDiv = document.createElement('div');
+                        uploadingDiv.id = tempId;
+                        uploadingDiv.className = 'message sent';
+                        uploadingDiv.style.fontStyle = 'italic';
+                        uploadingDiv.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Enviando áudio...';
+                        chatBody.appendChild(uploadingDiv);
+                        chatBody.scrollTop = chatBody.scrollHeight;
+                        
+                        chatInput.disabled = true;
+
+                        try {
+                            const blob = new Blob(audioChunks, { type: 'audio/webm' });
+                            
+                            if(blob.size > 0) {
+                                const fd = new FormData(); 
+                                fd.append('audio', blob, 'gravacao.webm'); 
+                                await sendMessageBackend(fd, localStorage.getItem('activeSession'));
+                                
+                                const el = document.getElementById(tempId);
+                                if(el) el.remove();
+                                currentMessageCount = 0; 
+                                await loadMessages();
+                            }
+                        } catch(err) {
+                            console.error("Erro no upload do áudio:", err);
+                            showToast("Erro ao enviar áudio", "error");
+                        } finally {
+                            isUploadingAudio = false;
+                            const el = document.getElementById(tempId);
+                            if(el) el.remove();
+                            
+                            chatInput.disabled = false;
+                            chatInput.focus();
+                            mediaRecorder = null;
+                        }
+                    };
+
+                    mediaRecorder.start();
+                    isRecording = true;
+                    recordingStartTime = Date.now(); 
+                    btnMic.classList.add('recording-now');
+                    if(icon) icon.className = 'fas fa-stop';
+                    
+                } catch(e) { 
+                    console.error(e);
+                    Swal.fire('Erro', 'Microfone não permitido.', 'error'); 
+                    isRecording = false;
+                }
+            } else {
+                if(mediaRecorder && mediaRecorder.state !== 'inactive') {
+                    mediaRecorder.stop();
+                    mediaRecorder.stream.getTracks().forEach(track => track.stop()); 
+                }
+                
+                isRecording = false;
+                btnMic.classList.remove('recording-now');
+                if(icon) icon.className = 'fas fa-microphone';
+            }
         });
-        btnMic.addEventListener('mouseup', () => { if(mediaRecorder) { mediaRecorder.stop(); btnMic.classList.remove('mic-active'); } });
     }
 
     function saveTicketToLocal(uuid) {
@@ -236,7 +407,11 @@ document.addEventListener('DOMContentLoaded', () => {
         fd.append('session_id', sess); fd.append('remetente', 'user');
         const res = await fetch('/send_chat', {method:'POST', body:fd});
         const data = await res.json();
-        if(data.status === 'closed') { appendMessage(data.msg, 'received'); chatInput.disabled = true; }
+        if(data.status === 'closed') { 
+            appendMessage(data.msg, 'received'); 
+            chatInput.disabled = true; 
+            chatInput.placeholder = "Atendimento encerrado.";
+        }
     }
 
     function appendMessage(c, t, h=false) {
@@ -256,46 +431,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 const d = document.createElement('div');
                 d.style.cssText = "padding:15px; border-bottom:1px solid #ddd; cursor:pointer;";
                 d.innerHTML = `<b>${t.ticket}</b> <span class="badge" style="background:${t.status=='Aberto'?'green':'grey'}">${t.status}</span><br><small>${t.category}</small>`;
-                d.onclick = () => { chatHistoryView.style.display='none'; chatInterface.style.display='flex'; localStorage.setItem('activeSession', t.uuid); statusText.innerText=t.ticket; botState='chatting'; loadMessages(); };
+                d.onclick = () => { 
+                    chatHistoryView.style.display='none'; 
+                    chatInterface.style.display='flex'; 
+                    localStorage.setItem('activeSession', t.uuid); 
+                    statusText.innerText=t.ticket; 
+                    botState='chatting'; 
+                    currentMessageCount = 0; 
+                    loadMessages(); 
+                };
                 historyList.appendChild(d);
             });
         } catch(e){}
     }
 
     async function loadMessages() {
+        if(isUploadingAudio || isRecording) return;
+
         const sess = localStorage.getItem('activeSession');
         if(!sess || chatInterface.style.display === 'none') return;
+        
         try {
-            const res = await fetch(`/get_messages/${sess}`); const data = await res.json();
-            chatBody.innerHTML = '';
-            data.messages.forEach(m => {
-                let c = m.conteudo;
-                if(m.tipo === 'audio') c = `<audio controls src="/static/uploads/${c}"></audio>`;
-                if(m.tipo === 'arquivo') c = `<a href="/static/uploads/${c}" target="_blank">Ver Arquivo</a>`;
-                appendMessage(c, m.remetente === 'user' ? 'sent' : 'received', true);
-            });
-            if(data.status === 'Encerrado') chatInput.disabled = true; else chatInput.disabled = false;
+            const res = await fetch(`/get_messages/${sess}`); 
+            const data = await res.json();
+            
+            if (data.messages.length !== currentMessageCount) {
+                chatBody.innerHTML = '';
+                data.messages.forEach(m => {
+                    let c = m.conteudo;
+                    if(m.tipo === 'audio') c = `<audio controls src="/static/uploads/${c}"></audio>`;
+                    if(m.tipo === 'arquivo') c = `<a href="/static/uploads/${c}" target="_blank">Ver Arquivo</a>`;
+                    appendMessage(c, m.remetente === 'user' ? 'sent' : 'received', true);
+                });
+                
+                currentMessageCount = data.messages.length;
+                
+                if(data.status === 'Encerrado') {
+                    chatInput.disabled = true;
+                    chatInput.placeholder = "Atendimento encerrado.";
+                } else if(chatInput.disabled && !isUploadingAudio) {
+                    chatInput.disabled = false;
+                    chatInput.placeholder = "Digite...";
+                }
+            }
         } catch(e){}
     }
     setInterval(loadMessages, 3000);
-});
-document.addEventListener('DOMContentLoaded', () => {
-    // ... seus outros códigos ...
-
-    // Inicializa o Vanta.js (Ondas)
-    VANTA.WAVES({
-        el: "#vanta-bg",
-        mouseControls: true,
-        touchControls: true,
-        gyroControls: false,
-        minHeight: 200.00,
-        minWidth: 200.00,
-        scale: 1.00,
-        scaleMobile: 1.00,
-        color: 0x111111,      // Cor da onda (Preto/Cinza escuro)
-        shininess: 35.00,     // Brilho
-        waveHeight: 15.00,    // Altura da onda
-        waveSpeed: 0.80,      // Velocidade (Lento é mais elegante)
-        zoom: 0.85
-    });
 });
