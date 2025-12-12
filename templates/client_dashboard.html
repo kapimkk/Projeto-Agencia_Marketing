@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Cliente - Studio Indexa</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .dashboard-grid { display: grid; grid-template-columns: 2.5fr 1.5fr; gap: 30px; margin-top: 30px; }
+        .chat-embedded { display: flex; flex-direction: column; height: 500px; background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); overflow: hidden; }
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; background: #f8f9fa; display: flex; flex-direction: column; gap: 10px; }
+        .chat-input-area { padding: 15px; background: white; border-top: 1px solid #eee; display: flex; gap: 10px; }
+        .msg { padding: 10px 15px; border-radius: 15px; max-width: 80%; font-size: 0.9rem; line-height: 1.4; }
+        .msg.sent { background: #2d3436; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .msg.received { background: #fff; border: 1px solid #eee; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
+        @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body style="background: #f4f6f8;">
+    <div style="display: flex; min-height: 100vh;">
+        <div style="width: 260px; background: #2d3436; color: white; padding: 30px; display: flex; flex-direction: column;">
+            <div style="font-weight: 800; font-size: 1.2rem; margin-bottom: 50px; text-align: center;">STUDIO INDEXA</div>
+            <div style="margin-bottom: 20px;"><div style="font-size: 0.8rem; opacity: 0.6;">Cliente</div><div style="font-size: 1.1rem; font-weight: 600;">{{ user.name }}</div></div>
+            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+            <a href="/" style="color: rgba(255,255,255,0.7); text-decoration: none; padding: 10px 0; display: block;">Ver Site</a>
+            <a href="/logout" style="color: #ff7675; text-decoration: none; margin-top: auto; display: block;">Sair</a>
+        </div>
+
+        <div style="flex: 1; padding: 40px; overflow-y: auto;">
+            <h2 style="margin-bottom: 30px; color: #2d3436;">Painel de Performance</h2>
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <div class="glass-card" style="background: white; flex: 1; padding: 25px; border-radius: 15px;">
+                    <div style="font-size: 0.9rem; color: #999;">PLANO</div>
+                    <div style="font-size: 1.5rem; font-weight: 700; color: #2d3436;">{{ plan.plan_name if plan else 'Personalizado' }}</div>
+                </div>
+                <div class="glass-card" style="background: white; flex: 1; padding: 25px; border-radius: 15px;">
+                    <div style="font-size: 0.9rem; color: #999;">STATUS</div>
+                    <div style="font-size: 1.5rem; font-weight: 700; color: #00b894;">Ativo <i class="fas fa-check-circle"></i></div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="glass-card" style="background: white; border-radius: 20px; padding: 30px;">
+                    <h3 style="margin-bottom: 20px; font-size: 1.1rem;">Evolução</h3>
+                    <div style="height: 300px;"><canvas id="clientChart"></canvas></div>
+                </div>
+                <div class="chat-embedded">
+                    <div style="padding: 15px; background: #2d3436; color: white;"><b>Suporte Dedicado</b></div>
+                    <div id="chat-box" class="chat-messages">
+                        {% for msg in messages %}
+                            <div class="msg {{ 'sent' if msg.remetente == 'user' else 'received' }}">{{ msg.conteudo }}</div>
+                        {% endfor %}
+                    </div>
+                    <form id="chatForm" class="chat-input-area">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="text" id="msgInput" placeholder="Mensagem..." style="flex: 1; border: 1px solid #ddd; padding: 10px; border-radius: 10px;">
+                        <button type="submit" style="background: #2d3436; color: white; border: none; width: 40px; border-radius: 10px; cursor: pointer;"><i class="fas fa-paper-plane"></i></button>
+                    </form>
+                </div>
+            </div>
+            
+            <div style="margin-top:30px;">
+                <h3>Seus Benefícios</h3>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    {% for b in benefits %}<span style="background:white; padding:8px 15px; border-radius:20px; font-size:0.9rem;">✅ {{ b }}</span>{% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('clientChart').getContext('2d');
+        const data = JSON.parse('{{ chart_data|safe }}');
+        new Chart(ctx, {
+            type: 'line',
+            data: { labels: data.labels, datasets: [{ label: 'Performance', data: data.values, borderColor: '#2d3436', backgroundColor: 'rgba(45, 52, 54, 0.05)', tension: 0.4, fill: true }] },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+        });
+
+        const chatForm = document.getElementById('chatForm');
+        const chatBox = document.getElementById('chat-box');
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const inp = document.getElementById('msgInput');
+            const txt = inp.value.trim();
+            if(!txt) return;
+            const div = document.createElement('div'); div.className = 'msg sent'; div.innerText = txt;
+            chatBox.appendChild(div); chatBox.scrollTop = chatBox.scrollHeight;
+            inp.value = '';
+            const fd = new FormData(); fd.append('message', txt);
+            const token = document.querySelector('input[name="csrf_token"]').value;
+            await fetch('/client/send_message', { method: 'POST', body: fd, headers: { 'X-CSRFToken': token } });
+        });
+
+        setInterval(async () => {
+            const res = await fetch('/client/get_chat');
+            const data = await res.json();
+            if (data.messages.length > chatBox.children.length) {
+                chatBox.innerHTML = '';
+                data.messages.forEach(m => {
+                    const d = document.createElement('div'); d.className = `msg ${m.remetente === 'user' ? 'sent' : 'received'}`; d.innerText = m.conteudo; chatBox.appendChild(d);
+                });
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        }, 3000);
+    </script>
+</body>
+</html>

@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="Studio Indexa - Performance Digital">
+    <meta property="og:description" content="Escale suas vendas com marketing de dados.">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}"> 
     <title>Studio Indexa</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -20,62 +23,82 @@
         
         <nav class="glass-nav reveal">
             <div class="logo">STUDIO INDEXA</div>
-            <ul class="nav-links">
+            <ul class="nav-links" style="display: flex; gap: 30px; align-items: center; list-style: none;">
                 <li><a href="#servicos">Serviços</a></li>
                 <li><a href="#portfolio">Cases</a></li>
                 <li><a href="#planos">Planos</a></li>
                 <li><a href="/avaliacoes">Avaliações</a></li>
+                <li>
+                    <a href="/cliente/login" class="btn-outline" style="border-color:var(--text-dark); color:var(--text-dark); padding: 8px 20px; display: inline-flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-lock"></i> Área do Cliente
+                    </a>
+                </li>
                 <li><a href="#contato" class="btn-main">Orçamento <i class="fas fa-arrow-right"></i></a></li>
             </ul>
         </nav>
 
-        <section id="home" class="hero">
-            <div class="glass-card reveal" data-tilt data-tilt-max="5" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2" style="display: inline-block; max-width: 900px; padding: 60px;">
-                <h1 style="font-size: 4rem; line-height: 1.1; margin-bottom: 25px; font-weight: 800;">
-                    Transforme Dados em <br>
-                    <span id="typed-output" style="background: linear-gradient(45deg, #181818, #555); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></span>
-                </h1>
-                <p style="font-size: 1.3rem; margin-bottom: 40px; color: var(--text-grey); max-width: 600px; margin-left: auto; margin-right: auto;">
-                    Estratégias digitais de alta performance para escalar seu negócio com design premium e inteligência de dados.
-                </p>
-                <div style="display:flex; gap:20px; justify-content:center; flex-wrap: wrap;">
-                    <a href="#planos" class="btn-main" style="padding: 15px 40px; font-size: 1.1rem;">Ver Planos</a>
-                    <a href="#contato" class="btn-outline" style="padding: 15px 40px; font-size: 1.1rem;">Falar com Especialista</a>
+        <section id="home" class="hero" style="display: flex; align-items: center; min-height: 90vh;">
+            <div style="max-width: 1300px; margin: 0 auto; display: grid; grid-template-columns: 1.2fr 1fr; gap: 50px; align-items: center;">
+                
+                <div class="glass-card reveal" data-tilt data-tilt-max="5" style="padding: 60px; text-align: left;">
+                    <h1 style="font-size: 3.5rem; line-height: 1.1; margin-bottom: 25px; font-weight: 800;">
+                        Transforme Dados em <br>
+                        <span id="typed-output" style="background: linear-gradient(45deg, #181818, #555); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></span>
+                    </h1>
+                    <p style="font-size: 1.2rem; margin-bottom: 40px; color: var(--text-grey);">
+                        Estratégias digitais de alta performance para escalar seu negócio com design premium e inteligência de dados.
+                    </p>
+                    <div style="display:flex; gap:20px;">
+                        <a href="#planos" class="btn-main">Ver Planos</a>
+                        <a href="#contato" class="btn-outline">Falar com Especialista</a>
+                    </div>
+                </div>
+
+                <div class="glass-card reveal" style="padding: 40px; background: rgba(255,255,255,0.4);">
+                    <h3 style="margin-bottom: 20px; font-size: 1.5rem; display:flex; align-items:center; gap:10px;">
+                        <i class="fas fa-fingerprint"></i> Um pouco sobre nós
+                    </h3>
+                    <p style="margin-bottom: 20px; color: var(--text-dark); line-height: 1.6;">
+                        Somos uma agência <b>Data-Driven</b>. Não acreditamos em "achismos". No Studio Indexa, cada pixel e cada linha de código é orientada por métricas reais de crescimento.
+                    </p>
+                    <ul style="list-style: none; margin-bottom: 25px;">
+                        <li style="margin-bottom: 10px; display:flex; align-items:center; gap:10px;"><i class="fas fa-check-circle" style="color: green;"></i> +50 Projetos Entregues</li>
+                        <li style="margin-bottom: 10px; display:flex; align-items:center; gap:10px;"><i class="fas fa-check-circle" style="color: green;"></i> Foco em ROI e Conversão</li>
+                        <li style="margin-bottom: 10px; display:flex; align-items:center; gap:10px;"><i class="fas fa-check-circle" style="color: green;"></i> Tecnologia Proprietária</li>
+                    </ul>
                 </div>
             </div>
         </section>
 
         <section id="servicos">
-            <div class="reveal"><h2 style="text-align:center; font-size: 2.5rem; margin-bottom: 60px; color: #1d1d1d; text-shadow: none;">Soluções Completas</h2></div>
+            <div class="reveal"><h2 style="text-align:center; font-size: 2.5rem; margin-bottom: 60px; color: #1d1d1d;">Soluções Completas</h2></div>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; max-width: 1200px; margin: 0 auto;">
                 <div class="glass-card reveal" data-tilt style="text-align: center; padding: 50px 30px;">
                     <div style="background: rgba(0,0,0,0.05); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
                         <i class="fas fa-rocket" style="font-size: 2.5rem; color: var(--text-dark);"></i>
                     </div>
                     <h3>Tráfego Pago</h3>
-                    <p style="margin-top: 15px; color: var(--text-grey); line-height: 1.6;">Gestão avançada de anúncios no Google Ads e Meta Ads focada em conversão e ROI positivo.</p>
+                    <p style="margin-top: 15px; color: var(--text-grey); line-height: 1.6;">Gestão avançada de anúncios no Google Ads e Meta Ads focada em conversão.</p>
                 </div>
                 <div class="glass-card reveal" data-tilt style="text-align: center; padding: 50px 30px;">
                     <div style="background: rgba(0,0,0,0.05); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
                         <i class="fas fa-paint-brush" style="font-size: 2.5rem; color: var(--text-dark);"></i>
                     </div>
                     <h3>Design & Branding</h3>
-                    <p style="margin-top: 15px; color: var(--text-grey); line-height: 1.6;">Identidade visual impactante e interfaces modernas (UI/UX) que conectam sua marca ao público.</p>
+                    <p style="margin-top: 15px; color: var(--text-grey); line-height: 1.6;">Identidade visual impactante e interfaces modernas (UI/UX) que conectam sua marca.</p>
                 </div>
                 <div class="glass-card reveal" data-tilt style="text-align: center; padding: 50px 30px;">
                     <div style="background: rgba(0,0,0,0.05); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
                         <i class="fas fa-chart-line" style="font-size: 2.5rem; color: var(--text-dark);"></i>
                     </div>
                     <h3>Data Intelligence</h3>
-                    <p style="margin-top: 15px; color: var(--text-grey); line-height: 1.6;">Dashboards interativos e análise de dados para tomadas de decisão baseadas em fatos.</p>
+                    <p style="margin-top: 15px; color: var(--text-grey); line-height: 1.6;">Dashboards interativos e análise de dados para tomadas de decisão.</p>
                 </div>
             </div>
         </section>
 
         <section id="portfolio">
-            <h2 class="reveal" style="text-align:center; font-size: 2.5rem; margin-bottom: 20px; color: #1d1d1d; text-shadow: none;">Cases de Sucesso</h2>
-            <p class="reveal" style="text-align: center; color: #444; margin-bottom: 40px;">Veja o que já construímos para nossos parceiros.</p>
-            
+            <h2 class="reveal" style="text-align:center; font-size: 2.5rem; margin-bottom: 20px; color: #1d1d1d;">Cases de Sucesso</h2>
             <div class="portfolio-grid reveal" style="max-width: 1200px; margin: 0 auto;">
                 <div class="portfolio-item">
                     <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80" alt="Case 1">
@@ -102,7 +125,7 @@
         </section>
 
         <section id="planos">
-            <h2 class="reveal" style="text-align:center; font-size: 2.5rem; margin-bottom: 60px; color: #1d1d1d; text-shadow: none;">Investimento Inteligente</h2>
+            <h2 class="reveal" style="text-align:center; font-size: 2.5rem; margin-bottom: 60px; color: #1d1d1d;">Investimento Inteligente</h2>
             <div class="pricing-container reveal">
                 <div class="glass-card pricing-card" data-tilt>
                     <h3>Start</h3>
@@ -155,42 +178,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Canais de Anúncio</td>
-                            <td>1 Canal (Meta)</td>
-                            <td>2 Canais (Meta + Google)</td>
-                            <td>Omnichannel (Todos)</td>
-                        </tr>
-                        <tr>
-                            <td>Landing Page</td>
-                            <td><i class="fas fa-times" style="color: #999;"></i></td>
-                            <td><i class="fas fa-check" style="color: var(--accent);"></i> Inclusa</td>
-                            <td><i class="fas fa-check" style="color: var(--accent);"></i> Alta Performance</td>
-                        </tr>
-                        <tr>
-                            <td>Dashboard de Dados</td>
-                            <td>Relatório PDF</td>
-                            <td>Acesso 24h (Básico)</td>
-                            <td>BI Personalizado</td>
-                        </tr>
-                        <tr>
-                            <td>Reuniões de Estratégia</td>
-                            <td>Mensal</td>
-                            <td>Quinzenal</td>
-                            <td>Semanal</td>
-                        </tr>
-                        <tr>
-                            <td>Suporte</td>
-                            <td>E-mail (24h úteis)</td>
-                            <td>WhatsApp Business</td>
-                            <td>Gerente de Conta VIP</td>
-                        </tr>
-                        <tr>
-                            <td>Design Criativo</td>
-                            <td>4 peças/mês</td>
-                            <td>8 peças/mês</td>
-                            <td>Ilimitado para Campanhas</td>
-                        </tr>
+                        <tr><td>Canais de Anúncio</td><td>1 Canal</td><td>2 Canais</td><td>Omnichannel</td></tr>
+                        <tr><td>Landing Page</td><td><i class="fas fa-times" style="color: #999;"></i></td><td><i class="fas fa-check" style="color: var(--accent);"></i> Inclusa</td><td><i class="fas fa-check" style="color: var(--accent);"></i> Alta Performance</td></tr>
+                        <tr><td>Dashboard</td><td>Relatório PDF</td><td>Acesso 24h</td><td>BI Personalizado</td></tr>
+                        <tr><td>Reuniões</td><td>Mensal</td><td>Quinzenal</td><td>Semanal</td></tr>
+                        <tr><td>Suporte</td><td>E-mail</td><td>WhatsApp</td><td>Gerente VIP</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -208,23 +200,16 @@
 
         <section id="contato" class="contact">
             <div class="reveal" style="max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px;">
-                
                 <div>
                     <div class="contact-info-card" data-tilt>
                         <h3 style="margin-bottom: 20px;">Fale Conosco</h3>
                         <div class="info-item">
                             <i class="fas fa-envelope"></i>
-                            <div>
-                                <small style="color:var(--text-grey);">E-mail</small><br>
-                                contato@studioindexa.com
-                            </div>
+                            <div><small style="color:var(--text-grey);">E-mail</small><br>contato@studioindexa.com</div>
                         </div>
                         <div class="info-item">
                             <i class="fab fa-whatsapp"></i>
-                            <div>
-                                <small style="color:var(--text-grey);">WhatsApp</small><br>
-                                (11) 99999-9999
-                            </div>
+                            <div><small style="color:var(--text-grey);">WhatsApp</small><br>(11) 99999-9999</div>
                         </div>
                         <div class="info-item">
                             <i class="fab fa-instagram"></i>
@@ -245,12 +230,10 @@
 
                 <div class="glass-card" style="width: 100%;">
                     <h2 style="text-align: left; margin-bottom: 10px;">Solicite um Orçamento</h2>
-                    <p style="margin-bottom: 30px; color: var(--text-grey);">Preencha o formulário e receba uma proposta em até 24h.</p>
                     <form id="leadForm" enctype="multipart/form-data">
                         <input type="text" id="nome" name="nome" placeholder="Nome Completo" required>
                         <input type="email" id="email" name="email" placeholder="Email Corporativo" required>
                         <input type="tel" id="telefone" name="telefone" placeholder="Telefone / WhatsApp" required>
-                        <label style="font-size: 0.9rem; color: var(--text-grey); margin-left: 5px; display: block; margin-bottom: 8px;">Possui algum briefing? (Opcional)</label>
                         <input type="file" id="arquivo" name="arquivo">
                         <textarea id="projeto" name="projeto" placeholder="Conte-nos sobre seu projeto..." rows="4"></textarea>
                         <button type="submit" class="btn-main" style="width: 100%; justify-content: center;">Enviar Solicitação</button>
@@ -281,12 +264,14 @@
                     </ul>
                 </div>
             </div>
-            <div style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 30px; padding-top: 20px; font-size: 0.8rem; color: #888;">
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 30px; padding-top: 20px; font-size: 0.8rem; color: #888; text-align: center;">
                 &copy; 2025 Studio Indexa. Todos os direitos reservados.
             </div>
         </footer>
 
-    </div> <a href="https://wa.me/5511999999999" class="whatsapp-float" target="_blank"><i class="fab fa-whatsapp"></i></a>
+    </div> 
+    
+    <a href="https://wa.me/5511999999999" class="whatsapp-float" target="_blank"><i class="fab fa-whatsapp"></i></a>
 
     <div class="chat-widget-container">
         <button id="chat-toggle" class="chat-btn"><i class="fas fa-comment-dots"></i></button>
@@ -301,6 +286,7 @@
                 </div>
                 <p id="chat-status" style="margin: 5px 0 0 0; font-size: 0.8rem; opacity: 0.8; color: white;">Suporte Online</p>
             </div>
+            
             <div id="chat-menu" style="display: flex; flex-direction: column; padding: 20px; gap: 10px; overflow-y: auto;">
                 <p style="text-align: center; margin-bottom: 10px; color: var(--text-dark);">Como podemos ajudar hoje?</p>
                 <button onclick="checkAndStart('Financeiro')" class="btn-outline" style="text-align:left; padding:15px; border-radius:15px;"><i class="fas fa-file-invoice-dollar" style="margin-right:10px;"></i> Financeiro</button>
@@ -311,6 +297,7 @@
                     <button onclick="showOldTickets()" style="background:none; border:none; color:var(--text-grey); cursor:pointer; font-size:0.9rem; text-decoration:underline;"><i class="fas fa-history"></i> Ver meus chamados</button>
                 </div>
             </div>
+
             <div id="chat-history-view" style="display: none; flex-direction: column; height: 100%;">
                 <div id="history-list" style="flex:1; overflow-y:auto; padding: 10px;"></div>
                 <button onclick="resetToMenu()" style="border:none; background:transparent; color: var(--text-dark); cursor:pointer; padding:10px;">Voltar</button>
@@ -332,12 +319,8 @@
     <script>
         var typed = new Typed('#typed-output', {
             strings: ['Resultados Reais', 'Vendas', 'Lucro', 'Performance'],
-            typeSpeed: 50,
-            backSpeed: 30,
-            backDelay: 2000,
-            loop: true
+            typeSpeed: 50, backSpeed: 30, backDelay: 2000, loop: true
         });
-        
         AOS.init({ duration: 1000, once: true });
     </script>
 </body>

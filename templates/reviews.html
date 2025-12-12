@@ -7,26 +7,27 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.waves.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
 </head>
 <body>
     <div class="cursor"></div>
     <div class="cursor2"></div>
-    <div class="animated-background"></div>
-    <div id="vanta-bg" style="position: fixed; width: 100%; height: 100%; z-index: -1; top: 0; left: 0;"></div>
     
-    
-    <nav class="glass-nav reveal">
+    <nav class="glass-nav reveal" style="position: absolute; top: 20px;">
         <div class="logo">STUDIO INDEXA</div>
-        <ul class="nav-links">
+        <ul class="nav-links" style="display: flex; gap: 30px; align-items: center; list-style: none;">
             <li><a href="/">Home</a></li>
+            <li><a href="/#planos">Planos</a></li>
+            <li>
+                <a href="/cliente/login" class="btn-outline" style="border-color:var(--text-dark); color:var(--text-dark); padding: 8px 20px; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-lock"></i> Área do Cliente
+                </a>
+            </li>
             <li><a href="/#contato" class="btn-main">Orçamento <i class="fas fa-arrow-right"></i></a></li>
         </ul>
     </nav>
 
-    <section class="hero" style="min-height: 40vh; padding-bottom: 20px;">
+    <section class="hero" style="min-height: 40vh; padding-bottom: 20px; padding-top: 150px;">
         <div class="glass-card reveal" style="text-align: center; max-width: 800px; margin: 0 auto;">
             <h1>O Que Dizem <br><span>Nossos Parceiros</span></h1>
             <p style="margin-top: 15px; color: var(--text-grey);">Histórias reais de transformação digital.</p>
@@ -75,7 +76,7 @@
                         <div style="color: #FFD700; margin-bottom: 10px;">
                             {% for i in range(rev.estrelas) %}<i class="fas fa-star"></i>{% endfor %}
                         </div>
-                        <p style="font-style: italic;">"{{ rev.avaliacao }}"</p>
+                        <p style="font-style: italic; color: #555;">"{{ rev.avaliacao }}"</p>
                         <div style="font-weight: bold; margin-top:15px; font-size: 0.9rem;">
                             - {{ rev.nome }} <span style="font-weight: normal; color: var(--text-grey);">({{ rev.empresa }})</span>
                         </div>
@@ -86,7 +87,7 @@
         </div>
     </section>
 
-    <section class="contact" style="display: flex; justify-content: center;">
+    <section class="contact" style="display: flex; justify-content: center; padding-bottom: 80px;">
         <div class="glass-card reveal" style="width: 100%; max-width: 700px;">
             <h2 style="text-align: center; margin-bottom: 10px;">Deixe sua Experiência</h2>
             <p style="text-align: center; margin-bottom: 30px; font-size: 0.9rem; color: var(--text-grey);">Sua opinião molda o futuro dos nossos serviços.</p>
@@ -121,6 +122,5 @@
     </section>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 </body>
 </html>

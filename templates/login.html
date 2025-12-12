@@ -2,25 +2,123 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Acesso Restrito - Studio Indexa</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    </head>
-<body style="display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px;">
-    
-    <div class="background-blobs">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-    </div>
-    
-    <div class="glass-card" style="width: 100%; max-width: 400px; text-align: center; padding: 50px 30px;">
-        <h2 style="margin-bottom: 30px; color: var(--text-dark);">Acesso Admin</h2>
+    <title>Acesso Seguro - {{ login_type }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
         
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #d7eaff 0%, #cbe0f5 100%);
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 1);
+            padding: 50px 40px;
+            border-radius: 25px;
+            width: 100%; max-width: 420px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            transform: translateY(20px); opacity: 0;
+            animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            text-align: center;
+            position: relative; z-index: 10;
+        }
+
+        @keyframes slideUp { to { transform: translateY(0); opacity: 1; } }
+
+        h2 { color: #2d3436; margin: 0 0 10px 0; font-weight: 700; }
+        p.subtitle { color: #636e72; font-size: 0.9rem; margin-bottom: 30px; }
+
+        .input-group { position: relative; margin-bottom: 25px; text-align: left; }
+        
+        .input-group input {
+            width: 100%; padding: 15px 15px 15px 45px;
+            border: 2px solid #e0e0e0; border-radius: 12px;
+            background: rgba(255,255,255,0.9);
+            font-size: 1rem; transition: 0.3s;
+            outline: none; box-sizing: border-box;
+            color: #333;
+        }
+
+        .input-group i {
+            position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
+            color: #b2bec3; transition: 0.3s; font-size: 1.1rem;
+        }
+
+        .input-group input:focus { border-color: #2d3436; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .input-group input:focus + i { color: #2d3436; }
+
+        button {
+            width: 100%; padding: 16px;
+            background: #2d3436; color: white;
+            border: none; border-radius: 12px;
+            font-size: 1rem; font-weight: 600;
+            cursor: pointer; transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(45, 52, 54, 0.2);
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(45, 52, 54, 0.3);
+            background: black;
+        }
+
+        .flash-msg {
+            background: #ffecec; color: #d63031;
+            padding: 12px; border-radius: 10px; font-size: 0.9rem;
+            margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
+            border: 1px solid #fab1a0;
+        }
+
+        .back-link {
+            margin-top: 25px; display: inline-block;
+            color: #636e72; text-decoration: none; font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        .back-link:hover { color: #2d3436; transform: translateX(-5px); }
+
+        /* Background Shapes */
+        .blob { position: absolute; border-radius: 50%; filter: blur(40px); z-index: 1; }
+        .blob-1 { width: 300px; height: 300px; background: rgba(108, 92, 231, 0.3); top: -10%; left: -10%; animation: float 6s infinite; }
+        .blob-2 { width: 250px; height: 250px; background: rgba(0, 184, 148, 0.3); bottom: -10%; right: -10%; animation: float 8s infinite reverse; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(20px, 20px); }
+            100% { transform: translate(0, 0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="login-card">
+        {% if login_type == 'Admin' %}
+            <div style="background: #2d3436; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 1.5rem;">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <h2>Painel Admin</h2>
+        {% else %}
+            <div style="background: #2d3436; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 1.5rem;">
+                <i class="fas fa-user"></i>
+            </div>
+            <h2>Área do Cliente</h2>
+        {% endif %}
+        
+        <p class="subtitle">Insira suas credenciais para continuar.</p>
+
         {% with messages = get_flashed_messages() %}
             {% if messages %}
-                <div style="background: rgba(231, 76, 60, 0.2); color: #c0392b; padding: 10px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(231, 76, 60, 0.3);">
-                    {% for message in messages %}
-                        <div>{{ message }}</div>
-                    {% endfor %}
+                <div class="flash-msg">
+                    <i class="fas fa-exclamation-circle"></i> {{ messages[0] }}
                 </div>
             {% endif %}
         {% endwith %}
@@ -28,20 +126,20 @@
         <form method="POST">
             {{ form.hidden_tag() }}
             
-            <div style="margin-bottom: 15px;">
-                <input type="text" name="username" placeholder="Usuário" required style="margin-bottom: 0;">
+            <div class="input-group">
+                <input type="text" name="username" placeholder="Usuário" required autocomplete="off">
+                <i class="fas fa-user"></i>
             </div>
             
-            <div style="margin-bottom: 30px;">
-                <input type="password" name="password" placeholder="Senha" required style="margin-bottom: 0;">
+            <div class="input-group">
+                <input type="password" name="password" placeholder="Senha" required>
+                <i class="fas fa-lock"></i>
             </div>
             
-            <button type="submit" class="btn-main" style="width: 100%; justify-content: center;">Entrar no Painel</button>
+            <button type="submit">Entrar no Sistema</button>
         </form>
-        
-        <p style="margin-top: 20px; font-size: 0.8rem;">
-            <a href="/" style="color: var(--text-dark); text-decoration: none;">&larr; Voltar ao site</a>
-        </p>
+
+        <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> Voltar ao site</a>
     </div>
 
 </body>

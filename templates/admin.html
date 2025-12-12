@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard Pro</title>
+    <title>Painel Administrativo - Studio Indexa</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -12,149 +12,196 @@
     
     <div class="admin-layout">
         <div class="sidebar">
-            <h2 style="margin-bottom: 40px; text-align: center; color:white;">PAINEL <span style="color: #999;">ADMIN</span></h2>
-            <button class="nav-btn active" onclick="openTab(event, 'dashboard')"><i class="fas fa-chart-pie"></i> Dashboard</button>
-            <button class="nav-btn" onclick="openTab(event, 'chat')"><i class="fas fa-comments"></i> Chat ({{ sessions.total }})</button>
-            <button class="nav-btn" onclick="openTab(event, 'leads')"><i class="fas fa-users"></i> Leads</button>
-            <button class="nav-btn" onclick="openTab(event, 'financeiro')"><i class="fas fa-wallet"></i> Financeiro</button>
+            <h2 style="margin-bottom: 40px; text-align: center; color:white;">SUPER <span style="color: #999;">ADMIN</span></h2>
+            <button class="nav-btn" onclick="openTab(event, 'dashboard')"><i class="fas fa-chart-pie"></i> Geral</button>
+            <button class="nav-btn" onclick="openTab(event, 'clients')"><i class="fas fa-users-cog"></i> Gestão Clientes</button>
+            <button class="nav-btn" onclick="openTab(event, 'chat_public')"><i class="fas fa-comments"></i> Chat Site</button>
+            <button class="nav-btn" onclick="openTab(event, 'chat_client')"><i class="fas fa-user-shield"></i> Chat Clientes</button>
             <button class="nav-btn" onclick="openTab(event, 'reviews')"><i class="fas fa-star"></i> Avaliações</button>
+            <button class="nav-btn" onclick="openTab(event, 'leads')"><i class="fas fa-bullhorn"></i> Leads</button>
+            <button class="nav-btn" onclick="openTab(event, 'financeiro')"><i class="fas fa-wallet"></i> Financeiro</button>
             <div style="margin-top: auto;"><a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Sair</a></div>
         </div>
 
         <div class="main-content">
             
-            <div class="filters" style="background: var(--admin-card-bg); padding: 15px; border-radius: 10px; display: flex; gap: 10px; margin-bottom: 25px; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                <form method="GET" style="display: flex; gap: 10px; flex: 1; align-items: center;">
-                    <input type="hidden" name="tab" id="activeTabInput" value="dashboard">
-                    <input type="text" name="q" placeholder="Buscar (Nome, Email, ID)..." style="margin:0; padding:10px; border:1px solid #ddd; border-radius:5px; flex: 1;">
-                    <select name="date" style="margin:0; width: auto; border:1px solid #ddd; border-radius:5px; padding: 10px;">
-                        <option value="">Período</option><option value="today">Hoje</option><option value="week">Semana</option><option value="month">Mês</option>
-                    </select>
-                    <select name="status" style="margin:0; width: auto; border:1px solid #ddd; border-radius:5px; padding: 10px;">
-                        <option value="">Status</option><option value="Aberto">Aberto</option><option value="Encerrado">Encerrado</option>
-                    </select>
-                    <button type="submit" class="btn-main" style="min-width: auto; padding: 10px 20px; font-size: 0.9rem;">Filtrar</button>
-                </form>
-            </div>
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div style="background: #00b894; color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;">{{ messages[0] }}</div>
+            {% endif %}
+            {% endwith %}
 
-            <div id="dashboard" class="tab-content active">
+            <div id="dashboard" class="tab-content">
                 <div class="stat-grid">
-                    <div class="admin-card"><div class="icon-box" style="background:#e0e7ff; color:#667eea;"><i class="fas fa-eye"></i></div><div><h3>{{ total_visits }}</h3><p>Visitas</p></div></div>
-                    <div class="admin-card"><div class="icon-box" style="background:#dcfce7; color:#16a34a;"><i class="fas fa-user-plus"></i></div><div><h3>{{ total_leads }}</h3><p>Leads Totais</p></div></div>
-                    <div class="admin-card"><div class="icon-box" style="background:#fce7f3; color:#db2777;"><i class="fas fa-shopping-cart"></i></div><div><h3>{{ total_sales }}</h3><p>Vendas</p></div></div>
+                    <div class="admin-card"><h3>{{ total_visits }}</h3><p>Visitas</p></div>
+                    <div class="admin-card"><h3>{{ total_leads }}</h3><p>Leads</p></div>
+                    <div class="admin-card"><h3>{{ total_sales }}</h3><p>Vendas</p></div>
                 </div>
-
-                <div class="charts-container" style="display:flex; gap:20px; flex-wrap:wrap;">
-                    <div class="glass-card" style="flex: 2; min-width: 300px; height: 400px; position: relative;">
-                        <h3 style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">Evolução de Leads (7 Dias)</h3>
-                        <canvas id="leadsChart"></canvas>
-                    </div>
-                    <div class="glass-card" style="flex: 1; min-width: 300px; height: 400px; position: relative;">
-                        <h3 style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">Status dos Chamados</h3>
-                        <canvas id="statusChart"></canvas>
-                    </div>
+                <div class="glass-card" style="margin-top: 30px; height: 400px;">
+                    <h3>Leads (7 Dias)</h3>
+                    <canvas id="leadsChart"></canvas>
                 </div>
             </div>
 
-            <div id="chat" class="tab-content">
+            <div id="chat_public" class="tab-content" style="display:none;">
+                <h3>Chat do Site (Visitantes)</h3>
                 <div class="messenger">
                     <div class="chat-list">
-                        {% for sess in sessions.items %}
-                        <div class="chat-item {% if sess.uuid == active_session %}active{% endif %}" style="position: relative;">
-                            <div onclick="window.location.href='?session_id={{ sess.uuid }}&tab=chat&page={{ sessions.page }}'" style="cursor: pointer;">
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <b style="color:var(--accent);">{{ sess.full_title }}</b> 
-                                    <span class="badge" style="background:{{ 'green' if sess.status=='Aberto' else '#999' }}; color:white; padding:2px 6px; font-size:0.7em; border-radius:4px;">{{ sess.status }}</span>
-                                </div>
-                                <div style="font-size:0.8em; color:#666; margin-top:5px;">{{ sess.category }} • {{ sess.created_at.strftime('%d/%m %H:%M') }}</div>
-                            </div>
-                            <button onclick="deleteTicket(event, '{{ sess.uuid }}')" style="position: absolute; right: 10px; bottom: 8px; background: none; border: none; color: #ff4444; cursor: pointer;"><i class="fas fa-trash"></i></button>
+                        {% for s in public_chats %}
+                        <div class="chat-item" onclick="window.location.href='?session_id={{ s.uuid }}&tab=chat_public'" style="padding:15px; cursor:pointer; border-bottom:1px solid #eee; background: {{ '#f1f2f6' if active_session == s.uuid else 'white' }};">
+                            <b>{{ s.client_name }}</b> <span class="badge" style="font-size:0.7em;">{{ s.category }}</span>
                         </div>
                         {% endfor %}
-                        
-                        <div style="padding: 10px; text-align: center; border-top: 1px solid #eee;">
-                            {% if sessions.has_prev %}<a href="?page={{ sessions.prev_num }}&tab=chat" class="btn-outline" style="padding: 5px 10px; font-size:0.8rem;">&larr; Ant</a>{% endif %}
-                            <span style="margin: 0 10px; font-size: 0.8rem;">Pág {{ sessions.page }}</span>
-                            {% if sessions.has_next %}<a href="?page={{ sessions.next_num }}&tab=chat" class="btn-outline" style="padding: 5px 10px; font-size:0.8rem;">Próx &rarr;</a>{% endif %}
-                        </div>
                     </div>
-
-                    <div class="chat-view">
-                        {% if active_session %}
-                        <div class="chat-header-admin" style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>Atendimento: <b>{{ active_ticket }}</b></span>
-                            {% if active_ticket_status == 'Aberto' %}
-                                <button onclick="closeTicket('{{ active_session }}')" style="background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;"><i class="fas fa-times-circle"></i> Encerrar</button>
-                            {% else %}
-                                <span style="color: #e74c3c; font-weight: bold; border: 1px solid #e74c3c; padding: 5px 10px; border-radius: 5px;">ENCERRADO</span>
-                            {% endif %}
-                        </div>
-                        <div class="chat-body" id="admin-chat-body">
-                            {% for msg in chat_history %}
-                                <div class="message {% if msg.remetente == 'admin' or msg.remetente == 'system' %}sent{% else %}received{% endif %}" 
-                                     style="{% if msg.remetente == 'system' %}background:#f1c40f; color:#333; align-self:center; width:auto;{% endif %}">
-                                    {% if msg.remetente == 'system' %}<b>Sistema:</b> {% endif %}
-                                    {% if msg.tipo == 'audio' %}<audio controls src="/static/uploads/{{ msg.conteudo }}"></audio>
-                                    {% elif msg.tipo == 'arquivo' %}<a href="/static/uploads/{{ msg.conteudo }}" target="_blank"><i class="fas fa-paperclip"></i> Ver Anexo</a>
-                                    {% else %}{{ msg.conteudo }}{% endif %}
-                                </div>
-                            {% endfor %}
-                        </div>
-                        {% if active_ticket_status == 'Aberto' %}
-                        <form id="replyForm" class="reply-area">
-                            <input type="hidden" name="session_id" value="{{ active_session }}">
-                            <input type="hidden" name="remetente" value="admin">
-                            <input type="text" name="message" placeholder="Digite sua resposta..." required>
-                            <button class="btn-main" style="min-width: auto;"><i class="fas fa-paper-plane"></i></button>
-                        </form>
-                        {% endif %}
+                    <div class="chat-view" style="display:flex; flex-direction:column; height:500px;">
+                        {% if active_session and active_tab == 'chat_public' %}
+                            <div class="chat-header-admin" style="padding:15px; background:#eee;"><b>{{ active_ticket }}</b></div>
+                            <div id="admin-chat-body-public" style="flex:1; overflow-y:auto; padding:20px; background:white; display:flex; flex-direction:column; gap:10px;">
+                                {% for msg in chat_history %}
+                                    <div class="message {{ 'sent' if msg.remetente != 'user' else 'received' }}" style="{{ 'background:#2d3436; color:white; align-self:flex-end;' if msg.remetente != 'user' else 'background:#f1f2f6; color:black; align-self:flex-start;' }} padding:10px 15px; border-radius:15px;">{{ msg.conteudo }}</div>
+                                {% endfor %}
+                            </div>
+                            <form id="replyFormPublic" style="padding:15px; background:#eee; display:flex; gap:10px;">
+                                <input type="hidden" name="session_id" value="{{ active_session }}">
+                                <input type="hidden" name="remetente" value="admin">
+                                <input type="text" name="message" style="flex:1; padding:10px; border-radius:5px;" placeholder="Responder...">
+                                <button class="btn-main" style="min-width:auto;"><i class="fas fa-paper-plane"></i></button>
+                            </form>
                         {% else %}
-                        <div style="display:flex; align-items:center; justify-content:center; height:100%; color:#aaa; flex-direction: column;">
-                            <i class="fas fa-comments" style="font-size: 3rem; margin-bottom: 10px;"></i><p>Selecione um atendimento.</p>
-                        </div>
+                            <div style="margin:auto; color:#ccc;">Selecione um chat</div>
                         {% endif %}
                     </div>
                 </div>
             </div>
 
-            <div id="leads" class="tab-content">
-                <div class="glass-card" style="padding:0; overflow-x:auto;">
-                    <table class="admin-table">
-                        <thead><tr><th>Data</th><th>Nome</th><th>Email</th><th>Telefone</th><th>Projeto</th></tr></thead>
-                        <tbody>
-                            {% for lead in leads.items %}
-                            <tr><td>{{ lead.data.strftime('%d/%m') }}</td><td>{{ lead.nome }}</td><td>{{ lead.email }}</td><td>{{ lead.telefone }}</td><td style="font-size:0.9em;">{{ lead.projeto }}</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                    <div style="padding: 15px; text-align: center;">
-                        {% if leads.has_prev %}<a href="?page={{ leads.prev_num }}&tab=leads" class="btn-outline">Anterior</a>{% endif %}
-                        <span style="margin: 0 10px;">Página {{ leads.page }}</span>
-                        {% if leads.has_next %}<a href="?page={{ leads.next_num }}&tab=leads" class="btn-outline">Próxima</a>{% endif %}
+            <div id="chat_client" class="tab-content" style="display:none;">
+                <h3>Chat Área do Cliente (Logados)</h3>
+                <div class="messenger">
+                    <div class="chat-list">
+                        {% for s in client_chats %}
+                        <div class="chat-item" onclick="window.location.href='?session_id={{ s.uuid }}&tab=chat_client'" style="padding:15px; cursor:pointer; border-bottom:1px solid #eee; background: {{ '#f1f2f6' if active_session == s.uuid else 'white' }};">
+                            <b>{{ s.client_name }}</b> <span class="badge" style="background:#00b894; color:white; padding:2px 5px; font-size:0.7em; border-radius:4px;">Cliente</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="chat-view" style="display:flex; flex-direction:column; height:500px;">
+                        {% if active_session and active_tab == 'chat_client' %}
+                            <div class="chat-header-admin" style="padding:15px; background:#eee;"><b>{{ active_ticket }}</b></div>
+                            <div id="admin-chat-body-client" style="flex:1; overflow-y:auto; padding:20px; background:white; display:flex; flex-direction:column; gap:10px;">
+                                {% for msg in chat_history %}
+                                    <div class="message {{ 'sent' if msg.remetente != 'user' else 'received' }}" style="{{ 'background:#2d3436; color:white; align-self:flex-end;' if msg.remetente != 'user' else 'background:#f1f2f6; color:black; align-self:flex-start;' }} padding:10px 15px; border-radius:15px;">{{ msg.conteudo }}</div>
+                                {% endfor %}
+                            </div>
+                            <form id="replyFormClient" style="padding:15px; background:#eee; display:flex; gap:10px;">
+                                <input type="hidden" name="session_id" value="{{ active_session }}">
+                                <input type="hidden" name="remetente" value="admin">
+                                <input type="text" name="message" style="flex:1; padding:10px; border-radius:5px;" placeholder="Responder...">
+                                <button class="btn-main" style="min-width:auto;"><i class="fas fa-paper-plane"></i></button>
+                            </form>
+                        {% else %}
+                            <div style="margin:auto; color:#ccc;">Selecione um cliente</div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
 
-            <div id="financeiro" class="tab-content">
+            <div id="clients" class="tab-content" style="display:none;">
+                <div class="glass-card" style="margin-bottom:20px;">
+                    <h3><i class="fas fa-user-plus"></i> Novo Cliente</h3>
+                    <form action="/admin/create_client" method="POST" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="text" name="name" placeholder="Nome Empresa" required>
+                        <input type="text" name="username" placeholder="Login" required>
+                        <input type="password" name="password" placeholder="Senha" required>
+                        <input type="text" name="plan_name" placeholder="Plano Inicial" required>
+                        <button class="btn-main" style="grid-column: span 2;">Criar</button>
+                    </form>
+                </div>
+
+                <h3>Editar Clientes Existentes</h3>
+                {% for c in clients %}
+                <div class="glass-card" style="margin-bottom:15px; padding:20px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                        <div style="font-weight:bold; font-size:1.1rem;">{{ c.name }} <span style="font-weight:normal; color:#666;">({{ c.username }})</span></div>
+                        <a href="/admin/delete_client/{{ c.id }}" onclick="return confirm('Tem certeza?')" style="color:red;"><i class="fas fa-trash"></i></a>
+                    </div>
+                    
+                    <form action="/admin/update_client_stats/{{ c.id }}" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div style="display:grid; grid-template-columns: 1fr 2fr; gap:10px; margin-bottom:15px;">
+                            <div>
+                                <label style="font-size:0.8rem;">Nome do Plano</label>
+                                <input type="text" name="plan_name" value="{{ c.plan_info.plan_name if c.plan_info else '' }}" style="margin:0;">
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem;">Benefícios (Separe por vírgula)</label>
+                                <input type="text" name="benefits" value="{{ c.plan_info.benefits|replace('[','' )|replace(']','' )|replace('\"','') if c.plan_info else '' }}" style="margin:0;">
+                            </div>
+                        </div>
+                        
+                        <label style="font-size:0.8rem; font-weight:bold;">Dados do Gráfico (Mês : Valor)</label>
+                        <div style="background:#f9f9f9; padding:10px; border-radius:5px; margin-bottom:10px;">
+                            {% for stat in c.stats %}
+                            <div style="display:flex; gap:10px; margin-bottom:5px;">
+                                <input type="text" name="labels[]" value="{{ stat.label }}" style="margin:0;">
+                                <input type="number" name="values[]" value="{{ stat.value }}" style="margin:0;">
+                            </div>
+                            {% endfor %}
+                            <div style="display:flex; gap:10px;">
+                                <input type="text" name="labels[]" placeholder="Novo Mês" style="margin:0; border:1px dashed #ccc;">
+                                <input type="number" name="values[]" placeholder="Valor" style="margin:0; border:1px dashed #ccc;">
+                            </div>
+                        </div>
+                        <button class="btn-outline" style="font-size:0.8rem;">Salvar Alterações</button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div id="reviews" class="tab-content" style="display:none;">
+                <h3>Avaliações</h3>
                 <div class="glass-card" style="padding:0; overflow-x:auto;">
                     <table class="admin-table">
-                        <thead><tr><th>ID</th><th>Plano</th><th>Valor</th><th>Status</th></tr></thead>
+                        <thead><tr><th>Cliente</th><th>Nota</th><th>Status</th><th>Ação</th></tr></thead>
                         <tbody>
-                            {% for order in orders.items %}
-                            <tr><td>#{{ order.id[:8] }}</td><td><span class="badge" style="background:#e0e7ff; color:#4338ca;">{{ order.plano }}</span></td><td>R$ {{ order.preco }}</td><td>{{ order.status }}</td></tr>
+                            {% for r in reviews %}
+                            <tr>
+                                <td>{{ r.nome }}</td>
+                                <td style="color:gold;">{{ r.estrelas }} <i class="fas fa-star"></i></td>
+                                <td><span class="badge" style="background:{{ '#00b894' if r.visivel else '#636e72' }}; color:white;">{{ 'Visível' if r.visivel else 'Oculto' }}</span></td>
+                                <td>
+                                    <a href="/admin/toggle_review/{{ r.id }}" class="btn-outline" style="padding:5px 10px; font-size:0.8rem;">{{ 'Ocultar' if r.visivel else 'Mostrar' }}</a>
+                                    <a href="/admin/delete_review/{{ r.id }}" onclick="return confirm('Apagar?')" style="color:red; margin-left:10px;"><i class="fas fa-trash"></i></a>
+                                </td>
+                            </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <div id="reviews" class="tab-content">
+            <div id="leads" class="tab-content" style="display:none;">
+                <h3>Leads</h3>
                 <div class="glass-card" style="padding:0; overflow-x:auto;">
                     <table class="admin-table">
-                        <thead><tr><th>Nome</th><th>Empresa</th><th>Nota</th><th>Texto</th></tr></thead>
+                        <thead><tr><th>Data</th><th>Nome</th><th>Contato</th><th>Projeto</th></tr></thead>
                         <tbody>
-                            {% for rev in reviews %}
-                            <tr><td>{{ rev.nome }}</td><td>{{ rev.empresa }}</td><td style="color: gold;">{% for i in range(rev.estrelas) %}<i class="fas fa-star"></i>{% endfor %}</td><td>{{ rev.avaliacao }}</td></tr>
+                            {% for lead in leads %}
+                            <tr><td>{{ lead.data.strftime('%d/%m') }}</td><td>{{ lead.nome }}</td><td>{{ lead.email }}<br>{{ lead.telefone }}</td><td>{{ lead.projeto }}</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="financeiro" class="tab-content" style="display:none;">
+                <h3>Financeiro</h3>
+                <div class="glass-card" style="padding:0; overflow-x:auto;">
+                    <table class="admin-table">
+                        <thead><tr><th>Plano</th><th>Valor</th><th>Status</th></tr></thead>
+                        <tbody>
+                            {% for order in orders %}
+                            <tr><td>{{ order.plano }}</td><td>{{ order.preco }}</td><td>{{ order.status }}</td></tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -166,101 +213,57 @@
 
     <script>
         function openTab(evt, tabName) {
-            var tabcontent = document.getElementsByClassName("tab-content");
-            for (var i = 0; i < tabcontent.length; i++) tabcontent[i].style.display = "none";
-            var navbtns = document.getElementsByClassName("nav-btn");
-            for (var i = 0; i < navbtns.length; i++) navbtns[i].classList.remove("active");
+            var i, tabcontent, navbtns;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) tabcontent[i].style.display = "none";
+            navbtns = document.getElementsByClassName("nav-btn");
+            for (i = 0; i < navbtns.length; i++) navbtns[i].classList.remove("active");
             document.getElementById(tabName).style.display = "block";
             if(evt) evt.currentTarget.classList.add("active");
-            document.getElementById('activeTabInput').value = tabName;
-            localStorage.setItem('activeTab', tabName);
         }
 
-        async function closeTicket(uuid) {
-            const result = await Swal.fire({title: 'Encerrar?', icon: 'question', showCancelButton: true});
-            if (result.isConfirmed) { await fetch(`/close_ticket/${uuid}`, { method: 'POST' }); location.reload(); }
-        }
+        const activeTab = "{{ active_tab }}" || "dashboard";
+        const btn = document.querySelector(`button[onclick*="'${activeTab}'"]`);
+        if(btn) openTab({currentTarget: btn}, activeTab); else openTab(null, 'dashboard');
 
-        async function deleteTicket(event, uuid) {
-            event.stopPropagation(); 
-            const result = await Swal.fire({title: 'Apagar?', text: "Irreversível.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33'});
-            if (result.isConfirmed) {
-                const res = await fetch(`/delete_ticket/${uuid}`, { method: 'DELETE' });
-                if(res.ok) location.reload(); else Swal.fire('Erro', 'Falha ao excluir', 'error');
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const params = new URLSearchParams(window.location.search);
-            const activeTab = params.get('tab') || localStorage.getItem('activeTab') || 'dashboard';
-            const btn = document.querySelector(`button[onclick*="'${activeTab}'"]`);
-            if(btn) openTab({currentTarget: btn}, activeTab); else openTab(null, 'dashboard');
-
-            // --- GRÁFICOS MELHORADOS ---
-            const leadsData = JSON.parse('{{ leads_chart|safe }}');
-            const statusData = JSON.parse('{{ status_chart|safe }}');
-
-            // Gráfico de Barras para Leads (Melhor visualização de volume)
-            if(document.getElementById('leadsChart')) {
-                new Chart(document.getElementById('leadsChart'), {
-                    type: 'bar', // Mudado para barra
-                    data: { 
-                        labels: leadsData.labels, 
-                        datasets: [{ 
-                            label: 'Novos Leads', 
-                            data: leadsData.values, 
-                            backgroundColor: 'rgba(54, 162, 235, 0.6)', 
-                            borderColor: 'rgba(54, 162, 235, 1)', 
-                            borderWidth: 1 
-                        }] 
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
-                });
-            }
-
-            // Gráfico de Pizza (Donut) para Status
-            if(document.getElementById('statusChart')) {
-                new Chart(document.getElementById('statusChart'), {
-                    type: 'doughnut',
-                    data: { 
-                        labels: statusData.labels, 
-                        datasets: [{ 
-                            data: statusData.values, 
-                            backgroundColor: ['#2ecc71', '#95a5a6'], // Verde para Aberto, Cinza para Fechado
-                            hoverOffset: 4
-                        }] 
-                    },
-                    options: { responsive: true, maintainAspectRatio: false }
-                });
-            }
-
-            {% if active_session and active_ticket_status == 'Aberto' %}
-            setInterval(async () => {
-                const res = await fetch('/get_messages/{{ active_session }}');
-                const data = await res.json();
-                const chatBody = document.getElementById('admin-chat-body');
-                chatBody.innerHTML = ''; 
-                data.messages.forEach(m => {
-                    let c = m.conteudo;
-                    if(m.tipo === 'audio') c = `<audio controls src="/static/uploads/${c}"></audio>`;
-                    if(m.tipo === 'arquivo') c = `<a href="/static/uploads/${c}" target="_blank">Ver Anexo</a>`;
-                    const div = document.createElement('div');
-                    div.className = `message ${m.remetente === 'admin' || m.remetente === 'system' ? 'sent' : 'received'}`;
-                    if(m.remetente === 'system') div.style.cssText = "background:#f1c40f; color:#333; align-self:center; width:auto;";
-                    div.innerHTML = c;
-                    chatBody.appendChild(div);
-                });
-            }, 3000); 
-
-            document.getElementById('replyForm').addEventListener('submit', async(e) => {
-                e.preventDefault(); const fd = new FormData(e.target);
-                await fetch('/send_chat', {method:'POST', body:fd});
-                e.target.reset();
-                const div = document.createElement('div'); div.className='message sent'; div.innerText=fd.get('message');
-                document.getElementById('admin-chat-body').appendChild(div);
+        // Gráfico Leads
+        const leadsEl = document.getElementById('leadsChart');
+        if(leadsEl) {
+            const data = JSON.parse('{{ leads_chart|safe }}');
+            new Chart(leadsEl, {
+                type: 'bar',
+                data: { labels: data.labels, datasets: [{ label: 'Leads', data: data.values, backgroundColor: '#0984e3' }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
             });
-            {% endif %}
-        });
+        }
+
+        // Logic Chat Ao Vivo (Admin)
+        {% if active_session %}
+            // Detecta qual chat está ativo (Publico ou Cliente) e usa o form correto
+            const formId = "{{ active_tab }}" == 'chat_client' ? 'replyFormClient' : 'replyFormPublic';
+            const bodyId = "{{ active_tab }}" == 'chat_client' ? 'admin-chat-body-client' : 'admin-chat-body-public';
+            const chatBody = document.getElementById(bodyId);
+            
+            if(chatBody) {
+                chatBody.scrollTop = chatBody.scrollHeight;
+                document.getElementById(formId).addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const fd = new FormData(e.target);
+                    await fetch('/send_chat', {method:'POST', body:fd});
+                    e.target.reset();
+                    const div = document.createElement('div'); 
+                    div.style.cssText = "background:#2d3436; color:white; align-self:flex-end; padding:10px 15px; border-radius:15px;";
+                    div.innerText = fd.get('message');
+                    chatBody.appendChild(div); chatBody.scrollTop = chatBody.scrollHeight;
+                });
+
+                setInterval(async () => {
+                    const res = await fetch('/get_messages/{{ active_session }}');
+                    const data = await res.json();
+                    if(data.messages.length > chatBody.children.length) location.reload();
+                }, 3000);
+            }
+        {% endif %}
     </script>
 </body>
 </html>

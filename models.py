@@ -2,13 +2,32 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from datetime import datetime
 import uuid
+import json
 
 db = SQLAlchemy()
 
 class User(db.Model, UserMixin): 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
+    name = db.Column(db.String(100))
     password_hash = db.Column(db.String(120), nullable=False)
+    role = db.Column(db.String(20), default='client')
+    
+    plan_info = db.relationship('ClientPlan', backref='user', uselist=False, cascade="all, delete-orphan")
+    stats = db.relationship('ClientStat', backref='user', cascade="all, delete-orphan")
+
+class ClientPlan(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True)
+    plan_name = db.Column(db.String(50))
+    benefits = db.Column(db.Text)
+
+class ClientStat(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    label = db.Column(db.String(50))
+    value = db.Column(db.Float)
+    type = db.Column(db.String(20))
 
 class Visit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -38,6 +57,7 @@ class Review(db.Model):
     avaliacao = db.Column(db.Text)
     estrelas = db.Column(db.Integer)
     data = db.Column(db.DateTime, default=datetime.utcnow)
+    visivel = db.Column(db.Boolean, default=True) # Controle Soft Delete
 
 class ChatSession(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -46,6 +66,7 @@ class ChatSession(db.Model):
     status = db.Column(db.String(20), default='Aberto')
     client_name = db.Column(db.String(100))
     client_phone = db.Column(db.String(30))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True) # Vínculo com cliente logado
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class ChatMessage(db.Model):
@@ -56,11 +77,10 @@ class ChatMessage(db.Model):
     remetente = db.Column(db.String(20))
     data = db.Column(db.DateTime, default=datetime.utcnow)
 
-# --- NOVO: TABELA DE AUDITORIA DE SEGURANÇA ---
 class AuditLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer) # ID do Admin que fez a ação
-    action = db.Column(db.String(50)) # O que fez (EX: DELETE_TICKET)
-    details = db.Column(db.Text) # Detalhes
-    ip_address = db.Column(db.String(50)) # IP de quem fez
+    user_id = db.Column(db.Integer)
+    action = db.Column(db.String(50))
+    details = db.Column(db.Text)
+    ip_address = db.Column(db.String(50))
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
