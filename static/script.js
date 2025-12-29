@@ -1,3 +1,4 @@
+// --- Configuração das Notificações (Toast) ---
 const Toast = Swal.mixin({
     toast: true,
     position: 'bottom-end',
@@ -27,6 +28,7 @@ function showAlert(title, text) {
     });
 }
 
+// Alterna a exibição da tabela de comparação de planos
 function toggleComparison() {
     const section = document.getElementById('comparison-section');
     if (section.style.display === 'none' || section.style.display === '') {
@@ -41,6 +43,7 @@ function toggleComparison() {
     }
 }
 
+// --- Inicialização do Gráfico de ROI (Canvas) ---
 function initROIChart() {
     const ctx = document.getElementById('roiChart');
     if(!ctx) return;
@@ -85,11 +88,13 @@ function initROIChart() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Observador para animar elementos quando aparecem na tela
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('active'); });
     });
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     
+    // Observador para carregar o gráfico apenas quando visível
     const chartObserver = new IntersectionObserver((entries) => {
         entries.forEach(e => {
             if(e.isIntersecting) {
@@ -101,6 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const roiSection = document.getElementById('results-graph');
     if(roiSection) chartObserver.observe(roiSection);
 
+    // Formatação de Telefone
     const telInputs = document.querySelectorAll('input[type="tel"]');
     telInputs.forEach(input => {
         input.addEventListener('input', (e) => {
@@ -111,6 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- Envio do Formulário de Lead (Orçamento) ---
     const leadForm = document.getElementById('leadForm');
     if(leadForm) {
         leadForm.addEventListener('submit', async (e) => {
@@ -134,6 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Envio de Avaliação ---
     const reviewForm = document.getElementById('reviewForm');
     if(reviewForm) {
         reviewForm.addEventListener('submit', async (e) => {
@@ -165,6 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- LÓGICA DO CHATBOT ---
     const chatBox = document.getElementById('chat-box');
     const chatMenu = document.getElementById('chat-menu');
     const chatInterface = document.getElementById('chat-interface');
@@ -180,12 +189,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentMessageCount = 0;
     let isUploadingAudio = false;
 
+    // Abrir/Fechar Chat
     window.toggleChat = function() {
         chatBox.style.display = (chatBox.style.display === 'flex') ? 'none' : 'flex';
         if(chatBox.style.display === 'flex') resetToMenu();
     }
     if(document.getElementById('chat-toggle')) document.getElementById('chat-toggle').addEventListener('click', toggleChat);
 
+    // Reseta para o menu inicial do chat
     window.resetToMenu = function() {
         chatMenu.style.display = 'flex'; chatInterface.style.display = 'none';
         if(chatHistoryView) chatHistoryView.style.display = 'none';
@@ -196,7 +207,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if(backBtn) backBtn.addEventListener('click', () => window.resetToMenu());
 
+    // Inicia fluxo de criação de ticket
     window.checkAndStart = async function(categoria) {
+        // Verifica se já existe ticket
         const history = JSON.parse(localStorage.getItem('ticketHistory') || '[]');
         if (history.length > 0) {
             try {
@@ -212,6 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.startBotFlow(categoria);
     }
 
+    // Fluxo do Robô (Perguntar nome e telefone)
     window.startBotFlow = function(categoria) {
         chatMenu.style.display = 'none'; chatInterface.style.display = 'flex';
         backBtn.style.display = 'block'; chatBody.innerHTML = ''; 
@@ -225,6 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 800);
     }
 
+    // Enviar Mensagem
     async function handleSend() {
         const text = chatInput.value.trim();
         if(!text) return;
@@ -244,6 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } catch(e) { console.error("Erro ao enviar", e); }
             }
         } else {
+            // Lógica do bot simples
             appendMessage(text, 'sent'); chatInput.value = '';
             if (botState === 'waiting_name') {
                 tempName = text; botState = 'waiting_phone';
@@ -267,6 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chatInput.addEventListener('keypress', (e)=>{ if(e.key==='Enter') handleSend(); });
     }
 
+    // --- Upload de Arquivos ---
     const fileInput = document.getElementById('file-input');
     const btnAttach = document.getElementById('btn-attach');
     if(btnAttach && fileInput) {
@@ -294,6 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Gravação de Áudio ---
     const btnMic = document.getElementById('btn-mic');
     let mediaRecorder = null;
     let audioChunks = [];
@@ -306,7 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if(!localStorage.getItem('activeSession')) return Swal.fire('Ops', 'Inicie um chat primeiro.', 'warning');
             
             const now = Date.now();
-            if (now - lastMicClick < 1000) return;
+            if (now - lastMicClick < 1000) return; // Evita duplo clique rápido
             lastMicClick = now;
 
             if(isUploadingAudio) return;
@@ -314,6 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const icon = btnMic.querySelector('i');
 
             if (!isRecording) {
+                // Iniciar Gravação
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     mediaRecorder = new MediaRecorder(stream);
@@ -386,6 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     isRecording = false;
                 }
             } else {
+                // Parar Gravação
                 if(mediaRecorder && mediaRecorder.state !== 'inactive') {
                     mediaRecorder.stop();
                     mediaRecorder.stream.getTracks().forEach(track => track.stop()); 
@@ -398,11 +418,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Salva ID do ticket no navegador
     function saveTicketToLocal(uuid) {
         let history = JSON.parse(localStorage.getItem('ticketHistory') || '[]');
         if(!history.includes(uuid)) { history.push(uuid); localStorage.setItem('ticketHistory', JSON.stringify(history)); }
     }
 
+    // Função auxiliar para enviar ao backend
     async function sendMessageBackend(fd, sess) {
         fd.append('session_id', sess); fd.append('remetente', 'user');
         const res = await fetch('/send_chat', {method:'POST', body:fd});
@@ -420,6 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chatBody.appendChild(d); chatBody.scrollTop = chatBody.scrollHeight;
     }
 
+    // Mostra histórico de tickets
     window.showOldTickets = async function() {
         chatMenu.style.display = 'none'; chatHistoryView.style.display = 'flex'; backBtn.style.display = 'block';
         const history = JSON.parse(localStorage.getItem('ticketHistory') || '[]');
@@ -445,6 +468,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch(e){}
     }
 
+    // Loop para buscar novas mensagens a cada 3 segundos
     async function loadMessages() {
         if(isUploadingAudio || isRecording) return;
 
