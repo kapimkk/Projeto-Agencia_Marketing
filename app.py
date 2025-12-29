@@ -15,53 +15,42 @@ from flask_limiter.util import get_remote_address
 from flask_talisman import Talisman
 
 from config import Config
-from models import db, User, Lead, Order, Review, ChatSession, ChatMessage, Visit, AuditLog, ClientPlan, ClientStat
+from models import db, User, Lead, Order, Review, ChatSession, ChatMessage, Visit, AuditLog, ClientPlan, ClientStat, PublicPlan
 from forms import LoginForm
 
 app = Flask(__name__)
-# Carrega as configurações do arquivo config.py
 app.config.from_object(Config)
 
-# --- Configurações de Upload e Segurança ---
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 # Limite de tamanho de arquivo (16MB)
+# Configurações
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'pdf', 'doc', 'docx'}
-# Cria a pasta de uploads se ela não existir
 if not os.path.exists(app.config['UPLOAD_FOLDER']): os.makedirs(app.config['UPLOAD_FOLDER'])
 
-# Inicialização das extensões (Banco de dados, Migração, Email, CSRF, Login)
 db.init_app(app)
 migrate = Migrate(app, db)
 mail = Mail(app)
 csrf = CSRFProtect(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'client_login' # Página de login padrão
+login_manager.login_view = 'client_login'
 
-# Configuração de limite de requisições (Segurança contra ataques)
 limiter = Limiter(get_remote_address, app=app, default_limits=["2000 per day", "500 per hour"], storage_uri="memory://")
-# Configuração de segurança de cabeçalhos HTTP (CSP)
 csp = { 'default-src': '\'self\'', 'script-src': ['\'self\'', '\'unsafe-inline\'', 'https://cdn.jsdelivr.net', 'https://cdnjs.cloudflare.com', 'https://unpkg.com'], 'style-src': ['\'self\'', '\'unsafe-inline\'', 'https://cdnjs.cloudflare.com', 'https://fonts.googleapis.com'], 'font-src': ['\'self\'', 'https://fonts.gstatic.com', 'https://cdnjs.cloudflare.com'], 'img-src': ['\'self\'', 'data:', 'https://images.unsplash.com', 'https://api.qrserver.com'], 'connect-src': ['\'self\''] }
 Talisman(app, content_security_policy=csp, force_https=False)
 
-# Carrega o usuário do banco de dados para a sessão
 @login_manager.user_loader
 def load_user(user_id): return db.session.get(User, int(user_id))
 
-# --- Decorator Personalizado para proteger rotas de Admin ---
 def admin_required(f):
     def wrap(*args, **kwargs):
-        if not current_user.is_authenticated:
-            return redirect(url_for('admin_login'))
+        if not current_user.is_authenticated: return redirect(url_for('admin_login'))
         if current_user.role != 'admin':
-            flash('Acesso negado. Área exclusiva para administradores.')
-            return redirect(url_for('client_login'))
+            flash('Acesso negado.'); return redirect(url_for('client_login'))
         return f(*args, **kwargs)
     wrap.__name__ = f.__name__
     return wrap
 
-# --- ROTAS DE LOGIN ---
-
-# Login do Cliente
+# --- LOGIN ---
 @app.route('/cliente/login', methods=['GET', 'POST'])
 def client_login():
     if current_user.is_authenticated:
@@ -69,7 +58,6 @@ def client_login():
         logout_user()
     form = LoginForm()
     if request.method == 'POST':
-        # Verifica usuário e senha no banco
         u = User.query.filter_by(username=request.form.get('username')).first()
         if u and check_password_hash(u.password_hash, request.form.get('password')):
             if u.role == 'client': login_user(u); return redirect(url_for('client_dashboard'))
@@ -77,7 +65,6 @@ def client_login():
         else: flash('Dados incorretos.')
     return render_template('login.html', form=form, login_type="Cliente")
 
-# Login do Admin
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
     if current_user.is_authenticated:
@@ -92,280 +79,230 @@ def admin_login():
         else: flash('Dados incorretos.')
     return render_template('login.html', form=form, login_type="Admin")
 
-# Logout (Sair do sistema)
 @app.route('/logout')
 @login_required
 def logout():
     r = current_user.role; logout_user()
     return redirect(url_for('admin_login')) if r == 'admin' else redirect(url_for('client_login'))
 
-# --- ROTAS PÚBLICAS (SITE) ---
-
-# Página Inicial (Home)
+# --- ROTAS GERAIS ---
 @app.route('/')
 def index():
-    try: db.session.add(Visit(page='home')); db.session.commit() # Registra visita
+    try: db.session.add(Visit(page='home')); db.session.commit()
     except: pass
-    return render_template('index.html')
+    
+    # Carrega planos do banco. Se não existir, usa padrão.
+    plans = PublicPlan.query.order_by(PublicPlan.order_index).all()
+    if not plans:
+        # Fallback visual se o banco estiver vazio
+        plans = [
+            {'name': 'Start', 'price': '1.500', 'benefits': json.dumps(['Gestão de Redes Sociais', 'Tráfego Pago Básico', 'Relatório Mensal']), 'is_highlighted': False},
+            {'name': 'Growth', 'price': '3.200', 'benefits': json.dumps(['Tráfego Avançado', 'Landing Page', 'Dashboard 24h']), 'is_highlighted': True},
+            {'name': 'Scale', 'price': '7.000', 'benefits': json.dumps(['Gestão 360º', 'Consultoria Semanal', 'Time Dedicado']), 'is_highlighted': False}
+        ]
+    else:
+        # Decodifica JSON dos benefícios para o template
+        for p in plans:
+            if isinstance(p.benefits, str):
+                try: p.benefits_list = json.loads(p.benefits)
+                except: p.benefits_list = []
+    
+    return render_template('index.html', plans=plans)
 
 @app.route('/termos-e-privacidade')
-def termos():
-    return render_template('legal.html') 
+def termos(): return render_template('legal.html') 
 
-# Página de Avaliações
 @app.route('/avaliacoes')
-def reviews():
-    return render_template('reviews.html', reviews=Review.query.filter_by(visivel=True).order_by(Review.data.desc()).all())
+def reviews(): return render_template('reviews.html', reviews=Review.query.filter_by(visivel=True).order_by(Review.data.desc()).all())
 
-# Página de Checkout (Pagamento)
 @app.route('/checkout/<plano>')
 def checkout(plano):
-    precos = {'Start': '1.500,00', 'Growth': '3.200,00', 'Scale': '7.000,00'}
-    return render_template('checkout.html', plano=plano, preco=precos.get(plano, 'Consultar'))
+    # Tenta pegar preço do banco
+    db_plan = PublicPlan.query.filter_by(name=plano).first()
+    preco = db_plan.price if db_plan else 'Consultar'
+    return render_template('checkout.html', plano=plano, preco=preco)
 
-# --- AÇÕES (API / FORMULÁRIOS) ---
-
-# Processa o pagamento (Simulação)
+# --- AÇÕES ---
 @app.route('/processar_pagamento', methods=['POST'])
 @csrf.exempt
 def processar_pagamento():
-    try: db.session.add(Order(plano=request.json.get('plano'), preco=request.json.get('preco'))); db.session.commit(); return jsonify({'status': 'success'})
+    try: db.session.add(Order(plano=request.json.get('plano'), preco=request.json.get('preco'), status='Pago' if request.json.get('metodo')=='card' else 'Pendente')); db.session.commit(); return jsonify({'status': 'success'})
     except: return jsonify({'status': 'error'}), 500
 
-# Recebe o formulário de contato (Lead)
 @app.route('/submit_lead', methods=['POST'])
 @csrf.exempt
 def submit_lead():
-    try:
-        db.session.add(Lead(nome=request.form.get('nome'), email=request.form.get('email'), telefone=request.form.get('telefone'), projeto=request.form.get('projeto')))
-        db.session.commit()
-        return jsonify({'status': 'success'})
+    try: db.session.add(Lead(nome=request.form.get('nome'), email=request.form.get('email'), telefone=request.form.get('telefone'), projeto=request.form.get('projeto'))); db.session.commit(); return jsonify({'status': 'success'})
     except: return jsonify({'status': 'error'}), 500
 
-# Recebe nova avaliação
 @app.route('/submit_review', methods=['POST'])
 @csrf.exempt
 def submit_review():
-    try:
-        d = request.json
-        db.session.add(Review(nome=d.get('nome'), empresa=d.get('empresa'), email=d.get('email'), avaliacao=d.get('avaliacao'), estrelas=int(d.get('estrelas',5)), visivel=True))
-        db.session.commit()
-        return jsonify({'status': 'success'})
+    try: d = request.json; db.session.add(Review(nome=d.get('nome'), empresa=d.get('empresa'), email=d.get('email'), avaliacao=d.get('avaliacao'), estrelas=int(d.get('estrelas',5)), visivel=True)); db.session.commit(); return jsonify({'status': 'success'})
     except: return jsonify({'status': 'error'}), 500
 
-# --- DASHBOARD DO CLIENTE ---
+# --- DASHBOARD CLIENTE ---
 @app.route('/cliente')
 @login_required
 def client_dashboard():
     if current_user.role != 'client': return redirect(url_for('admin_login'))
-    
-    # Busca dados do plano e estatísticas do cliente logado
     plan = ClientPlan.query.filter_by(user_id=current_user.id).first()
     stats = ClientStat.query.filter_by(user_id=current_user.id).all()
-    
-    # Prepara dados para o gráfico
-    chart_data = {'labels': [], 'values': []}
-    for s in stats: chart_data['labels'].append(s.label); chart_data['values'].append(s.value)
-    
+    chart_data = {'labels': [s.label for s in stats], 'values': [s.value for s in stats]}
     benefits = json.loads(plan.benefits) if plan and plan.benefits else []
-    
-    # Carrega histórico do chat de suporte
     chat_session = ChatSession.query.filter_by(user_id=current_user.id, status='Aberto').first()
-    messages = []
-    if chat_session:
-        messages = ChatMessage.query.filter_by(session_id=chat_session.id).order_by(ChatMessage.data).all()
+    messages = ChatMessage.query.filter_by(session_id=chat_session.id).order_by(ChatMessage.data).all() if chat_session else []
+    return render_template('client_dashboard.html', user=current_user, plan=plan, benefits=benefits, chart_data=json.dumps(chart_data), chat_session=chat_session, messages=messages)
 
-    return render_template('client_dashboard.html', 
-                           user=current_user, plan=plan, benefits=benefits, 
-                           chart_data=json.dumps(chart_data),
-                           chat_session=chat_session, messages=messages)
-
-# Envia mensagem no chat (Cliente)
 @app.route('/client/send_message', methods=['POST'])
 @login_required
 def client_send_message():
-    if current_user.role != 'client': return jsonify({'error': 'Unauthorized'}), 403
-    msg = request.form.get('message')
-    
     sess = ChatSession.query.filter_by(user_id=current_user.id, status='Aberto').first()
     if not sess:
-        # Se não existir sessão, cria uma nova
         sess = ChatSession(session_uuid=uuid.uuid4().hex, user_id=current_user.id, client_name=current_user.name, category='Cliente Dashboard', status='Aberto')
-        db.session.add(sess); db.session.commit()
-        db.session.add(ChatMessage(session_id=sess.id, tipo='texto', remetente='system', conteudo='Olá! Em que posso ajudar?'))
-        
-    db.session.add(ChatMessage(session_id=sess.id, tipo='texto', remetente='user', conteudo=msg))
-    db.session.commit()
+        db.session.add(sess); db.session.commit(); db.session.add(ChatMessage(session_id=sess.id, tipo='texto', remetente='system', conteudo='Olá! Em que posso ajudar?'))
+    db.session.add(ChatMessage(session_id=sess.id, tipo='texto', remetente='user', conteudo=request.form.get('message'))); db.session.commit()
     return jsonify({'status': 'success'})
 
-# Atualiza mensagens do chat em tempo real (Cliente)
 @app.route('/client/get_chat', methods=['GET'])
 @login_required
 def client_get_chat():
     sess = ChatSession.query.filter_by(user_id=current_user.id, status='Aberto').first()
-    if not sess: return jsonify({'messages': []})
-    msgs = ChatMessage.query.filter_by(session_id=sess.id).order_by(ChatMessage.data).all()
-    return jsonify({'messages': [{'remetente': m.remetente, 'conteudo': m.conteudo, 'tipo': m.tipo} for m in msgs]})
+    msgs = ChatMessage.query.filter_by(session_id=sess.id).order_by(ChatMessage.data).all() if sess else []
+    return jsonify({'messages': [{'remetente': m.remetente, 'conteudo': m.conteudo} for m in msgs]})
 
-# --- PAINEL ADMINISTRATIVO (SUPER ADMIN) ---
+# --- ADMIN ---
 @app.route('/admin')
 @login_required
 @admin_required
 def admin():
     tab = request.args.get('tab', 'dashboard')
-    
-    # Calcula dados para o gráfico de Leads dos últimos 7 dias
-    last_7_days = datetime.now() - timedelta(days=7)
-    leads_data = db.session.query(func.date(Lead.data), func.count(Lead.id)).filter(Lead.data >= last_7_days).group_by(func.date(Lead.data)).all()
+    last_7 = datetime.now() - timedelta(days=7)
+    leads_data = db.session.query(func.date(Lead.data), func.count(Lead.id)).filter(Lead.data >= last_7).group_by(func.date(Lead.data)).all()
     chart_map = {(datetime.now() - timedelta(days=i)).strftime('%Y-%m-%d'): 0 for i in range(6, -1, -1)}
-    for date_obj, count in leads_data: chart_map[str(date_obj)] = count
-    leads_chart = {'labels': [datetime.strptime(d, '%Y-%m-%d').strftime('%d/%m') for d in chart_map.keys()], 'values': list(chart_map.values())}
-
-    # Busca totais gerais
-    total_visits = Visit.query.count()
-    total_leads = Lead.query.count()
-    total_sales = Order.query.count()
-    leads = Lead.query.order_by(Lead.data.desc()).all()
-    reviews = Review.query.order_by(Review.data.desc()).all()
-    orders = Order.query.order_by(Order.data.desc()).all()
+    for d, c in leads_data: chart_map[str(d)] = c
     
-    # Lista todos os clientes
-    clients = User.query.filter_by(role='client').all()
+    # Dados para renderizar
+    public_plans = PublicPlan.query.order_by(PublicPlan.order_index).all()
     
-    # Separa chats (Visitantes do Site vs Clientes Logados)
-    public_chats = ChatSession.query.filter(ChatSession.user_id == None).order_by(ChatSession.created_at.desc()).all()
-    client_chats = ChatSession.query.filter(ChatSession.user_id != None).order_by(ChatSession.created_at.desc()).all()
-    
-    # Lógica para abrir um chat específico no admin
+    # Lógica Chat Admin
     active_uuid = request.args.get('session_id')
     chat_history, active_ticket = [], ""
     if active_uuid:
         sess = ChatSession.query.filter_by(session_uuid=active_uuid).first()
-        if sess:
-            chat_history = ChatMessage.query.filter_by(session_id=sess.id).order_by(ChatMessage.data).all()
-            active_ticket = sess.client_name
-    
+        if sess: chat_history = ChatMessage.query.filter_by(session_id=sess.id).order_by(ChatMessage.data).all(); active_ticket = sess.client_name
+
+    # Ajuste nos objetos de chat para o template
+    public_chats = ChatSession.query.filter(ChatSession.user_id == None).order_by(ChatSession.created_at.desc()).all()
+    client_chats = ChatSession.query.filter(ChatSession.user_id != None).order_by(ChatSession.created_at.desc()).all()
     for s in public_chats: s.uuid = s.session_uuid
     for s in client_chats: s.uuid = s.session_uuid
 
     return render_template('admin.html', 
-                           leads=leads, reviews=reviews, clients=clients, orders=orders,
-                           public_chats=public_chats, client_chats=client_chats,
-                           total_visits=total_visits, total_leads=total_leads, total_sales=total_sales,
-                           leads_chart=json.dumps(leads_chart),
-                           active_tab=tab, active_session=active_uuid, chat_history=chat_history, active_ticket=active_ticket)
+        leads=Lead.query.order_by(Lead.data.desc()).all(),
+        reviews=Review.query.order_by(Review.data.desc()).all(),
+        clients=User.query.filter_by(role='client').all(),
+        orders=Order.query.order_by(Order.data.desc()).all(),
+        public_plans=public_plans,
+        total_visits=Visit.query.count(), total_leads=Lead.query.count(), total_sales=Order.query.count(),
+        leads_chart=json.dumps({'labels': [datetime.strptime(d, '%Y-%m-%d').strftime('%d/%m') for d in chart_map.keys()], 'values': list(chart_map.values())}),
+        active_tab=tab, active_session=active_uuid, chat_history=chat_history, active_ticket=active_ticket,
+        public_chats=public_chats, client_chats=client_chats
+    )
 
-# --- AÇÕES DE ADMINISTRAÇÃO ---
+# --- ROTAS ADMIN PLANOS ---
+@app.route('/admin/update_plan/<int:plan_id>', methods=['POST'])
+@login_required
+@admin_required
+def update_plan(plan_id):
+    p = db.session.get(PublicPlan, plan_id)
+    if p:
+        p.name = request.form.get('name')
+        p.price = request.form.get('price')
+        # Converte string separada por virgula em lista JSON
+        benefits_list = [b.strip() for b in request.form.get('benefits').split(',')]
+        p.benefits = json.dumps(benefits_list)
+        db.session.commit()
+        flash('Plano atualizado!')
+    return redirect(url_for('admin', tab='plans'))
 
-# Cria um novo usuário cliente
 @app.route('/admin/create_client', methods=['POST'])
 @login_required
 @admin_required
 def create_client():
-    u = request.form.get('username')
-    if User.query.filter_by(username=u).first(): flash('Usuário já existe'); return redirect(url_for('admin', tab='clients'))
-    new_user = User(username=u, password_hash=generate_password_hash(request.form.get('password')), name=request.form.get('name'), role='client')
-    db.session.add(new_user); db.session.commit()
-    # Cria configurações padrão para o novo cliente
-    db.session.add(ClientPlan(user_id=new_user.id, plan_name=request.form.get('plan_name'), benefits=json.dumps(["Dashboard", "Suporte"])))
-    db.session.add(ClientStat(user_id=new_user.id, label='Jan', value=0, type='growth'))
+    if User.query.filter_by(username=request.form.get('username')).first(): flash('Usuário já existe'); return redirect(url_for('admin', tab='clients'))
+    u = User(username=request.form.get('username'), password_hash=generate_password_hash(request.form.get('password')), name=request.form.get('name'), role='client')
+    db.session.add(u); db.session.commit()
+    db.session.add(ClientPlan(user_id=u.id, plan_name=request.form.get('plan_name'), benefits=json.dumps(["Suporte"])))
+    db.session.add(ClientStat(user_id=u.id, label='Mês 1', value=0, type='growth'))
     db.session.commit(); return redirect(url_for('admin', tab='clients'))
 
-# Atualiza gráficos e plano do cliente
 @app.route('/admin/update_client_stats/<int:user_id>', methods=['POST'])
 @login_required
 @admin_required
 def update_client_stats(user_id):
-    # Remove stats antigos e adiciona novos
     ClientStat.query.filter_by(user_id=user_id).delete()
-    labels = request.form.getlist('labels[]'); values = request.form.getlist('values[]')
-    for l, v in zip(labels, values):
+    for l, v in zip(request.form.getlist('labels[]'), request.form.getlist('values[]')):
         if l and v: db.session.add(ClientStat(user_id=user_id, label=l, value=float(v), type='growth'))
-    
-    # Atualiza nome do plano
-    plan = ClientPlan.query.filter_by(user_id=user_id).first()
-    if plan: 
-        plan.plan_name = request.form.get('plan_name')
-        plan.benefits = json.dumps([b.strip() for b in request.form.get('benefits').split(',')])
-    
-    db.session.commit()
-    flash('Dados do cliente atualizados com sucesso.')
-    return redirect(url_for('admin', tab='clients'))
+    p = ClientPlan.query.filter_by(user_id=user_id).first()
+    if p: p.plan_name = request.form.get('plan_name'); p.benefits = json.dumps([b.strip() for b in request.form.get('benefits').split(',')])
+    db.session.commit(); flash('Cliente atualizado!'); return redirect(url_for('admin', tab='clients'))
 
-# Deleta cliente
 @app.route('/admin/delete_client/<int:id>')
 @login_required
 @admin_required
 def delete_client(id): User.query.filter_by(id=id).delete(); db.session.commit(); return redirect(url_for('admin', tab='clients'))
 
-# Mostra/Oculta avaliação no site
 @app.route('/admin/toggle_review/<int:id>')
 @login_required
 @admin_required
-def toggle_review(id):
-    r = db.session.get(Review, id)
-    if r: r.visivel = not r.visivel; db.session.commit()
-    return redirect(url_for('admin', tab='reviews'))
+def toggle_review(id): r=db.session.get(Review,id); r.visivel=not r.visivel; db.session.commit(); return redirect(url_for('admin', tab='reviews'))
 
-# Apaga avaliação
 @app.route('/admin/delete_review/<int:id>')
 @login_required
 @admin_required
 def delete_review(id): Review.query.filter_by(id=id).delete(); db.session.commit(); return redirect(url_for('admin', tab='reviews'))
 
-# --- CHAT WIDGET PÚBLICO (BACKEND) ---
-
-# Inicia nova sessão de chat anônimo
+# Chat Publico Backend
 @app.route('/init_session', methods=['POST'])
 @csrf.exempt
 def init_session():
-    d = request.json
-    ns = ChatSession(session_uuid=uuid.uuid4().hex, category=d.get('category'), client_name=d.get('name'), client_phone=d.get('phone'), status='Aberto')
+    d=request.json; ns=ChatSession(session_uuid=uuid.uuid4().hex, category=d.get('category'), client_name=d.get('name'), client_phone=d.get('phone'), status='Aberto')
     db.session.add(ns); db.session.commit(); db.session.add(ChatMessage(session_id=ns.id, tipo='texto', conteudo=f"Olá {d.get('name')}.", remetente='system')); db.session.commit()
-    return jsonify({'status': 'success', 'session_id': ns.session_uuid, 'ticket': f"#{ns.id:04d}", 'category': ns.category})
+    return jsonify({'status':'success', 'session_id':ns.session_uuid, 'ticket':f"#{ns.id:04d}"})
 
-# Recebe mensagem ou áudio do chat
 @app.route('/send_chat', methods=['POST'])
 @csrf.exempt
 def send_chat():
-    suuid = request.form.get('session_id'); rem = request.form.get('remetente'); sess = ChatSession.query.filter_by(session_uuid=suuid).first()
-    if not sess: return jsonify({'status': 'error'}), 404
-    if 'message' in request.form: db.session.add(ChatMessage(session_id=sess.id, tipo='texto', conteudo=request.form['message'], remetente=rem))
-    # Salva áudio se houver
-    if 'audio' in request.files: f = request.files['audio']; n = f"audio_{uuid.uuid4().hex}.webm"; f.save(os.path.join(app.config['UPLOAD_FOLDER'], n)); db.session.add(ChatMessage(session_id=sess.id, tipo='audio', conteudo=n, remetente=rem))
-    db.session.commit(); return jsonify({'status': 'success'})
+    sess=ChatSession.query.filter_by(session_uuid=request.form.get('session_id')).first()
+    if sess:
+        if 'message' in request.form: db.session.add(ChatMessage(session_id=sess.id, tipo='texto', conteudo=request.form['message'], remetente=request.form.get('remetente')))
+        if 'audio' in request.files: f=request.files['audio']; n=f"audio_{uuid.uuid4().hex}.webm"; f.save(os.path.join(app.config['UPLOAD_FOLDER'], n)); db.session.add(ChatMessage(session_id=sess.id, tipo='audio', conteudo=n, remetente=request.form.get('remetente')))
+        db.session.commit()
+    return jsonify({'status':'success'})
 
-# Recupera mensagens para atualizar a tela
 @app.route('/get_messages/<session_uuid>') 
 def get_messages(session_uuid):
-    sess = ChatSession.query.filter_by(session_uuid=session_uuid).first()
-    msgs = ChatMessage.query.filter_by(session_id=sess.id).order_by(ChatMessage.data).all() if sess else []
-    return jsonify({'messages': [{'remetente': m.remetente, 'conteudo': m.conteudo, 'tipo': m.tipo} for m in msgs], 'status': sess.status if sess else 'Closed'})
+    sess=ChatSession.query.filter_by(session_uuid=session_uuid).first()
+    msgs=ChatMessage.query.filter_by(session_id=sess.id).order_by(ChatMessage.data).all() if sess else []
+    return jsonify({'messages':[{'remetente':m.remetente,'conteudo':m.conteudo,'tipo':m.tipo} for m in msgs], 'status':sess.status if sess else 'Closed'})
 
-# Encerra o ticket
 @app.route('/close_ticket/<session_uuid>', methods=['POST'])
 @csrf.exempt
 @login_required
-def close_ticket(session_uuid):
-    sess = ChatSession.query.filter_by(session_uuid=session_uuid).first(); 
-    if sess: sess.status = 'Encerrado'; db.session.commit()
-    return jsonify({'status': 'success'})
+def close_ticket(session_uuid): sess=ChatSession.query.filter_by(session_uuid=session_uuid).first(); sess.status='Encerrado'; db.session.commit(); return jsonify({'status':'success'})
 
-# Deleta o ticket
-@app.route('/delete_ticket/<session_uuid>', methods=['DELETE'])
-@csrf.exempt 
-@login_required
-def delete_ticket(session_uuid):
-    sess = ChatSession.query.filter_by(session_uuid=session_uuid).first()
-    if sess: ChatMessage.query.filter_by(session_id=sess.id).delete(); db.session.delete(sess); db.session.commit()
-    return jsonify({'status': 'success'})
-
-# Inicialização do servidor
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-        # Cria usuário Admin padrão se não existir
+        # Seed Admin
         if not User.query.filter_by(username='admin').first():
             db.session.add(User(username='admin', name="Super Admin", role='admin', password_hash=generate_password_hash('admin123')))
+            db.session.commit()
+        # Seed Planos Públicos
+        if not PublicPlan.query.first():
+            db.session.add(PublicPlan(name='Start', price='1.500', benefits=json.dumps(['Redes Sociais', 'Tráfego Básico', 'Relatório PDF']), is_highlighted=False, order_index=1))
+            db.session.add(PublicPlan(name='Growth', price='3.200', benefits=json.dumps(['Tráfego Avançado', 'Landing Page', 'Dashboard 24h']), is_highlighted=True, order_index=2))
+            db.session.add(PublicPlan(name='Scale', price='7.000', benefits=json.dumps(['Gestão 360º', 'Consultoria Semanal', 'Time Dedicado']), is_highlighted=False, order_index=3))
             db.session.commit()
     app.run(debug=False, port=5000)

@@ -127,37 +127,23 @@
         <section id="planos">
             <h2 class="reveal" style="text-align:center; font-size: 2.5rem; margin-bottom: 60px; color: #1d1d1d;">Investimento Inteligente</h2>
             <div class="pricing-container reveal">
-                <div class="glass-card pricing-card" data-tilt>
-                    <h3>Start</h3>
-                    <div class="price">R$ 1.500</div>
+                {% for plan in plans %}
+                <div class="glass-card pricing-card {{ 'featured' if plan.is_highlighted else '' }}" data-tilt>
+                    {% if plan.is_highlighted %}
+                        <div style="background:var(--text-dark); color:white; padding:5px 15px; border-radius:20px; font-size:0.8rem; margin-bottom:15px; display:inline-block;">Mais Popular</div>
+                    {% endif %}
+                    <h3>{{ plan.name }}</h3>
+                    <div class="price">R$ {{ plan.price }}</div>
                     <ul>
-                        <li><i class="fas fa-check"></i> Gestão de Redes Sociais</li>
-                        <li><i class="fas fa-check"></i> Tráfego Pago Básico</li>
-                        <li><i class="fas fa-check"></i> Relatório Mensal</li>
+                        {% for benefit in plan.benefits_list %}
+                            <li><i class="fas fa-check"></i> {{ benefit }}</li>
+                        {% endfor %}
                     </ul>
-                    <a href="/checkout/Start" class="btn-outline" style="margin-top: auto;">Iniciar com Start</a>
+                    <a href="/checkout/{{ plan.name }}" class="{{ 'btn-main' if plan.is_highlighted else 'btn-outline' }}" style="{{ 'width: 100%; justify-content: center;' if plan.is_highlighted else 'margin-top: auto;' }}">
+                        {{ 'Quero ' + plan.name if plan.is_highlighted else 'Iniciar com ' + plan.name }}
+                    </a>
                 </div>
-                <div class="glass-card pricing-card featured" data-tilt>
-                    <div style="background:var(--text-dark); color:white; padding:5px 15px; border-radius:20px; font-size:0.8rem; margin-bottom:15px; display:inline-block;">Mais Popular</div>
-                    <h3>Growth</h3>
-                    <div class="price">R$ 3.200</div>
-                    <ul>
-                        <li><i class="fas fa-check"></i> Tráfego Avançado (Google/Face)</li>
-                        <li><i class="fas fa-check"></i> Landing Page Alta Conversão</li>
-                        <li><i class="fas fa-check"></i> Dashboard em Tempo Real</li>
-                    </ul>
-                    <a href="/checkout/Growth" class="btn-main" style="width: 100%; justify-content: center;">Quero Growth</a>
-                </div>
-                <div class="glass-card pricing-card" data-tilt>
-                    <h3>Scale</h3>
-                    <div class="price">R$ 7.000</div>
-                    <ul>
-                        <li><i class="fas fa-check"></i> Gestão 360º Completa</li>
-                        <li><i class="fas fa-check"></i> Consultoria Semanal</li>
-                        <li><i class="fas fa-check"></i> Time Dedicado</li>
-                    </ul>
-                    <a href="/checkout/Scale" class="btn-outline" style="margin-top: auto;">Escolher Scale</a>
-                </div>
+                {% endfor %}
             </div>
 
             <div class="reveal" style="text-align: center; margin-top: 50px;">
@@ -259,8 +245,8 @@
                 <div>
                     <h4 style="margin-bottom: 15px;">Legal</h4>
                     <ul style="list-style: none; padding: 0;">
-                        <li style="margin-bottom: 8px;"><a href="/termos-e-privacidade" style="color: #ccc; text-decoration: none;">Política de Privacidade</a></li>
-                        <li style="margin-bottom: 8px;"><a href="/termos-e-privacidade" style="color: #ccc; text-decoration: none;">Termos de Uso</a></li>
+                        <li style="margin-bottom: 8px;"><a href="/termos-e-privacidade?tab=privacidade" style="color: #ccc; text-decoration: none;">Política de Privacidade</a></li>
+                        <li style="margin-bottom: 8px;"><a href="/termos-e-privacidade?tab=termos" style="color: #ccc; text-decoration: none;">Termos de Uso</a></li>
                     </ul>
                 </div>
             </div>

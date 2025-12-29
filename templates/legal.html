@@ -3,48 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Termos de Uso e Política de Privacidade — Indexa Studio</title>
+    <title>Termos de Uso e Política de Privacidade — Studio Indexa</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .legal-card { background: var(--glass-bg); backdrop-filter: blur(20px); border-radius: 24px; padding: 50px; border: 1px solid var(--glass-border); color: var(--text-dark); }
-        .tab-btn { background: none; border: none; padding: 15px 25px; cursor: pointer; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 1.1rem; color: var(--text-grey); border-bottom: 2px solid transparent; transition: 0.3s; }
-        .tab-btn.active { color: var(--text-dark); border-bottom-color: var(--text-dark); }
-        .tab-content { display: none; padding-top: 30px; animation: fadeIn 0.5s ease; }
+        /* Ajustes específicos desta página */
+        .legal-card { 
+            background: var(--glass-bg); 
+            backdrop-filter: blur(20px); 
+            border-radius: 24px; 
+            padding: 50px; 
+            border: 1px solid var(--glass-border); 
+            color: var(--text-dark); 
+        }
+        
+        /* Botões das abas */
+        .tab-header {
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+        }
+        .tab-btn { 
+            background: none; 
+            border: none; 
+            padding: 15px 25px; 
+            cursor: pointer; 
+            font-family: 'Poppins', sans-serif; 
+            font-weight: 600; 
+            font-size: 1.1rem; 
+            color: var(--text-grey); 
+            border-bottom: 3px solid transparent; 
+            transition: 0.3s; 
+            white-space: nowrap;
+        }
+        .tab-btn:hover { color: var(--text-dark); }
+        .tab-btn.active { 
+            color: var(--text-dark); 
+            border-bottom-color: var(--accent); 
+        }
+        
+        /* Conteúdo das abas */
+        .tab-content { display: none; animation: fadeIn 0.5s ease; }
         .tab-content.active { display: block; }
-        .law-link { color: #004a99; text-decoration: underline; font-weight: 500; }
-        h1, h2, h3 { margin-bottom: 20px; }
-        p, li { margin-bottom: 15px; line-height: 1.8; text-align: justify; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        /* Links de leis */
+        .law-link { color: #0984e3; text-decoration: underline; font-weight: 500; }
+        .law-link:hover { color: #2d3436; }
+        
+        /* Tipografia */
+        h1 { margin-bottom: 30px; font-size: 2rem; line-height: 1.2; }
+        h2 { margin-top: 40px; margin-bottom: 20px; font-size: 1.5rem; }
+        h3 { margin-top: 30px; margin-bottom: 15px; font-size: 1.2rem; }
+        p, li { margin-bottom: 15px; line-height: 1.8; text-align: justify; font-size: 0.95rem; }
+        ul { margin-left: 20px; margin-bottom: 20px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Banner de Cookies */
-        .cookie-banner { position: fixed; bottom: -200px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 500px; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 15px 50px rgba(0,0,0,0.2); z-index: 10000; transition: 0.6s cubic-bezier(0.19, 1, 0.22, 1); }
+        .cookie-banner { 
+            position: fixed; 
+            bottom: -300px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 90%; 
+            max-width: 600px; 
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(10px);
+            padding: 30px; 
+            border-radius: 20px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15); 
+            z-index: 10000; 
+            transition: bottom 0.6s cubic-bezier(0.19, 1, 0.22, 1); 
+            border: 1px solid rgba(0,0,0,0.05);
+            text-align: center;
+        }
         .cookie-banner.show { bottom: 30px; }
     </style>
 </head>
 <body>
     <nav class="glass-nav">
         <div class="logo">STUDIO INDEXA</div>
-        <ul class="nav-links">
+        <ul class="nav-links" style="display: flex; gap: 30px; align-items: center; list-style: none;">
             <li><a href="/">Home</a></li>
             <li><a href="/#contato" class="btn-main">Orçamento</a></li>
         </ul>
     </nav>
 
-    <main class="reveal active" style="max-width: 1000px; margin: 0 auto; padding: 20px;">
+    <main class="reveal active" style="max-width: 1000px; margin: 0 auto; padding: 180px 20px 150px 20px;">
         <div class="legal-card">
-            <div style="border-bottom: 1px solid rgba(0,0,0,0.1);">
-                <button class="tab-btn active" onclick="openTab(event, 'termos')">Termos de Uso</button>
-                <button class="tab-btn" onclick="openTab(event, 'privacidade')">Política de Cookies</button>
+            
+            <div class="tab-header">
+                <button id="btn-termos" class="tab-btn active" onclick="openTab(event, 'termos')">Termos de Uso</button>
+                <button id="btn-privacidade" class="tab-btn" onclick="openTab(event, 'privacidade')">Política de Cookies e Privacidade</button>
             </div>
 
             <div id="termos" class="tab-content active">
-                <h1>Termos de Uso — Indexa Studio</h1>
-                <p>Última atualização: //_____</p>
-                <p>Ao acessar, navegar ou utilizar o site e serviços da Indexa Studio (doravante “Indexa”), você concorda com estes Termos de Uso. Caso não concorde com algum ponto, não utilize este site ou contrate nossos serviços.</p>
+                <h1>Termos de Uso — Studio Indexa</h1>
+                <p>Última atualização: Dezembro de 2025</p>
+                <p>Ao acessar, navegar ou utilizar o site e serviços da Studio Indexa (doravante “Indexa”), você concorda com estes Termos de Uso. Caso não concorde com algum ponto, não utilize este site ou contrate nossos serviços.</p>
                 
                 <h2>1. Definições</h2>
-                <p><strong>Indexa:</strong> Indexa Studio, pessoa jurídica responsável pelo site e prestação de serviços de marketing digital.</p>
+                <p><strong>Indexa:</strong> Studio Indexa, pessoa jurídica responsável pelo site e prestação de serviços de marketing digital.</p>
                 <p><strong>Usuário:</strong> pessoa física ou jurídica que acessa o site ou contrata serviços.</p>
                 <p><strong>Conteúdo:</strong> textos, imagens, vídeos, códigos, marcas, materiais gráficos, campanhas e todo material disponibilizado pela Indexa.</p>
 
@@ -69,10 +130,10 @@
                 <p>Materiais enviados pelo usuário (imagens, textos, logos) devem estar livres de ônus e o usuário declara possuir direitos para seu uso; em caso de reclamação de titularidade de terceiros, o usuário indenizará a Indexa por perdas e custos decorrentes, salvo se comprovada culpa exclusiva da Indexa.</p>
 
                 <h2>6. Direito de Imagem e Materiais Fornecidos pelo Usuário</h2>
-                <p>Quando o usuário enviar imagens, depoimentos ou autorizar a veiculação de sua imagem para fins de portfólio ou promoção, declara ter concedido autorização válida ou possuir consentimento dos titulares (incluindo pais/responsáveis para menores — ECA). A utilização será feita nos termos acordados entre as partes. Para menores, exige-se autorização dos responsáveis. <a href="http://www.planalto.gov.br/ccivil_03/leis/l8069.htm" class="law-link" target="_blank">Planalto+1</a></p>
+                <p>Quando o usuário enviar imagens, depoimentos ou autorizar a veiculação de sua imagem para fins de portfólio ou promoção, declara ter concedido autorização válida ou possuir consentimento dos titulares (incluindo pais/responsáveis para menores — ECA). A utilização será feita nos termos acordados entre as partes. Para menores, exige-se autorização dos responsáveis. <a href="http://www.planalto.gov.br/ccivil_03/leis/l8069.htm" class="law-link" target="_blank">Lei nº 8.069/1990 (ECA)</a></p>
 
                 <h2>7. Proteção de Dados e Cookies</h2>
-                <p>A Indexa trata dados pessoais em conformidade com a Lei Geral de Proteção de Dados (LGPD). Quando aplicável, a Indexa coleta dados necessários à prestação dos serviços e para operação do site (incluindo cookies para funcionamento, análise e, mediante consentimento, marketing). Detalhes sobre tratamento de dados e opções de consentimento/gerenciamento constam na Política de Privacidade e Política de Cookies disponibilizadas no site. <a href="http://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" class="law-link" target="_blank">Planalto+1</a></p>
+                <p>A Indexa trata dados pessoais em conformidade com a Lei Geral de Proteção de Dados (LGPD). Quando aplicável, a Indexa coleta dados necessários à prestação dos serviços e para operação do site (incluindo cookies para funcionamento, análise e, mediante consentimento, marketing). Detalhes sobre tratamento de dados e opções de consentimento/gerenciamento constam na Política de Privacidade e Política de Cookies disponibilizadas no site. <a href="http://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" class="law-link" target="_blank">Lei nº 13.709/2018 (LGPD)</a></p>
 
                 <h2>8. Limitação de Responsabilidade</h2>
                 <p>A Indexa esforça-se para manter o site disponível e com informações corretas, mas não garante disponibilidade ininterrupta nem a total ausência de erros. A Indexa não será responsável por:</p>
@@ -81,76 +142,106 @@
                     <li>Conteúdo de terceiros acessado por links;</li>
                     <li>Atos de usuários que violem a lei.</li>
                 </ul>
-                <p>Essa limitação não se aplica em casos de dolo ou culpa grave da Indexa, nem exclui direitos do consumidor previstos no Código de Defesa do Consumidor. Além disso, cláusulas contratuais não podem ser abusivas em relação ao consumidor. <a href="http://www.planalto.gov.br/ccivil_03/leis/l8078.htm" class="law-link" target="_blank">Planalto+1</a></p>
+                <p>Essa limitação não se aplica em casos de dolo ou culpa grave da Indexa, nem exclui direitos do consumidor previstos no Código de Defesa do Consumidor. Além disso, cláusulas contratuais não podem ser abusivas em relação ao consumidor. <a href="http://www.planalto.gov.br/ccivil_03/leis/l8078.htm" class="law-link" target="_blank">Lei nº 8.078/1990 (CDC)</a></p>
 
-                <h2>12. Legislação Aplicável e Foro</h2>
-                <p>Estes Termos são regidos pelas leis da República Federativa do Brasil, incluindo, conforme aplicável, a <a href="http://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" class="law-link" target="_blank">LGPD (Lei nº 13.709/2018)</a>, o <a href="http://www.planalto.gov.br/ccivil_03/_ato2011-2014/2014/lei/l12965.htm" class="law-link" target="_blank">Marco Civil da Internet (Lei nº 12.965/2014)</a>, o Código Civil (art. 20 sobre direito de imagem) e o Código de Defesa do Consumidor. Para controvérsias, fica eleito o foro da comarca da sede da Indexa, ressalvados direitos do consumidor. <a href="http://www.planalto.gov.br/ccivil_03/leis/2002/l10406compilada.htm" class="law-link" target="_blank">Planalto+3</a></p>
+                <h2>9. Legislação Aplicável e Foro</h2>
+                <p>Estes Termos são regidos pelas leis da República Federativa do Brasil, incluindo, conforme aplicável, a <a href="http://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" class="law-link" target="_blank">LGPD (Lei nº 13.709/2018)</a>, o <a href="http://www.planalto.gov.br/ccivil_03/_ato2011-2014/2014/lei/l12965.htm" class="law-link" target="_blank">Marco Civil da Internet (Lei nº 12.965/2014)</a>, o Código Civil (art. 20 sobre direito de imagem) e o Código de Defesa do Consumidor. Para controvérsias, fica eleito o foro da comarca da sede da Indexa, ressalvados direitos do consumidor. <a href="http://www.planalto.gov.br/ccivil_03/leis/2002/l10406compilada.htm" class="law-link" target="_blank">Código Civil</a></p>
             </div>
 
             <div id="privacidade" class="tab-content">
-                <h1>Política de Cookies — Indexa Studio</h1>
+                <h1>Política de Cookies — Studio Indexa</h1>
+                
                 <h3>O que são cookies?</h3>
-                <p>Cookies são pequenos arquivos gravados no dispositivo do usuário para melhorar a navegação, lembrar preferências, medir desempenho do site e, quando autorizado, exibir conteúdo/propaganda personalizada. (Princípios do Marco Civil e LGPD relacionados à privacidade e tratamento de dados). <a href="http://www.planalto.gov.br/ccivil_03/_ato2011-2014/2014/lei/l12965.htm" class="law-link" target="_blank">Planalto+1</a></p>
+                <p>Cookies são pequenos arquivos gravados no dispositivo do usuário para melhorar a navegação, lembrar preferências, medir desempenho do site e, quando autorizado, exibir conteúdo/propaganda personalizada. (Princípios do Marco Civil e LGPD relacionados à privacidade e tratamento de dados). <a href="http://www.planalto.gov.br/ccivil_03/_ato2011-2014/2014/lei/l12965.htm" class="law-link" target="_blank">Marco Civil da Internet</a></p>
 
-                <h3>Tipos de cookies que podemos usar.</h3>
+                <h3>Tipos de cookies que podemos usar</h3>
                 <ul>
-                    <li>Essenciais: necessários para funcionamento do site.</li>
-                    <li>Desempenho/analíticos: para entender como o site é usado e otimizar performance.</li>
-                    <li>Funcionais: lembram preferências e configurações.</li>
-                    <li>Marketing/publicidade: para fornecer anúncios relevantes (exige consentimento).</li>
+                    <li><strong>Essenciais:</strong> necessários para funcionamento do site.</li>
+                    <li><strong>Desempenho/analíticos:</strong> para entender como o site é usado e otimizar performance.</li>
+                    <li><strong>Funcionais:</strong> lembram preferências e configurações.</li>
+                    <li><strong>Marketing/publicidade:</strong> para fornecer anúncios relevantes (exige consentimento).</li>
                 </ul>
 
-                <h3>Consentimento e banner.</h3>
-                <p>Ao acessar o site, o usuário verá um banner informativo de cookies e poderá aceitar, rejeitar (exceto essenciais) ou configurar preferências. O registro do consentimento será mantido para fins de auditoria, em conformidade com a LGPD. O usuário pode alterar sua escolha a qualquer momento pelas configurações do navegador ou pelo link de gerenciamento disponibilizado pela INDEXA STUDIO. <a href="http://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" class="law-link" target="_blank">Planalto</a></p>
+                <h3>Consentimento e banner</h3>
+                <p>Ao acessar o site, o usuário verá um banner informativo de cookies e poderá aceitar, rejeitar (exceto essenciais) ou configurar preferências. O registro do consentimento será mantido para fins de auditoria, em conformidade com a LGPD. O usuário pode alterar sua escolha a qualquer momento pelas configurações do navegador ou pelo link de gerenciamento disponibilizado pela STUDIO INDEXA. <a href="http://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" class="law-link" target="_blank">LGPD</a></p>
 
-                <h3>Finalidade, base legal e tempo de guarda.</h3>
-                <p>Os dados coletados por cookies serão usados apenas para as finalidades informadas. Quando os cookies implicarem tratamento de dados pessoais, o tratamento observará bases legais previstas na LGPD (por exemplo: consentimento, legítimo interesse quando aplicável) e prazos de retenção compatíveis com a finalidade. <a href="http://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" class="law-link" target="_blank">Planalto</a></p>
+                <h3>Finalidade, base legal e tempo de guarda</h3>
+                <p>Os dados coletados por cookies serão usados apenas para as finalidades informadas. Quando os cookies implicarem tratamento de dados pessoais, o tratamento observará bases legais previstas na LGPD (por exemplo: consentimento, legítimo interesse quando aplicável) e prazos de retenção compatíveis com a finalidade.</p>
 
-                <h3>Terceiros e pixels.</h3>
-                <p>Podemos autorizar provedores terceiros (analytics, redes sociais, plataformas de anúncios) a processar dados via cookies. A responsabilidade sobre o tratamento por terceiros é regulada por contratos e, quando aplicável, por obrigações de confidencialidade e segurança. (Marco Civil e LGPD aplicáveis). <a href="http://www.planalto.gov.br/ccivil_03/_ato2011-2014/2014/lei/l12965.htm" class="law-link" target="_blank">Planalto+1</a></p>
+                <h3>Terceiros e pixels</h3>
+                <p>Podemos autorizar provedores terceiros (analytics, redes sociais, plataformas de anúncios) a processar dados via cookies. A responsabilidade sobre o tratamento por terceiros é regulada por contratos e, quando aplicável, por obrigações de confidencialidade e segurança.</p>
 
-                <h3>Como gerenciar/recusar cookies.</h3>
+                <h3>Como gerenciar/recusar cookies</h3>
                 <p>O usuário pode bloquear/excluir cookies nas configurações do navegador ou usar o painel de gerenciamento de cookies do site. Bloquear cookies pode limitar funcionalidades.</p>
 
-                <h2>Conduta vedada.</h2>
-                <p>É proibido utilizar o site/serviços para: envio de conteúdo ilegal, difamatório, pornográfico, propaganda enganosa, exploração de vulnerabilidades, scraping em massa sem autorização, ou quaisquer ações que prejudiquem a operação, segurança ou terceiros. Em caso de violação, a INDEXA STUDIO poderá suspender o acesso, remover conteúdo e adotar medidas legais cabíveis (cíveis e criminais).</p>
+                <h2>Conduta vedada</h2>
+                <p>É proibido utilizar o site/serviços para: envio de conteúdo ilegal, difamatório, pornográfico, propaganda enganosa, exploração de vulnerabilidades, scraping em massa sem autorização, ou quaisquer ações que prejudiquem a operação, segurança ou terceiros. Em caso de violação, a STUDIO INDEXA poderá suspender o acesso, remover conteúdo e adotar medidas legais cabíveis (cíveis e criminais).</p>
 
-                <h2>Indenização.</h2>
-                <p>Usuário que praticar atos ilícitos ou causar danos à INDEXA STUDIO indenizará pelos prejuízos comprovados (diretos e custos de defesa). A INDEXA STUDIO reserva-se o direito de buscar reparação e comunicar autoridades quando cabível.</p>
+                <h2>Indenização</h2>
+                <p>Usuário que praticar atos ilícitos ou causar danos à STUDIO INDEXA indenizará pelos prejuízos comprovados (diretos e custos de defesa). A STUDIO INDEXA reserva-se o direito de buscar reparação e comunicar autoridades quando cabível.</p>
 
-                <h2>Limitação de responsabilidade.</h2>
-                <p>A INDEXA STUDIO não será responsável por danos indiretos, lucros cessantes ou perda de dados que decorram de conduta de terceiros ou de uso impróprio pelo usuário. Contudo, esta limitação não se aplica a danos decorrentes de dolo ou culpa grave da INDEXA STUDIO, nem pode excluir direitos do consumidor previstos em lei (Lei nº 8.078/1990). (Ver: nulidade de cláusulas abusivas — art. 51, CDC).</p>
+                <h2>Limitação de responsabilidade</h2>
+                <p>A STUDIO INDEXA não será responsável por danos indiretos, lucros cessantes ou perda de dados que decorram de conduta de terceiros ou de uso impróprio pelo usuário. Contudo, esta limitação não se aplica a danos decorrentes de dolo ou culpa grave, nem pode excluir direitos do consumidor previstos em lei.</p>
             </div>
         </div>
     </main>
 
     <div id="cookie-banner" class="cookie-banner">
-        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
-            <div style="font-weight: 800; font-size: 1.2rem; color: #000;">STUDIO INDEXA</div>
+        <div style="margin-bottom: 15px;">
+            <div style="font-weight: 800; font-size: 1.2rem; color: #2d3436;">🍪 Privacidade e Cookies</div>
         </div>
-        <p style="font-size: 0.9rem; color: #555;">Usamos cookies para melhorar sua experiência. Ao continuar, você concorda com nossos <a href="/termos-e-privacidade" style="color: #000; font-weight: 600;">Termos e Privacidade</a>.</p>
-        <button onclick="acceptCookies()" class="btn-main" style="width: 100%; justify-content: center; margin-top: 10px;">Aceitar e Continuar</button>
+        <p style="font-size: 0.9rem; color: #636e72; margin-bottom: 20px;">
+            Usamos cookies para melhorar sua experiência. Ao continuar, você concorda com nossos <a href="javascript:void(0)" onclick="openTab(null, 'privacidade'); window.scrollTo(0,0);" style="color: #2d3436; font-weight: 700; text-decoration: underline;">Termos e Privacidade</a>.
+        </p>
+        <button onclick="acceptCookies()" class="btn-main" style="width: 100%; justify-content: center;">Aceitar e Continuar</button>
     </div>
 
     <script>
+        // Função para alternar abas
         function openTab(evt, tabName) {
             var i, content, tablinks;
             content = document.getElementsByClassName("tab-content");
-            for (i = 0; i < content.length; i++) { content[i].classList.remove("active"); }
+            for (i = 0; i < content.length; i++) { 
+                content[i].classList.remove("active"); 
+                content[i].style.display = "none"; // Garante que suma
+            }
+            
             tablinks = document.getElementsByClassName("tab-btn");
             for (i = 0; i < tablinks.length; i++) { tablinks[i].classList.remove("active"); }
-            document.getElementById(tabName).classList.add("active");
-            evt.currentTarget.classList.add("active");
+            
+            document.getElementById(tabName).style.display = "block";
+            // Pequeno delay para a animação funcionar
+            setTimeout(() => document.getElementById(tabName).classList.add("active"), 10);
+            
+            if(evt) {
+                evt.currentTarget.classList.add("active");
+            } else {
+                // Se chamado via script, ativa o botão correspondente manualmente
+                document.getElementById('btn-' + tabName).classList.add("active");
+            }
         }
 
+        // Função de Aceite de Cookies
         function acceptCookies() {
             localStorage.setItem("cookiesAccepted", "true");
             document.getElementById("cookie-banner").classList.remove("show");
         }
 
+        // Ao carregar a página
         window.onload = function() {
+            // Verifica Cookies
             if (!localStorage.getItem("cookiesAccepted")) {
                 setTimeout(() => { document.getElementById("cookie-banner").classList.add("show"); }, 1000);
+            }
+
+            // Verifica URL para abrir a aba correta (ex: legal.html?tab=privacidade)
+            const urlParams = new URLSearchParams(window.location.search);
+            const tab = urlParams.get('tab');
+            
+            if(tab === 'privacidade') {
+                openTab(null, 'privacidade');
+            } else {
+                openTab(null, 'termos');
             }
         }
     </script>
