@@ -59,20 +59,14 @@
             position: relative;
         }
 
-        /* Flash Message (Aviso) */
+        /* Flash Message */
         .flash-message {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            background: var(--success-color);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 10px;
+            position: fixed; top: 20px; right: 20px; z-index: 9999;
+            background: var(--success-color); color: white;
+            padding: 15px 25px; border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             display: flex; align-items: center; gap: 10px;
-            animation: slideIn 0.5s ease;
-            cursor: pointer;
+            animation: slideIn 0.5s ease; cursor: pointer;
         }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
@@ -108,37 +102,22 @@
         .badge-gray { background: rgba(99, 110, 114, 0.15); color: #636e72; }
         .badge-red { background: rgba(214, 48, 49, 0.15); color: #d63031; }
 
-        /* Chat */
+        /* Chat Layout */
         .chat-layout { display: grid; grid-template-columns: 260px 1fr; height: 550px; background: #fff; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #eee; }
         .chat-sidebar { border-right: 1px solid #eee; background: #fcfcfc; overflow-y: auto; }
         .chat-list-item { padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; transition: 0.2s; }
         .chat-list-item:hover, .chat-list-item.active { background: #fff; border-left: 4px solid var(--primary-color); }
         .chat-history { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #f9f9f9; }
-
-        /* --- MODAIS --- */
-        .modal-overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.5); z-index: 1000; 
-            display: none; align-items: center; justify-content: center; 
-            backdrop-filter: blur(4px); 
-        }
+        
+        /* Modais */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
         .modal-overlay.active { display: flex; animation: fadeIn 0.2s; }
-        
-        .modal-card { 
-            background: white; width: 90%; max-width: 380px; padding: 20px;
-            border-radius: 15px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); 
-            position: relative; 
-        }
-        
+        .modal-card { background: white; width: 90%; max-width: 380px; padding: 20px; border-radius: 15px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); position: relative; }
         .close-modal { position: absolute; top: 15px; right: 15px; cursor: pointer; color: #999; }
         .form-group { margin-bottom: 10px; }
         .form-group label { font-size: 0.75rem; font-weight: 600; color: var(--text-light); margin-bottom: 3px; display: block; }
-        .form-group input, .form-group textarea { 
-            width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ddd; 
-            font-size: 0.85rem; outline: none; background: #fcfcfc;
-        }
+        .form-group input, .form-group textarea { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ddd; font-size: 0.85rem; outline: none; background: #fcfcfc; }
         .form-group input:focus { border-color: var(--primary-color); background: #fff; }
-
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
@@ -177,7 +156,7 @@
             {% endif %}
             {% endwith %}
 
-            <div id="dashboard" class="tab-content" style="display: block;">
+            <div id="dashboard" class="tab-content">
                 <div class="section-header">
                     <div class="section-title"><h1>Visão Geral</h1></div>
                     <div style="background: white; padding: 8px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; color: #555;">
@@ -206,25 +185,7 @@
                 </div>
             </div>
 
-            <div id="plans" class="tab-content" style="display: none;">
-                <div class="section-header">
-                    <div class="section-title"><h1>Planos do Site</h1><p>Edite o que aparece na página inicial.</p></div>
-                </div>
-                <div class="stat-grid">
-                    {% for p in public_plans %}
-                    <div class="stat-card" style="display: block;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-                            <h3 style="font-size:1.4rem;">{{ p.name }}</h3>
-                            <span class="status-badge {{ 'badge-green' if p.is_highlighted else 'badge-gray' }}">{{ 'Destaque' if p.is_highlighted else 'Padrão' }}</span>
-                        </div>
-                        <div style="font-size: 1.5rem; font-weight:bold; color: var(--primary-color); margin-bottom:10px;">R$ {{ p.price }}</div>
-                        <button onclick="openEditPlan('{{ p.id }}', '{{ p.name }}', '{{ p.price }}', '{{ p.benefits }}')" class="btn-main" style="width:100%; font-size:0.8rem;">Editar Detalhes</button>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-
-            <div id="chat_public" class="tab-content" style="display: none;">
+            <div id="chat_public" class="tab-content">
                 <div class="section-header"><div class="section-title"><h1>Chat Site</h1></div></div>
                 <div class="chat-layout">
                     <div class="chat-sidebar">
@@ -255,13 +216,15 @@
                                 <button type="submit" class="btn-main" style="width: auto; padding: 0 15px;"><i class="fas fa-paper-plane"></i></button>
                             </form>
                         {% else %}
-                            <div style="margin: auto; color: #ccc; text-align: center;"><i class="fas fa-comments" style="font-size: 2rem;"></i><br>Selecione um chat</div>
+                            <div style="display:flex; height:100%; align-items:center; justify-content:center; color:#ccc; flex-direction:column;">
+                                <i class="fas fa-comments" style="font-size: 2rem;"></i><br>Selecione um chat
+                            </div>
                         {% endif %}
                     </div>
                 </div>
             </div>
 
-            <div id="chat_client" class="tab-content" style="display: none;">
+            <div id="chat_client" class="tab-content">
                 <div class="section-header"><div class="section-title"><h1>Chat Clientes</h1></div></div>
                 <div class="chat-layout">
                     <div class="chat-sidebar">
@@ -289,13 +252,33 @@
                                 <button type="submit" class="btn-main" style="width: auto; padding: 0 15px;"><i class="fas fa-paper-plane"></i></button>
                             </form>
                         {% else %}
-                            <div style="margin: auto; color: #ccc; text-align: center;"><i class="fas fa-headset" style="font-size: 2rem;"></i><br>Selecione um cliente</div>
+                             <div style="display:flex; height:100%; align-items:center; justify-content:center; color:#ccc; flex-direction:column;">
+                                <i class="fas fa-headset" style="font-size: 2rem;"></i><br>Selecione um cliente
+                            </div>
                         {% endif %}
                     </div>
                 </div>
             </div>
 
-            <div id="clients" class="tab-content" style="display: none;">
+            <div id="plans" class="tab-content">
+                <div class="section-header">
+                    <div class="section-title"><h1>Planos do Site</h1><p>Edite o que aparece na página inicial.</p></div>
+                </div>
+                <div class="stat-grid">
+                    {% for p in public_plans %}
+                    <div class="stat-card" style="display: block;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                            <h3 style="font-size:1.4rem;">{{ p.name }}</h3>
+                            <span class="status-badge {{ 'badge-green' if p.is_highlighted else 'badge-gray' }}">{{ 'Destaque' if p.is_highlighted else 'Padrão' }}</span>
+                        </div>
+                        <div style="font-size: 1.5rem; font-weight:bold; color: var(--primary-color); margin-bottom:10px;">R$ {{ p.price }}</div>
+                        <button onclick="openEditPlan('{{ p.id }}', '{{ p.name }}', '{{ p.price }}', '{{ p.benefits }}')" class="btn-main" style="width:100%; font-size:0.8rem;">Editar Detalhes</button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div id="clients" class="tab-content">
                 <div class="section-header">
                     <div class="section-title"><h1>Clientes</h1></div>
                     <button class="btn-main" onclick="toggleModal('modalNewClient')"><i class="fas fa-plus"></i> Novo</button>
@@ -325,7 +308,7 @@
                 </div>
             </div>
 
-            <div id="leads" class="tab-content" style="display: none;">
+            <div id="leads" class="tab-content">
                 <div class="section-header">
                     <div class="section-title"><h1>Leads</h1></div>
                     <button onclick="exportTableToCSV('leadsTable', 'leads.csv')" class="btn-outline" style="font-size:0.8rem;"><i class="fas fa-download"></i> Baixar CSV</button>
@@ -351,7 +334,7 @@
                 </div>
             </div>
 
-            <div id="financeiro" class="tab-content" style="display: none;">
+            <div id="financeiro" class="tab-content">
                 <div class="section-header">
                     <div class="section-title"><h1>Financeiro</h1></div>
                     <button onclick="exportTableToCSV('financeiroTable', 'vendas.csv')" class="btn-outline" style="font-size:0.8rem;"><i class="fas fa-download"></i> Baixar CSV</button>
@@ -391,7 +374,7 @@
                 </div>
             </div>
 
-            <div id="reviews" class="tab-content" style="display: none;">
+            <div id="reviews" class="tab-content">
                 <div class="section-header"><div class="section-title"><h1>Avaliações</h1></div></div>
                 <div class="table-container">
                     <table class="admin-table">
@@ -413,7 +396,6 @@
                     </table>
                 </div>
             </div>
-
         </main>
     </div>
 
@@ -475,13 +457,24 @@
             document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(tabName).style.display = 'block';
-            const btn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick').includes(tabName));
-            if(btn) btn.classList.add('active');
-            const url = new URL(window.location); url.searchParams.set('tab', tabName); window.history.pushState({}, '', url);
+            
+            // Ativa o botão correspondente
+            const buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach(btn => {
+                if(btn.getAttribute('onclick').includes("'" + tabName + "'")) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Atualiza URL sem recarregar
+            const url = new URL(window.location); 
+            url.searchParams.set('tab', tabName); 
+            window.history.pushState({}, '', url);
         }
 
         const urlParams = new URLSearchParams(window.location.search);
-        openTab(urlParams.get('tab') || 'dashboard');
+        const currentTab = urlParams.get('tab') || 'dashboard';
+        openTab(currentTab);
 
         function toggleModal(modalId) { document.getElementById(modalId).classList.toggle('active'); }
 
@@ -500,6 +493,7 @@
             toggleModal('modalEditPlan');
         }
 
+        // Auto-close flash message after 3s
         const flashMsg = document.getElementById('flash-message');
         if(flashMsg) {
             setTimeout(() => {
