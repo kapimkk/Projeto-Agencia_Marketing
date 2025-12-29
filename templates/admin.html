@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* CSS Específico para o Novo Admin */
+        /* CSS Específico para o Admin */
         :root {
             --sidebar-width: 260px;
             --primary-color: #2d3436;
@@ -102,10 +102,11 @@
         .admin-table td { padding: 12px; border-bottom: 1px solid #f1f2f6; color: var(--primary-color); font-size: 0.9rem; vertical-align: middle; }
         .admin-table tr:hover { background: #fcfcfc; }
         
-        .status-badge { padding: 4px 10px; border-radius: 15px; font-size: 0.7rem; font-weight: 600; }
+        .status-badge { padding: 4px 10px; border-radius: 15px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
         .badge-green { background: rgba(0, 184, 148, 0.15); color: #00b894; }
         .badge-blue { background: rgba(9, 132, 227, 0.15); color: #0984e3; }
         .badge-gray { background: rgba(99, 110, 114, 0.15); color: #636e72; }
+        .badge-red { background: rgba(214, 48, 49, 0.15); color: #d63031; }
 
         /* Chat */
         .chat-layout { display: grid; grid-template-columns: 260px 1fr; height: 550px; background: #fff; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #eee; }
@@ -114,7 +115,7 @@
         .chat-list-item:hover, .chat-list-item.active { background: #fff; border-left: 4px solid var(--primary-color); }
         .chat-history { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #f9f9f9; }
 
-        /* --- MODAIS (Janelas Pop-up) --- */
+        /* --- MODAIS --- */
         .modal-overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.5); z-index: 1000; 
@@ -123,19 +124,14 @@
         }
         .modal-overlay.active { display: flex; animation: fadeIn 0.2s; }
         
-        /* Modal COMPACTO */
         .modal-card { 
-            background: white; 
-            width: 90%; 
-            max-width: 380px; /* Largura reduzida */
-            padding: 20px;    /* Espaçamento reduzido */
-            border-radius: 15px; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2); 
+            background: white; width: 90%; max-width: 380px; padding: 20px;
+            border-radius: 15px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); 
             position: relative; 
         }
         
         .close-modal { position: absolute; top: 15px; right: 15px; cursor: pointer; color: #999; }
-        .form-group { margin-bottom: 10px; } /* Margem reduzida */
+        .form-group { margin-bottom: 10px; }
         .form-group label { font-size: 0.75rem; font-weight: 600; color: var(--text-light); margin-bottom: 3px; display: block; }
         .form-group input, .form-group textarea { 
             width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ddd; 
@@ -366,14 +362,28 @@
                         <div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Buscar..." onkeyup="searchTable(this, 'financeiroTable')"></div>
                     </div>
                     <table class="admin-table" id="financeiroTable">
-                        <thead><tr><th>Data</th><th>Plano</th><th>Valor</th><th>Status</th></tr></thead>
+                        <thead><tr><th>Data</th><th>Plano</th><th>Valor</th><th>Método</th><th>Status</th></tr></thead>
                         <tbody>
                             {% for order in orders %}
                             <tr>
-                                <td>{{ order.data.strftime('%d/%m') }}</td>
+                                <td>{{ order.data.strftime('%d/%m %H:%M') }}</td>
                                 <td><b>{{ order.plano }}</b></td>
                                 <td>R$ {{ order.preco }}</td>
-                                <td><span class="status-badge {{ 'badge-green' if order.status == 'Pago' else 'badge-gray' }}">{{ order.status }}</span></td>
+                                <td>
+                                    {% if order.metodo == 'pix' %}<i class="fab fa-pix" style="color:#00b894"></i> PIX
+                                    {% else %}<i class="far fa-credit-card" style="color:#0984e3"></i> Cartão{% endif %}
+                                </td>
+                                <td>
+                                    {% if order.status == 'Aprovado' %}
+                                        <span class="status-badge badge-green"><i class="fas fa-check"></i> Pago</span>
+                                    {% elif order.status == 'Pendente' %}
+                                        <span class="status-badge badge-gray"><i class="fas fa-clock"></i> Aguardando</span>
+                                    {% elif order.status == 'Rejeitado' %}
+                                        <span class="status-badge badge-red">Recusado</span>
+                                    {% else %}
+                                        <span class="status-badge">{{ order.status }}</span>
+                                    {% endif %}
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -442,17 +452,8 @@
             <h3 style="margin-bottom: 15px;">Editar Cliente</h3>
             <form id="formEditClient" action="" method="POST">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                
-                <div class="form-group">
-                    <label>Plano / Promoção</label>
-                    <input type="text" id="editPlanName" name="plan_name" placeholder="Growth - BLACK FRIDAY">
-                </div>
-                
-                <div class="form-group">
-                    <label>Benefícios (Vírgula)</label>
-                    <textarea id="editBenefits" name="benefits" rows="2" style="resize:none;"></textarea>
-                </div>
-                
+                <div class="form-group"><label>Plano / Promoção</label><input type="text" id="editPlanName" name="plan_name" placeholder="Growth - BLACK FRIDAY"></div>
+                <div class="form-group"><label>Benefícios (Vírgula)</label><textarea id="editBenefits" name="benefits" rows="2" style="resize:none;"></textarea></div>
                 <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
                     <label style="font-size: 0.7rem; font-weight: bold; margin-bottom: 5px; display:block;">Gráfico (4 Meses)</label>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
@@ -462,7 +463,6 @@
                         <input type="text" name="labels[]" placeholder="Mês 4"> <input type="number" name="values[]" placeholder="Val">
                     </div>
                 </div>
-                
                 <button class="btn-main" style="width: 100%;">Salvar</button>
             </form>
         </div>
@@ -500,7 +500,6 @@
             toggleModal('modalEditPlan');
         }
 
-        // Auto-close flash message after 3s
         const flashMsg = document.getElementById('flash-message');
         if(flashMsg) {
             setTimeout(() => {

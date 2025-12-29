@@ -90,32 +90,13 @@
                     <button class="pay-option" onclick="showMethod('pix')"><i class="fas fa-qrcode"></i> PIX</button>
                 </div>
 
-                <div id="method-card">
-                    <input type="text" placeholder="Número do Cartão" style="width: 100%; margin-bottom: 15px;">
-                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                        <input type="text" placeholder="MM/AA" style="width: 50%;">
-                        <input type="text" placeholder="CVV" style="width: 50%;">
-                    </div>
-                    <input type="text" placeholder="Nome no Cartão" style="width: 100%; margin-bottom: 15px;">
-                    
-                    <label style="font-size: 0.9rem; color: var(--text-grey); margin-bottom: 5px; display: block;">Parcelamento:</label>
-                    <select id="parcelas" style="width: 100%; padding: 15px; border: 1px solid var(--glass-border); border-radius: 10px; margin-bottom: 20px; background: var(--input-bg); color: var(--text-dark); outline: none;">
-                        <option value="1x">1x de R$ {{ preco }} (Sem juros)</option>
-                        <option value="2x">2x (Sem juros)</option>
-                        <option value="3x">3x (Sem juros)</option>
-                        <option value="6x">6x (Com juros)</option>
-                        <option value="12x">12x (Com juros)</option>
-                    </select>
-
-                    <button class="btn-main" onclick="finalizar('Cartão')" style="width: 100%;">Pagar Agora</button>
+                <div id="method-card" style="margin-top:20px;">
+                    <p style="margin-bottom:15px;">Você será redirecionado para o ambiente seguro do Mercado Pago.</p>
+                    <button class="btn-main" onclick="finalizar('Cartão')" style="width: 100%;">Pagar com Cartão</button>
                 </div>
 
-                <div id="method-pix" style="display: none; text-align: center;">
-                    <div style="background: white; padding: 10px; display: inline-block; border-radius: 10px; margin-bottom: 20px;">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=PixExemplo" style="opacity: 0.9;">
-                    </div>
-                    <p>Liberação Imediata</p>
-                    <button class="btn-main" onclick="finalizar('PIX')" style="width: 100%;">Já realizei o PIX</button>
+                <div id="method-pix" style="display: none; text-align: center; margin-top:20px;">
+                    <button class="btn-main" onclick="finalizar('PIX')" style="width: 100%;">Gerar QR Code PIX</button>
                 </div>
                 
                 <button onclick="goToStep(1)" style="background: none; border: none; color: var(--text-grey); cursor: pointer; margin-top: 20px; text-decoration: underline;">Voltar ao resumo</button>
@@ -125,6 +106,8 @@
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script>
+        let pollingInterval = null;
+
         function goToStep(step) {
             document.querySelectorAll('.payment-section').forEach(el => el.classList.remove('active'));
             document.getElementById('step-' + step).classList.add('active');
@@ -140,26 +123,76 @@
 
         async function finalizar(metodo) {
             const btn = event.target;
+            const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
             btn.disabled = true;
 
-            const parcelas = document.getElementById('parcelas') ? document.getElementById('parcelas').value : '1x';
+            const payload = { 
+                plano: "{{ plano }}", 
+                preco: "{{ preco }}", 
+                metodo: metodo === 'Cartão' ? 'card' : 'pix',
+                email: "cliente@teste.com",
+                nome: "Cliente Teste"
+            };
 
-            await fetch('/processar_pagamento', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ 
-                    plano: "{{ plano }}", 
-                    preco: "{{ preco }}", 
-                    metodo: metodo,
-                    parcelas: metodo === 'Cartão' ? parcelas : '1x'
-                })
-            });
+            try {
+                const res = await fetch('/criar_pagamento', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
 
-            setTimeout(() => {
-                alert('Pagamento Processado com Sucesso! Bem-vindo à Agência.');
-                window.location.href = '/';
-            }, 2000);
+                if (data.status === 'preference_created') {
+                    window.location.href = data.init_point;
+                } 
+                else if (data.status === 'pix_created') {
+                    const pixDiv = document.getElementById('method-pix');
+                    pixDiv.innerHTML = `
+                        <div style="text-align: center; animation: fadeIn 0.5s;">
+                            <h3 style="color:#00c851; margin-bottom:10px;">QR Code Gerado!</h3>
+                            <p style="font-size:0.9rem; margin-bottom:15px;">Escaneie com o app do seu banco:</p>
+                            <img src="data:image/jpeg;base64,${data.qr_code_base64}" style="width: 200px; border-radius:10px; border:1px solid #eee; margin:10px 0;">
+                            
+                            <div style="margin: 15px 0;">
+                                <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:5px;">Pix Copia e Cola:</label>
+                                <input type="text" value="${data.qr_code}" id="pixCopy" style="width:100%; font-size:0.8rem; padding:8px; text-align:center; border:1px solid #ddd; border-radius:5px;" readonly>
+                                <button onclick="navigator.clipboard.writeText(document.getElementById('pixCopy').value); Swal.fire('Copiado!', '', 'success');" class="btn-outline" style="padding:5px 15px; font-size:0.8rem; margin-top:10px; cursor:pointer;">Copiar Código</button>
+                            </div>
+
+                            <div id="status-pagamento" style="background:#f8f9fa; padding:15px; border-radius:8px; font-weight:bold; color:#666; margin-top:20px;">
+                                <i class="fas fa-sync fa-spin"></i> Aguardando pagamento...
+                            </div>
+                        </div>
+                    `;
+                    
+                    if(pollingInterval) clearInterval(pollingInterval);
+                    pollingInterval = setInterval(async () => {
+                        const check = await fetch(`/check_status/${data.order_id}`);
+                        const statusData = await check.json();
+                        if(statusData.status === 'Aprovado') {
+                            clearInterval(pollingInterval);
+                            document.getElementById('status-pagamento').innerHTML = '<span style="color:green; font-size:1.1rem;"><i class="fas fa-check-circle"></i> Pagamento Aprovado!</span>';
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Pagamento Confirmado!',
+                                text: 'Redirecionando para sua área do cliente...',
+                                timer: 3000,
+                                willClose: () => { window.location.href = '/'; }
+                            });
+                        }
+                    }, 5000);
+                } else {
+                    Swal.fire('Erro', 'Ocorreu um erro ao gerar o pagamento.', 'error');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            } catch (e) {
+                console.error(e);
+                Swal.fire('Erro', 'Falha na comunicação com o servidor.', 'error');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
         }
     </script>
 </body>

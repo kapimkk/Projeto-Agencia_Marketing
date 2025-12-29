@@ -1,6 +1,7 @@
 import os
 import uuid
 import json
+import mercadopago
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
@@ -21,10 +22,16 @@ from forms import LoginForm
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# Configurações
+# --- CONFIGURAÇÕES ---
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'pdf', 'doc', 'docx'}
 if not os.path.exists(app.config['UPLOAD_FOLDER']): os.makedirs(app.config['UPLOAD_FOLDER'])
+
+# Inicializa SDK do Mercado Pago
+try:
+    sdk = mercadopago.SDK(app.config['MERCADO_PAGO_ACCESS_TOKEN'])
+except:
+    print("Aviso: Token do Mercado Pago não configurado.")
 
 db.init_app(app)
 migrate = Migrate(app, db)
@@ -35,7 +42,17 @@ login_manager.init_app(app)
 login_manager.login_view = 'client_login'
 
 limiter = Limiter(get_remote_address, app=app, default_limits=["2000 per day", "500 per hour"], storage_uri="memory://")
-csp = { 'default-src': '\'self\'', 'script-src': ['\'self\'', '\'unsafe-inline\'', 'https://cdn.jsdelivr.net', 'https://cdnjs.cloudflare.com', 'https://unpkg.com'], 'style-src': ['\'self\'', '\'unsafe-inline\'', 'https://cdnjs.cloudflare.com', 'https://fonts.googleapis.com'], 'font-src': ['\'self\'', 'https://fonts.gstatic.com', 'https://cdnjs.cloudflare.com'], 'img-src': ['\'self\'', 'data:', 'https://images.unsplash.com', 'https://api.qrserver.com'], 'connect-src': ['\'self\''] }
+
+# Configuração de Segurança (CSP) Atualizada para permitir Mercado Pago
+csp = {
+    'default-src': '\'self\'',
+    'script-src': ['\'self\'', '\'unsafe-inline\'', 'https://cdn.jsdelivr.net', 'https://cdnjs.cloudflare.com', 'https://unpkg.com', 'https://www.mercadopago.com.br', 'https://http2.mlstatic.com'],
+    'style-src': ['\'self\'', '\'unsafe-inline\'', 'https://cdnjs.cloudflare.com', 'https://fonts.googleapis.com'],
+    'font-src': ['\'self\'', 'https://fonts.gstatic.com', 'https://cdnjs.cloudflare.com'],
+    'img-src': ['\'self\'', 'data:', 'https://images.unsplash.com', 'https://api.qrserver.com', 'https://http2.mlstatic.com'],
+    'connect-src': ['\'self\'', 'https://api.mercadopago.com', 'https://events.mercadopago.com'],
+    'frame-src': ['\'self\'', 'https://www.mercadopago.com.br']
+}
 Talisman(app, content_security_policy=csp, force_https=False)
 
 @login_manager.user_loader
@@ -49,6 +66,125 @@ def admin_required(f):
         return f(*args, **kwargs)
     wrap.__name__ = f.__name__
     return wrap
+
+# --- ROTAS DE PAGAMENTO (MERCADO PAGO) ---
+
+@app.route('/criar_pagamento', methods=['POST'])
+@csrf.exempt
+def criar_pagamento():
+    try:
+        dados = request.json
+        order_id = str(uuid.uuid4())
+        plano = dados.get('plano')
+        # Limpa formatação do preço (Ex: "1.500,00" -> 1500.00)
+        preco_str = str(dados.get('preco')).replace('R$', '').replace('.', '').replace(',', '.').strip()
+        try:
+            preco = float(preco_str)
+        except:
+            preco = 0.0
+            
+        metodo = dados.get('metodo') # 'pix' ou 'card'
+
+        # Cria Pedido no Banco
+        nova_order = Order(
+            id=order_id,
+            plano=plano,
+            preco=dados.get('preco'), # Salva visualmente formatado
+            status='Pendente',
+            metodo=metodo
+        )
+        db.session.add(nova_order)
+        db.session.commit()
+
+        # 1. Pagamento via PIX (Transparente)
+        if metodo == 'pix':
+            payment_data = {
+                "transaction_amount": preco,
+                "description": f"Plano {plano} - Studio Indexa",
+                "payment_method_id": "pix",
+                "payer": {
+                    "email": dados.get('email', 'cliente@email.com'),
+                    "first_name": dados.get('nome', 'Cliente'),
+                },
+                "external_reference": order_id,
+                "notification_url": url_for('webhook_mp', _external=True)
+            }
+            result = sdk.payment().create(payment_data)
+            
+            if result["status"] == 201:
+                payment = result["response"]
+                return jsonify({
+                    'status': 'pix_created',
+                    'qr_code': payment['point_of_interaction']['transaction_data']['qr_code'],
+                    'qr_code_base64': payment['point_of_interaction']['transaction_data']['qr_code_base64'],
+                    'order_id': order_id
+                })
+            else:
+                return jsonify({'status': 'error', 'message': 'Erro ao gerar PIX'}), 500
+
+        # 2. Pagamento via Cartão (Checkout Pro)
+        else:
+            preference_data = {
+                "items": [{
+                    "title": f"Plano {plano}",
+                    "quantity": 1,
+                    "unit_price": preco,
+                    "currency_id": "BRL"
+                }],
+                "external_reference": order_id,
+                "notification_url": url_for('webhook_mp', _external=True),
+                "back_urls": {
+                    "success": url_for('index', _external=True),
+                    "failure": url_for('checkout', plano=plano, _external=True),
+                    "pending": url_for('checkout', plano=plano, _external=True)
+                },
+                "auto_return": "approved"
+            }
+            result = sdk.preference().create(preference_data)
+            return jsonify({
+                'status': 'preference_created',
+                'init_point': result['response']['init_point']
+            })
+
+    except Exception as e:
+        print(f"Erro MP: {e}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/webhook/mercadopago', methods=['POST'])
+@csrf.exempt
+def webhook_mp():
+    # Mercado Pago envia o ID nas query strings
+    topic = request.args.get('topic') or request.args.get('type')
+    p_id = request.args.get('id') or request.args.get('data.id')
+
+    if (topic == 'payment' or request.json.get('type') == 'payment') and p_id:
+        try:
+            payment_info = sdk.payment().get(p_id)
+            if payment_info["status"] == 200:
+                resp = payment_info["response"]
+                status = resp["status"]
+                external_ref = resp["external_reference"]
+                
+                order = db.session.get(Order, external_ref)
+                if order:
+                    if status == 'approved':
+                        order.status = 'Aprovado'
+                        # Lógica adicional: Enviar email, criar usuário, etc.
+                    elif status in ['rejected', 'cancelled']:
+                        order.status = 'Rejeitado'
+                    
+                    db.session.commit()
+        except Exception as e:
+            print(f"Erro Webhook: {e}")
+                
+    return jsonify({'status': 'ok'}), 200
+
+@app.route('/check_status/<order_id>')
+def check_status(order_id):
+    order = db.session.get(Order, order_id)
+    if order:
+        return jsonify({'status': order.status})
+    return jsonify({'status': 'not_found'}), 404
 
 # --- LOGIN ---
 @app.route('/cliente/login', methods=['GET', 'POST'])
@@ -91,17 +227,14 @@ def index():
     try: db.session.add(Visit(page='home')); db.session.commit()
     except: pass
     
-    # Carrega planos do banco. Se não existir, usa padrão.
     plans = PublicPlan.query.order_by(PublicPlan.order_index).all()
     if not plans:
-        # Fallback visual se o banco estiver vazio
         plans = [
             {'name': 'Start', 'price': '1.500', 'benefits': json.dumps(['Gestão de Redes Sociais', 'Tráfego Pago Básico', 'Relatório Mensal']), 'is_highlighted': False},
             {'name': 'Growth', 'price': '3.200', 'benefits': json.dumps(['Tráfego Avançado', 'Landing Page', 'Dashboard 24h']), 'is_highlighted': True},
             {'name': 'Scale', 'price': '7.000', 'benefits': json.dumps(['Gestão 360º', 'Consultoria Semanal', 'Time Dedicado']), 'is_highlighted': False}
         ]
     else:
-        # Decodifica JSON dos benefícios para o template
         for p in plans:
             if isinstance(p.benefits, str):
                 try: p.benefits_list = json.loads(p.benefits)
@@ -117,28 +250,27 @@ def reviews(): return render_template('reviews.html', reviews=Review.query.filte
 
 @app.route('/checkout/<plano>')
 def checkout(plano):
-    # Tenta pegar preço do banco
     db_plan = PublicPlan.query.filter_by(name=plano).first()
-    preco = db_plan.price if db_plan else 'Consultar'
+    preco = db_plan.price if db_plan else '0,00'
     return render_template('checkout.html', plano=plano, preco=preco)
 
-# --- AÇÕES ---
+# --- AÇÕES ANTIGAS (Mantidas para compatibilidade) ---
 @app.route('/processar_pagamento', methods=['POST'])
 @csrf.exempt
-def processar_pagamento():
-    try: db.session.add(Order(plano=request.json.get('plano'), preco=request.json.get('preco'), status='Pago' if request.json.get('metodo')=='card' else 'Pendente')); db.session.commit(); return jsonify({'status': 'success'})
-    except: return jsonify({'status': 'error'}), 500
+def processar_pagamento_old():
+    # Redireciona lógica antiga para a nova se for chamada diretamente
+    return criar_pagamento()
 
 @app.route('/submit_lead', methods=['POST'])
 @csrf.exempt
 def submit_lead():
-    try: db.session.add(Lead(nome=request.form.get('nome'), email=request.form.get('email'), telefone=request.form.get('telefone'), projeto=request.form.get('projeto'))); db.session.commit(); return jsonify({'status': 'success'})
+    try: db.session.add(Lead(nome=request.form.get('nome'), email=request.form.get('email'), telefone=request.form.get('telefone'), projeto=request.form.get('projeto'), data=datetime.now())); db.session.commit(); return jsonify({'status': 'success'})
     except: return jsonify({'status': 'error'}), 500
 
 @app.route('/submit_review', methods=['POST'])
 @csrf.exempt
 def submit_review():
-    try: d = request.json; db.session.add(Review(nome=d.get('nome'), empresa=d.get('empresa'), email=d.get('email'), avaliacao=d.get('avaliacao'), estrelas=int(d.get('estrelas',5)), visivel=True)); db.session.commit(); return jsonify({'status': 'success'})
+    try: d = request.json; db.session.add(Review(nome=d.get('nome'), empresa=d.get('empresa'), email=d.get('email'), avaliacao=d.get('avaliacao'), estrelas=int(d.get('estrelas',5)), visivel=True, data=datetime.now())); db.session.commit(); return jsonify({'status': 'success'})
     except: return jsonify({'status': 'error'}), 500
 
 # --- DASHBOARD CLIENTE ---
@@ -161,7 +293,7 @@ def client_send_message():
     if not sess:
         sess = ChatSession(session_uuid=uuid.uuid4().hex, user_id=current_user.id, client_name=current_user.name, category='Cliente Dashboard', status='Aberto')
         db.session.add(sess); db.session.commit(); db.session.add(ChatMessage(session_id=sess.id, tipo='texto', remetente='system', conteudo='Olá! Em que posso ajudar?'))
-    db.session.add(ChatMessage(session_id=sess.id, tipo='texto', remetente='user', conteudo=request.form.get('message'))); db.session.commit()
+    db.session.add(ChatMessage(session_id=sess.id, tipo='texto', remetente='user', conteudo=request.form.get('message'), data=datetime.now())); db.session.commit()
     return jsonify({'status': 'success'})
 
 @app.route('/client/get_chat', methods=['GET'])
@@ -182,17 +314,14 @@ def admin():
     chart_map = {(datetime.now() - timedelta(days=i)).strftime('%Y-%m-%d'): 0 for i in range(6, -1, -1)}
     for d, c in leads_data: chart_map[str(d)] = c
     
-    # Dados para renderizar
     public_plans = PublicPlan.query.order_by(PublicPlan.order_index).all()
     
-    # Lógica Chat Admin
     active_uuid = request.args.get('session_id')
     chat_history, active_ticket = [], ""
     if active_uuid:
         sess = ChatSession.query.filter_by(session_uuid=active_uuid).first()
         if sess: chat_history = ChatMessage.query.filter_by(session_id=sess.id).order_by(ChatMessage.data).all(); active_ticket = sess.client_name
 
-    # Ajuste nos objetos de chat para o template
     public_chats = ChatSession.query.filter(ChatSession.user_id == None).order_by(ChatSession.created_at.desc()).all()
     client_chats = ChatSession.query.filter(ChatSession.user_id != None).order_by(ChatSession.created_at.desc()).all()
     for s in public_chats: s.uuid = s.session_uuid
@@ -219,7 +348,6 @@ def update_plan(plan_id):
     if p:
         p.name = request.form.get('name')
         p.price = request.form.get('price')
-        # Converte string separada por virgula em lista JSON
         benefits_list = [b.strip() for b in request.form.get('benefits').split(',')]
         p.benefits = json.dumps(benefits_list)
         db.session.commit()
@@ -268,7 +396,7 @@ def delete_review(id): Review.query.filter_by(id=id).delete(); db.session.commit
 @csrf.exempt
 def init_session():
     d=request.json; ns=ChatSession(session_uuid=uuid.uuid4().hex, category=d.get('category'), client_name=d.get('name'), client_phone=d.get('phone'), status='Aberto')
-    db.session.add(ns); db.session.commit(); db.session.add(ChatMessage(session_id=ns.id, tipo='texto', conteudo=f"Olá {d.get('name')}.", remetente='system')); db.session.commit()
+    db.session.add(ns); db.session.commit(); db.session.add(ChatMessage(session_id=ns.id, tipo='texto', conteudo=f"Olá {d.get('name')}.", remetente='system', data=datetime.now())); db.session.commit()
     return jsonify({'status':'success', 'session_id':ns.session_uuid, 'ticket':f"#{ns.id:04d}"})
 
 @app.route('/send_chat', methods=['POST'])
@@ -276,8 +404,8 @@ def init_session():
 def send_chat():
     sess=ChatSession.query.filter_by(session_uuid=request.form.get('session_id')).first()
     if sess:
-        if 'message' in request.form: db.session.add(ChatMessage(session_id=sess.id, tipo='texto', conteudo=request.form['message'], remetente=request.form.get('remetente')))
-        if 'audio' in request.files: f=request.files['audio']; n=f"audio_{uuid.uuid4().hex}.webm"; f.save(os.path.join(app.config['UPLOAD_FOLDER'], n)); db.session.add(ChatMessage(session_id=sess.id, tipo='audio', conteudo=n, remetente=request.form.get('remetente')))
+        if 'message' in request.form: db.session.add(ChatMessage(session_id=sess.id, tipo='texto', conteudo=request.form['message'], remetente=request.form.get('remetente'), data=datetime.now()))
+        if 'audio' in request.files: f=request.files['audio']; n=f"audio_{uuid.uuid4().hex}.webm"; f.save(os.path.join(app.config['UPLOAD_FOLDER'], n)); db.session.add(ChatMessage(session_id=sess.id, tipo='audio', conteudo=n, remetente=request.form.get('remetente'), data=datetime.now()))
         db.session.commit()
     return jsonify({'status':'success'})
 
@@ -295,14 +423,12 @@ def close_ticket(session_uuid): sess=ChatSession.query.filter_by(session_uuid=se
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-        # Seed Admin
         if not User.query.filter_by(username='admin').first():
             db.session.add(User(username='admin', name="Super Admin", role='admin', password_hash=generate_password_hash('admin123')))
             db.session.commit()
-        # Seed Planos Públicos
         if not PublicPlan.query.first():
             db.session.add(PublicPlan(name='Start', price='1.500', benefits=json.dumps(['Redes Sociais', 'Tráfego Básico', 'Relatório PDF']), is_highlighted=False, order_index=1))
             db.session.add(PublicPlan(name='Growth', price='3.200', benefits=json.dumps(['Tráfego Avançado', 'Landing Page', 'Dashboard 24h']), is_highlighted=True, order_index=2))
             db.session.add(PublicPlan(name='Scale', price='7.000', benefits=json.dumps(['Gestão 360º', 'Consultoria Semanal', 'Time Dedicado']), is_highlighted=False, order_index=3))
             db.session.commit()
-    app.run(debug=False, port=5000)
+    app.run(debug=True, port=5000)

@@ -9,6 +9,9 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///banco_final.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
+    # Credencial Mercado Pago (Obtenha em: https://www.mercadopago.com.br/developers/panel)
+    MERCADO_PAGO_ACCESS_TOKEN = os.getenv('MP_ACCESS_TOKEN', 'TEST-00000000-0000-0000-0000-000000000000')
+
     # Caminho absoluto
     basedir = os.path.abspath(os.path.dirname(__file__))
     UPLOAD_FOLDER = os.path.join(basedir, 'static', 'uploads')
@@ -24,6 +27,6 @@ class Config:
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # Limite de 16MB
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'pdf', 'doc', 'docx', 'csv', 'xlsx'}
 
-    SESSION_COOKIE_SECURE = False      # Só envia cookie via HTTPS (Ative apenas quando tiver SSL/Domínio)
-    SESSION_COOKIE_HTTPONLY = True    # JavaScript não consegue ler o cookie
-    SESSION_COOKIE_SAMESITE = 'Lax'   # Previne ataques CSRF de outros sites
+    SESSION_COOKIE_SECURE = False      # Ative apenas quando tiver SSL (HTTPS)
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'

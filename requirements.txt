@@ -9,3 +9,4 @@ Flask-Talisman
 Werkzeug
 Bleach
 email-validator
+mercadopago
