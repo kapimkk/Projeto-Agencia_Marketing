@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
+        .email-container { max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .header { background: #2d3436; padding: 30px; text-align: center; color: white; }
+        .header h1 { margin: 0; font-size: 24px; letter-spacing: 1px; }
+        .content { padding: 40px; color: #2d3436; }
+        .label { font-size: 12px; color: #636e72; text-transform: uppercase; font-weight: bold; margin-top: 20px; display: block; }
+        .value { font-size: 16px; font-weight: 500; border-bottom: 1px solid #eee; padding-bottom: 8px; display: block; }
+        .footer { background: #f9f9f9; padding: 20px; text-align: center; font-size: 12px; color: #aaa; }
+        .btn-link { display: inline-block; background: #0984e3; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-top: 20px; font-weight: bold;}
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>NOVO LEAD RECEBIDO 🚀</h1>
+        </div>
+        <div class="content">
+            <p>Olá, Administrador. Um novo cliente potencial entrou em contato através do site.</p>
+            
+            <span class="label">Nome do Cliente</span>
+            <span class="value">{{ nome }}</span>
+
+            <span class="label">E-mail</span>
+            <span class="value">{{ email }}</span>
+
+            <span class="label">Telefone / WhatsApp</span>
+            <span class="value">{{ telefone }}</span>
+
+            <span class="label">Descrição do Projeto</span>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 5px; line-height: 1.6;">
+                {{ projeto }}
+            </div>
+
+            {% if tem_arquivo %}
+            <div style="text-align: center; margin-top: 30px;">
+                <p>📎 Este lead anexou um arquivo.</p>
+            </div>
+            {% endif %}
+        </div>
+        <div class="footer">
+            &copy; 2025 Studio Indexa - Sistema Automático
+        </div>
+    </div>
+</body>
+</html>

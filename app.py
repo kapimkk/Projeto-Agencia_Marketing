@@ -6,9 +6,11 @@ from datetime import datetime, timedelta
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_migrate import Migrate
-from flask_mail import Mail
+from flask_mail import Mail, Message
 from flask_wtf.csrf import CSRFProtect
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+from werkzeug.middleware.proxy_fix import ProxyFix
 from sqlalchemy import or_, func
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -20,6 +22,10 @@ from forms import LoginForm
 
 app = Flask(__name__)
 app.config.from_object(Config)
+
+# --- CONFIGURAÇÃO PARA PRODUÇÃO (ProxyFix) ---
+# Corrige IP e HTTPS quando rodando atrás de proxy (Nginx/Heroku/Render)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 # --- CONFIGURAÇÕES DE SEGURANÇA E PLUGINS ---
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
@@ -57,7 +63,10 @@ csp = {
     'connect-src': ['\'self\'', 'https://api.mercadopago.com', 'https://events.mercadopago.com'],
     'frame-src': ['\'self\'', 'https://www.mercadopago.com.br']
 }
-Talisman(app, content_security_policy=csp, force_https=False)
+
+# Força HTTPS apenas se estiver em produção
+is_production = os.environ.get('FLASK_ENV') == 'production'
+Talisman(app, content_security_policy=csp, force_https=is_production)
 
 @login_manager.user_loader
 def load_user(user_id): return db.session.get(User, int(user_id))
@@ -67,7 +76,6 @@ def admin_required(f):
         if not current_user.is_authenticated:
             return redirect(url_for('admin_login'))
         
-        # SEGURANÇA: Se não for admin, desloga e manda para login admin (Evita loop de redirecionamento)
         if current_user.role != 'admin':
             logout_user()
             flash('Acesso restrito a administradores.', 'error')
@@ -77,23 +85,25 @@ def admin_required(f):
     wrap.__name__ = f.__name__
     return wrap
 
-# --- ROTAS DE PAGAMENTO (SEGURANÇA REFORÇADA) ---
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+
+# --- ROTAS DE PAGAMENTO ---
 
 @app.route('/criar_pagamento', methods=['POST'])
 @csrf.exempt
-@limiter.limit("10 per minute") # Limita tentativas de criação de pagamento
+@limiter.limit("10 per minute")
 def criar_pagamento():
     try:
         dados = request.json
         plano_nome = dados.get('plano')
         metodo = dados.get('metodo') # 'pix' ou 'card'
         
-        # SEGURANÇA: Busca o preço REAL no banco de dados. Ignora o preço enviado pelo front-end.
         db_plan = PublicPlan.query.filter_by(name=plano_nome).first()
         if not db_plan:
             return jsonify({'status': 'error', 'message': 'Plano inválido ou não encontrado.'}), 400
             
-        # Converte "1.500,00" para float 1500.00
         try:
             preco_real = float(db_plan.price.replace('R$', '').replace('.', '').replace(',', '.').strip())
         except:
@@ -101,18 +111,16 @@ def criar_pagamento():
 
         order_id = str(uuid.uuid4())
 
-        # Cria Pedido no Banco
         nova_order = Order(
             id=order_id,
             plano=plano_nome,
-            preco=db_plan.price, # Salva o valor visual original
+            preco=db_plan.price,
             status='Pendente',
             metodo=metodo
         )
         db.session.add(nova_order)
         db.session.commit()
 
-        # 1. Pagamento via PIX
         if metodo == 'pix':
             payment_data = {
                 "transaction_amount": preco_real,
@@ -138,7 +146,6 @@ def criar_pagamento():
             else:
                 return jsonify({'status': 'error', 'message': 'Erro ao gerar PIX no Mercado Pago'}), 500
 
-        # 2. Pagamento via Cartão
         else:
             preference_data = {
                 "items": [{
@@ -200,12 +207,11 @@ def check_status(order_id):
         return jsonify({'status': order.status})
     return jsonify({'status': 'not_found'}), 404
 
-# --- LOGIN (CORRIGIDO PARA EVITAR LOOP) ---
+# --- LOGIN ---
 @app.route('/cliente/login', methods=['GET', 'POST'])
 @limiter.limit("5 per minute") 
 def client_login():
     if current_user.is_authenticated:
-        # CORREÇÃO: Se for admin, manda pro admin. Se for cliente, manda pro cliente.
         if current_user.role == 'admin': return redirect(url_for('admin'))
         return redirect(url_for('client_dashboard'))
         
@@ -228,7 +234,7 @@ def client_login():
 def admin_login():
     if current_user.is_authenticated:
         if current_user.role == 'admin': return redirect(url_for('admin'))
-        logout_user() # Garante logout se tiver usuário errado logado
+        logout_user() 
         
     form = LoginForm()
     if request.method == 'POST':
@@ -260,7 +266,6 @@ def index():
     except: pass
     
     plans = PublicPlan.query.order_by(PublicPlan.order_index).all()
-    # Fallback se não houver planos
     if not plans:
         plans = []
     else:
@@ -283,11 +288,55 @@ def checkout(plano):
     preco = db_plan.price if db_plan else '0,00'
     return render_template('checkout.html', plano=plano, preco=preco)
 
+# ROTA DE LEADS ATUALIZADA (EMAIL E ARQUIVO)
 @app.route('/submit_lead', methods=['POST'])
 @csrf.exempt
 def submit_lead():
-    try: db.session.add(Lead(nome=request.form.get('nome'), email=request.form.get('email'), telefone=request.form.get('telefone'), projeto=request.form.get('projeto'), data=datetime.now())); db.session.commit(); return jsonify({'status': 'success'})
-    except: return jsonify({'status': 'error'}), 500
+    try:
+        nome = request.form.get('nome')
+        email = request.form.get('email')
+        telefone = request.form.get('telefone')
+        projeto = request.form.get('projeto')
+        
+        # Upload de Arquivo
+        arquivo_nome = None
+        file = request.files.get('arquivo')
+        
+        if file and file.filename != '':
+            if not allowed_file(file.filename):
+                return jsonify({'status': 'error', 'message': 'Tipo de arquivo não permitido.'}), 400
+            
+            filename = secure_filename(file.filename)
+            unique_filename = f"{uuid.uuid4().hex}_{filename}"
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
+            arquivo_nome = unique_filename
+
+        # Salva no Banco
+        db.session.add(Lead(nome=nome, email=email, telefone=telefone, projeto=projeto, data=datetime.now()))
+        db.session.commit()
+
+        # Envia Email
+        msg = Message(f"Novo Lead: {nome}",
+                      sender=app.config.get('MAIL_USERNAME'),
+                      recipients=[app.config.get('MAIL_USERNAME')])
+        
+        msg.html = render_template('email_lead.html', 
+                                   nome=nome, 
+                                   email=email, 
+                                   telefone=telefone, 
+                                   projeto=projeto,
+                                   tem_arquivo=(arquivo_nome is not None))
+        
+        if arquivo_nome:
+            with app.open_resource(os.path.join(app.config['UPLOAD_FOLDER'], arquivo_nome)) as fp:
+                msg.attach(arquivo_nome, "application/octet-stream", fp.read())
+
+        mail.send(msg)
+        return jsonify({'status': 'success'})
+
+    except Exception as e:
+        print(f"Erro Lead: {e}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 @app.route('/submit_review', methods=['POST'])
 @csrf.exempt
@@ -325,16 +374,14 @@ def client_get_chat():
     msgs = ChatMessage.query.filter_by(session_id=sess.id).order_by(ChatMessage.data).all() if sess else []
     return jsonify({'messages': [{'remetente': m.remetente, 'conteudo': m.conteudo} for m in msgs]})
 
-# --- ADMIN (Painel e Logica de Abas) ---
+# --- ADMIN ---
 @app.route('/admin')
 @login_required
 @admin_required
 def admin():
-    # Obtém a aba e a sessão ativa
     tab = request.args.get('tab', 'dashboard')
     active_uuid = request.args.get('session_id')
     
-    # Dados do Dashboard
     last_7 = datetime.now() - timedelta(days=7)
     leads_data = db.session.query(func.date(Lead.data), func.count(Lead.id)).filter(Lead.data >= last_7).group_by(func.date(Lead.data)).all()
     chart_map = {(datetime.now() - timedelta(days=i)).strftime('%Y-%m-%d'): 0 for i in range(6, -1, -1)}
@@ -342,7 +389,6 @@ def admin():
     
     public_plans = PublicPlan.query.order_by(PublicPlan.order_index).all()
     
-    # Lógica do Chat (Carrega conversa se houver session_id)
     chat_history = []
     active_ticket = ""
     if active_uuid:
@@ -350,7 +396,6 @@ def admin():
         if sess: 
             chat_history = ChatMessage.query.filter_by(session_id=sess.id).order_by(ChatMessage.data).all()
             active_ticket = sess.client_name
-            # IMPORTANTE: Se o usuário selecionou um chat de cliente, força a aba correta
             if sess.user_id:
                 if tab != 'chat_client': tab = 'chat_client'
             else:
@@ -359,7 +404,6 @@ def admin():
     public_chats = ChatSession.query.filter(ChatSession.user_id == None).order_by(ChatSession.created_at.desc()).all()
     client_chats = ChatSession.query.filter(ChatSession.user_id != None).order_by(ChatSession.created_at.desc()).all()
     
-    # Garante que .uuid exista no objeto para o template
     for s in public_chats: s.uuid = s.session_uuid
     for s in client_chats: s.uuid = s.session_uuid
 
@@ -375,7 +419,6 @@ def admin():
         public_chats=public_chats, client_chats=client_chats
     )
 
-# --- ROTAS ADMIN (Planos, Clientes, etc) ---
 @app.route('/admin/update_plan/<int:plan_id>', methods=['POST'])
 @login_required
 @admin_required
