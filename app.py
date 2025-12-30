@@ -68,6 +68,28 @@ csp = {
 is_production = os.environ.get('FLASK_ENV') == 'production'
 Talisman(app, content_security_policy=csp, force_https=is_production)
 
+# --- ROTA TEMPORÁRIA PARA CRIAR ADMIN (APAGUE DEPOIS) ---
+@app.route('/setup-admin-secreto')
+def setup_admin():
+    from werkzeug.security import generate_password_hash
+    try:
+        # Verifica se já existe
+        if User.query.filter_by(username='admin').first():
+            return "O usuário Admin já existe!", 200
+        
+        # Cria o Admin
+        admin = User(
+            username='admin', 
+            name="Super Admin", 
+            role='admin', 
+            password_hash=generate_password_hash('sua_senha_forte_aqui') # <--- Troque a senha aqui se quiser
+        )
+        db.session.add(admin)
+        db.session.commit()
+        return "Sucesso! Usuário Admin criado. Agora apague esta rota do código.", 200
+    except Exception as e:
+        return f"Erro ao criar admin: {str(e)}", 500
+
 @login_manager.user_loader
 def load_user(user_id): return db.session.get(User, int(user_id))
 
