@@ -60,6 +60,7 @@ class Order(db.Model):
     plano = db.Column(db.String(50))
     preco = db.Column(db.String(20))
     status = db.Column(db.String(20), default='Pendente')
+    metodo = db.Column(db.String(20))
     data = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Review(db.Model):
@@ -90,10 +91,15 @@ class ChatMessage(db.Model):
     remetente = db.Column(db.String(20))
     data = db.Column(db.DateTime, default=datetime.utcnow)
 
-class AuditLog(db.Model):
+# --- NOVAS TABELAS PARA O CMS ---
+class PortfolioItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer)
-    action = db.Column(db.String(50))
-    details = db.Column(db.Text)
-    ip_address = db.Column(db.String(50))
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    title = db.Column(db.String(100))
+    description = db.Column(db.String(200))
+    image_url = db.Column(db.String(300))
+    
+class SiteConfig(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    key = db.Column(db.String(50), unique=True)
+    value = db.Column(db.Text)
+    

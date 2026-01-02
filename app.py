@@ -3,6 +3,7 @@ import uuid
 import json
 import mercadopago
 from datetime import datetime, timedelta
+from threading import Thread
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_migrate import Migrate
@@ -288,15 +289,22 @@ def index():
     except: pass
     
     plans = PublicPlan.query.order_by(PublicPlan.order_index).all()
-    if not plans:
-        plans = []
+    # Carrega Portfólio e Sobre Nós
+    portfolio = PortfolioItem.query.all()
+    about_text = SiteConfig.query.filter_by(key='about_text').first()
+    
+    # Se não tiver texto no banco, usa um padrão
+    about_content = about_text.value if about_text else "Texto padrão sobre a agência..."
+
+    # Fallback para planos (seu código antigo)
+    if not plans: plans = []
     else:
         for p in plans:
             if isinstance(p.benefits, str):
                 try: p.benefits_list = json.loads(p.benefits)
                 except: p.benefits_list = []
     
-    return render_template('index.html', plans=plans)
+    return render_template('index.html', plans=plans, portfolio=portfolio, about_content=about_content)
 
 @app.route('/termos-e-privacidade')
 def termos(): return render_template('legal.html') 
@@ -310,6 +318,13 @@ def checkout(plano):
     preco = db_plan.price if db_plan else '0,00'
     return render_template('checkout.html', plano=plano, preco=preco)
 
+def send_async_email(app, msg):
+    with app.app_context():
+        try:
+            mail.send(msg)
+        except Exception as e:
+            print(f"Erro ao enviar email em background: {e}")
+
 # ROTA DE LEADS ATUALIZADA (EMAIL E ARQUIVO)
 @app.route('/submit_lead', methods=['POST'])
 @csrf.exempt
@@ -320,7 +335,7 @@ def submit_lead():
         telefone = request.form.get('telefone')
         projeto = request.form.get('projeto')
         
-        # Upload de Arquivo
+        # 1. Validação e Upload de Arquivo
         arquivo_nome = None
         file = request.files.get('arquivo')
         
@@ -333,11 +348,18 @@ def submit_lead():
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
             arquivo_nome = unique_filename
 
-        # Salva no Banco
-        db.session.add(Lead(nome=nome, email=email, telefone=telefone, projeto=projeto, data=datetime.now()))
+        # 2. Salvar no Banco de Dados
+        novo_lead = Lead(
+            nome=nome, 
+            email=email, 
+            telefone=telefone, 
+            projeto=projeto, 
+            data=datetime.now()
+        )
+        db.session.add(novo_lead)
         db.session.commit()
 
-        # Envia Email
+        # 3. Preparar E-mail
         msg = Message(f"Novo Lead: {nome}",
                       sender=app.config.get('MAIL_USERNAME'),
                       recipients=[app.config.get('MAIL_USERNAME')])
@@ -350,14 +372,16 @@ def submit_lead():
                                    tem_arquivo=(arquivo_nome is not None))
         
         if arquivo_nome:
-            with app.open_resource(os.path.join(app.config['UPLOAD_FOLDER'], arquivo_nome)) as fp:
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], arquivo_nome)
+            with app.open_resource(file_path) as fp:
                 msg.attach(arquivo_nome, "application/octet-stream", fp.read())
 
-        mail.send(msg)
+        Thread(target=send_async_email, args=(app._get_current_object(), msg)).start()
+
         return jsonify({'status': 'success'})
 
     except Exception as e:
-        print(f"Erro Lead: {e}")
+        print(f"Erro ao processar lead: {e}")
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
 @app.route('/submit_review', methods=['POST'])
