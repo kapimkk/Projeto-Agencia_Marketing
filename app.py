@@ -18,7 +18,7 @@ from flask_limiter.util import get_remote_address
 from flask_talisman import Talisman
 
 from config import Config
-from models import db, User, Lead, Order, Review, ChatSession, ChatMessage, Visit, ClientPlan, ClientStat, PublicPlan
+from models import db, User, Lead, Order, Review, ChatSession, ChatMessage, Visit, ClientPlan, ClientStat, PublicPlan, PortfolioItem, SiteConfig
 from forms import LoginForm
 
 app = Flask(__name__)
