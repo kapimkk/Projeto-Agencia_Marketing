@@ -129,9 +129,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(res.ok) {
                     Swal.fire({
                         icon: 'success',
-                        title: 'Recebemos seu projeto!',
-                        text: 'Nossa equipe entrará em contato em breve.',
-                        confirmButtonColor: '#1d1d1d',
+                        title: 'Recebemos seu contato!',
+                        html: `
+                            <p>Nossa equipe entrará em contato em breve.</p>
+                            <p style="margin-top:10px;">Tem urgência ou ficou com dúvida?</p>
+                            <a href="https://wa.me/5511999999999?text=Olá,%20enviei%20um%20lead%20pelo%20site" target="_blank" 
+                               style="display:inline-block; margin-top:15px; background:#25d366; color:white; padding:10px 20px; border-radius:20px; text-decoration:none; font-weight:bold;">
+                               <i class="fab fa-whatsapp"></i> Chamar no WhatsApp
+                            </a>
+                        `,
+                        showConfirmButton: false, // Remove o botão "OK" padrão para destacar o WhatsApp
+                        showCloseButton: true,
                         background: 'rgba(255,255,255,0.95)'
                     });
                     leadForm.reset();

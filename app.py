@@ -90,6 +90,36 @@ def setup_admin():
         return "Sucesso! Usuário Admin criado. Agora apague esta rota do código.", 200
     except Exception as e:
         return f"Erro ao criar admin: {str(e)}", 500
+    
+@app.route('/configurar-site')
+def configurar_site():
+    try:
+        # 1. Configurar Admin com senha 123456
+        admin = User.query.filter_by(username='admin').first()
+        senha_hash = generate_password_hash('123456')
+        
+        if admin:
+            admin.password_hash = senha_hash
+            msg_admin = "Senha do Admin atualizada para 123456."
+        else:
+            admin = User(username='admin', name="Super Admin", role='admin', password_hash=senha_hash)
+            db.session.add(admin)
+            msg_admin = "Admin criado com senha 123456."
+        
+        # 2. Criar Planos se não existirem
+        if not PublicPlan.query.first():
+            db.session.add(PublicPlan(name='Start', price='1.500', benefits=json.dumps(['Redes Sociais', 'Tráfego Básico', 'Relatório PDF']), is_highlighted=False, order_index=1))
+            db.session.add(PublicPlan(name='Growth', price='3.200', benefits=json.dumps(['Tráfego Avançado', 'Landing Page', 'Dashboard 24h']), is_highlighted=True, order_index=2))
+            db.session.add(PublicPlan(name='Scale', price='7.000', benefits=json.dumps(['Gestão 360º', 'Consultoria Semanal', 'Time Dedicado']), is_highlighted=False, order_index=3))
+            msg_planos = "Planos Start, Growth e Scale criados."
+        else:
+            msg_planos = "Planos já existem."
+
+        db.session.commit()
+        return f"<h1>Sucesso!</h1><p>{msg_admin}</p><p>{msg_planos}</p><a href='/admin/login'>Ir para Login</a>"
+    
+    except Exception as e:
+        return f"Erro: {str(e)}"
 
 @login_manager.user_loader
 def load_user(user_id): return db.session.get(User, int(user_id))
@@ -376,7 +406,7 @@ def submit_lead():
             with app.open_resource(file_path) as fp:
                 msg.attach(arquivo_nome, "application/octet-stream", fp.read())
 
-        Thread(target=send_async_email, args=(app._get_current_object(), msg)).start()
+        Thread(target=send_async_email, args=(app, msg)).start()
 
         return jsonify({'status': 'success'})
 
