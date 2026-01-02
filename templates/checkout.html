@@ -1,154 +1,307 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Finalizar Contratação - {{ plano }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
     <style>
-        .checkout-container { max-width: 1100px; margin: 50px auto; display: grid; grid-template-columns: 1fr 1fr; gap: 50px; }
-        .benefits-list { list-style: none; margin: 30px 0; }
-        .benefits-list li { margin-bottom: 15px; display: flex; align-items: center; gap: 10px; font-size: 1.1rem; color: var(--text-dark); }
-        .benefits-list i { color: #00c851; }
-        
-        .payment-section { 
-            background: var(--glass-bg); 
-            padding: 40px; 
-            border-radius: 20px; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.1); 
-            display: none; 
-            animation: slideUp 0.5s ease; 
-            border: 1px solid var(--glass-border);
-        }
-        .payment-section.active { display: block; }
-        
-        .step-indicator { display: flex; gap: 10px; margin-bottom: 20px; font-size: 0.9rem; color: var(--text-grey); }
-        .step.active { color: var(--accent); font-weight: bold; }
-        
-        .pay-option { 
-            flex: 1; padding: 12px; 
-            border: 1px solid var(--glass-border); 
-            background: var(--input-bg); 
-            border-radius: 8px; 
-            cursor: pointer; transition: 0.3s; 
-            font-weight: 500; color: var(--text-dark);
-        }
-        .pay-option:hover, .pay-option.active { 
-            background: var(--accent); color: white; border-color: var(--accent); 
-        }
+      .checkout-container {
+        max-width: 1100px;
+        margin: 50px auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 50px;
+      }
+      .benefits-list {
+        list-style: none;
+        margin: 30px 0;
+      }
+      .benefits-list li {
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.1rem;
+        color: var(--text-dark);
+      }
+      .benefits-list i {
+        color: #00c851;
+      }
 
-        h1, h2, h3 { color: var(--text-dark); }
-        p { color: var(--text-grey); }
+      .payment-section {
+        background: var(--glass-bg);
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+        display: none;
+        animation: slideUp 0.5s ease;
+        border: 1px solid var(--glass-border);
+      }
+      .payment-section.active {
+        display: block;
+      }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+      .step-indicator {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        font-size: 0.9rem;
+        color: var(--text-grey);
+      }
+      .step.active {
+        color: var(--accent);
+        font-weight: bold;
+      }
+
+      .pay-option {
+        flex: 1;
+        padding: 12px;
+        border: 1px solid var(--glass-border);
+        background: var(--input-bg);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+        font-weight: 500;
+        color: var(--text-dark);
+      }
+      .pay-option:hover,
+      .pay-option.active {
+        background: var(--accent);
+        color: white;
+        border-color: var(--accent);
+      }
+
+      h1,
+      h2,
+      h3 {
+        color: var(--text-dark);
+      }
+      p {
+        color: var(--text-grey);
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
     </style>
-</head>
-<body>
-
-    <div class="background-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
+  </head>
+  <body>
+    <div class="background-blobs">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+    </div>
 
     <div class="checkout-container reveal active">
-        
-        <div>
-            <a href="/" style="color: var(--text-grey); text-decoration: none;"><i class="fas fa-arrow-left"></i> Voltar</a>
-            <h1 style="font-size: 3rem; margin: 20px 0; line-height: 1;">Você escolheu o <br><span style="color: var(--accent);">Plano {{ plano }}</span></h1>
-            
-            <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=600&q=80" style="width: 100%; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-            
-            <h3>O que está incluso:</h3>
-            <ul class="benefits-list">
-                <li><i class="fas fa-check-circle"></i> Estratégia de Crescimento Acelerado</li>
-                <li><i class="fas fa-check-circle"></i> Suporte Prioritário via WhatsApp</li>
-                <li><i class="fas fa-check-circle"></i> Relatórios Semanais de Performance</li>
-                <li><i class="fas fa-check-circle"></i> Garantia de 7 Dias ou Dinheiro de Volta</li>
-            </ul>
+      <div>
+        <a href="/" style="color: var(--text-grey); text-decoration: none"
+          ><i class="fas fa-arrow-left"></i> Voltar</a
+        >
+        <h1 style="font-size: 3rem; margin: 20px 0; line-height: 1">
+          Você escolheu o <br /><span style="color: var(--accent)"
+            >Plano {{ plano }}</span
+          >
+        </h1>
 
-            <div style="background: var(--glass-bg); padding: 20px; border-radius: 15px; border-left: 4px solid var(--accent); color: var(--text-dark);">
-                <p style="font-style: italic; margin: 0; color: var(--text-grey);">"Este plano é ideal para empresas que buscam escalar suas vendas rapidamente utilizando inteligência de dados."</p>
-            </div>
+        <img
+          src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=600&q=80"
+          style="
+            width: 100%;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+          "
+        />
+
+        <h3>O que está incluso:</h3>
+        <ul class="benefits-list">
+          <li>
+            <i class="fas fa-check-circle"></i> Estratégia de Crescimento
+            Acelerado
+          </li>
+          <li>
+            <i class="fas fa-check-circle"></i> Suporte Prioritário via WhatsApp
+          </li>
+          <li>
+            <i class="fas fa-check-circle"></i> Relatórios Semanais de
+            Performance
+          </li>
+          <li>
+            <i class="fas fa-check-circle"></i> Garantia de 7 Dias ou Dinheiro
+            de Volta
+          </li>
+        </ul>
+
+        <div
+          style="
+            background: var(--glass-bg);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 4px solid var(--accent);
+            color: var(--text-dark);
+          "
+        >
+          <p style="font-style: italic; margin: 0; color: var(--text-grey)">
+            "Este plano é ideal para empresas que buscam escalar suas vendas
+            rapidamente utilizando inteligência de dados."
+          </p>
+        </div>
+      </div>
+
+      <div>
+        <div id="step-1" class="payment-section active">
+          <h2>Investimento</h2>
+          <div
+            style="
+              font-size: 3.5rem;
+              font-weight: 800;
+              color: var(--text-dark);
+              margin: 20px 0;
+            "
+          >
+            R$ {{ preco }}
+            <span
+              style="
+                font-size: 1rem;
+                font-weight: normal;
+                color: var(--text-grey);
+              "
+              >/mês</span
+            >
+          </div>
+          <p>Sem fidelidade. Cancele quando quiser.</p>
+          <button
+            class="btn-main"
+            onclick="goToStep(2)"
+            style="width: 100%; margin-top: 30px; font-size: 1.2rem"
+          >
+            Ir para Pagamento &rarr;
+          </button>
         </div>
 
-        <div>
-            <div id="step-1" class="payment-section active">
-                <h2>Investimento</h2>
-                <div style="font-size: 3.5rem; font-weight: 800; color: var(--text-dark); margin: 20px 0;">
-                    R$ {{ preco }} <span style="font-size: 1rem; font-weight: normal; color: var(--text-grey);">/mês</span>
-                </div>
-                <p>Sem fidelidade. Cancele quando quiser.</p>
-                <button class="btn-main" onclick="goToStep(2)" style="width: 100%; margin-top: 30px; font-size: 1.2rem;">Ir para Pagamento &rarr;</button>
-            </div>
+        <div id="step-2" class="payment-section">
+          <div class="step-indicator">
+            <span class="step">1. Resumo</span> &rsaquo;
+            <span class="step active">2. Pagamento</span>
+          </div>
 
-            <div id="step-2" class="payment-section">
-                <div class="step-indicator">
-                    <span class="step">1. Resumo</span> &rsaquo; <span class="step active">2. Pagamento</span>
-                </div>
-                
-                <h3>Selecione o Método</h3>
-                <div style="display: flex; gap: 10px; margin: 20px 0;">
-                    <button class="pay-option active" onclick="showMethod('card')"><i class="far fa-credit-card"></i> Cartão</button>
-                    <button class="pay-option" onclick="showMethod('pix')"><i class="fas fa-qrcode"></i> PIX</button>
-                </div>
+          <h3>Selecione o Método</h3>
+          <div style="display: flex; gap: 10px; margin: 20px 0">
+            <button class="pay-option active" onclick="showMethod('card')">
+              <i class="far fa-credit-card"></i> Cartão
+            </button>
+            <button class="pay-option" onclick="showMethod('pix')">
+              <i class="fas fa-qrcode"></i> PIX
+            </button>
+          </div>
 
-                <div id="method-card" style="margin-top:20px;">
-                    <p style="margin-bottom:15px;">Você será redirecionado para o ambiente seguro do Mercado Pago.</p>
-                    <button class="btn-main" onclick="finalizar('Cartão')" style="width: 100%;">Pagar com Cartão</button>
-                </div>
+          <div id="method-card" style="margin-top: 20px">
+            <p style="margin-bottom: 15px">
+              Você será redirecionado para o ambiente seguro do Mercado Pago.
+            </p>
+            <button
+              class="btn-main"
+              onclick="finalizar('Cartão')"
+              style="width: 100%"
+            >
+              Pagar com Cartão
+            </button>
+          </div>
 
-                <div id="method-pix" style="display: none; text-align: center; margin-top:20px;">
-                    <button class="btn-main" onclick="finalizar('PIX')" style="width: 100%;">Gerar QR Code PIX</button>
-                </div>
-                
-                <button onclick="goToStep(1)" style="background: none; border: none; color: var(--text-grey); cursor: pointer; margin-top: 20px; text-decoration: underline;">Voltar ao resumo</button>
-            </div>
+          <div
+            id="method-pix"
+            style="display: none; text-align: center; margin-top: 20px"
+          >
+            <button
+              class="btn-main"
+              onclick="finalizar('PIX')"
+              style="width: 100%"
+            >
+              Gerar QR Code PIX
+            </button>
+          </div>
+
+          <button
+            onclick="goToStep(1)"
+            style="
+              background: none;
+              border: none;
+              color: var(--text-grey);
+              cursor: pointer;
+              margin-top: 20px;
+              text-decoration: underline;
+            "
+          >
+            Voltar ao resumo
+          </button>
         </div>
+      </div>
     </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script>
-        let pollingInterval = null;
+      let pollingInterval = null;
 
-        function goToStep(step) {
-            document.querySelectorAll('.payment-section').forEach(el => el.classList.remove('active'));
-            document.getElementById('step-' + step).classList.add('active');
-        }
+      function goToStep(step) {
+        document
+          .querySelectorAll(".payment-section")
+          .forEach((el) => el.classList.remove("active"));
+        document.getElementById("step-" + step).classList.add("active");
+      }
 
-        function showMethod(method) {
-            document.getElementById('method-card').style.display = method === 'card' ? 'block' : 'none';
-            document.getElementById('method-pix').style.display = method === 'pix' ? 'block' : 'none';
-            
-            document.querySelectorAll('.pay-option').forEach(el => el.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-        }
+      function showMethod(method) {
+        document.getElementById("method-card").style.display =
+          method === "card" ? "block" : "none";
+        document.getElementById("method-pix").style.display =
+          method === "pix" ? "block" : "none";
 
-        async function finalizar(metodo) {
-            const btn = event.target;
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
-            btn.disabled = true;
+        document
+          .querySelectorAll(".pay-option")
+          .forEach((el) => el.classList.remove("active"));
+        event.currentTarget.classList.add("active");
+      }
 
-            const payload = { 
-                plano: "{{ plano }}", 
-                preco: "{{ preco }}", 
-                metodo: metodo === 'Cartão' ? 'card' : 'pix',
-                email: "cliente@teste.com",
-                nome: "Cliente Teste"
-            };
+      async function finalizar(metodo) {
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+        btn.disabled = true;
 
-            try {
-                const res = await fetch('/criar_pagamento', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
+        const payload = {
+          plano: "{{ plano }}",
+          preco: "{{ preco }}",
+          metodo: metodo === "Cartão" ? "card" : "pix",
+          email: "cliente@teste.com",
+          nome: "Cliente Teste",
+        };
 
-                if (data.status === 'preference_created') {
-                    window.location.href = data.init_point;
-                } 
-                else if (data.status === 'pix_created') {
-                    const pixDiv = document.getElementById('method-pix');
-                    pixDiv.innerHTML = `
+        try {
+          const res = await fetch("/criar_pagamento", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          const data = await res.json();
+
+          if (data.status === "preference_created") {
+            window.location.href = data.init_point;
+          } else if (data.status === "pix_created") {
+            const pixDiv = document.getElementById("method-pix");
+            pixDiv.innerHTML = `
                         <div style="text-align: center; animation: fadeIn 0.5s;">
                             <h3 style="color:#00c851; margin-bottom:10px;">QR Code Gerado!</h3>
                             <p style="font-size:0.9rem; margin-bottom:15px;">Escaneie com o app do seu banco:</p>
@@ -165,35 +318,38 @@
                             </div>
                         </div>
                     `;
-                    
-                    if(pollingInterval) clearInterval(pollingInterval);
-                    pollingInterval = setInterval(async () => {
-                        const check = await fetch(`/check_status/${data.order_id}`);
-                        const statusData = await check.json();
-                        if(statusData.status === 'Aprovado') {
-                            clearInterval(pollingInterval);
-                            document.getElementById('status-pagamento').innerHTML = '<span style="color:green; font-size:1.1rem;"><i class="fas fa-check-circle"></i> Pagamento Aprovado!</span>';
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Pagamento Confirmado!',
-                                text: 'Redirecionando para sua área do cliente...',
-                                timer: 3000,
-                                willClose: () => { window.location.href = '/'; }
-                            });
-                        }
-                    }, 5000);
-                } else {
-                    Swal.fire('Erro', 'Ocorreu um erro ao gerar o pagamento.', 'error');
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                }
-            } catch (e) {
-                console.error(e);
-                Swal.fire('Erro', 'Falha na comunicação com o servidor.', 'error');
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
+
+            if (pollingInterval) clearInterval(pollingInterval);
+            pollingInterval = setInterval(async () => {
+              const check = await fetch(`/check_status/${data.order_id}`);
+              const statusData = await check.json();
+              if (statusData.status === "Aprovado") {
+                clearInterval(pollingInterval);
+                document.getElementById("status-pagamento").innerHTML =
+                  '<span style="color:green; font-size:1.1rem;"><i class="fas fa-check-circle"></i> Pagamento Aprovado!</span>';
+                Swal.fire({
+                  icon: "success",
+                  title: "Pagamento Confirmado!",
+                  text: "Redirecionando para sua área do cliente...",
+                  timer: 3000,
+                  willClose: () => {
+                    window.location.href = "/";
+                  },
+                });
+              }
+            }, 5000);
+          } else {
+            Swal.fire("Erro", "Ocorreu um erro ao gerar o pagamento.", "error");
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+          }
+        } catch (e) {
+          console.error(e);
+          Swal.fire("Erro", "Falha na comunicação com o servidor.", "error");
+          btn.innerHTML = originalText;
+          btn.disabled = false;
         }
+      }
     </script>
-</body>
+  </body>
 </html>

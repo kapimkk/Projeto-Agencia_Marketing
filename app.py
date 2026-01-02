@@ -4,7 +4,7 @@ import json
 import mercadopago
 from datetime import datetime, timedelta
 from threading import Thread
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, abort
+from flask import Flask,current_app, render_template, request, jsonify, redirect, url_for, flash, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_migrate import Migrate
 from flask_mail import Mail, Message
@@ -348,12 +348,13 @@ def checkout(plano):
     preco = db_plan.price if db_plan else '0,00'
     return render_template('checkout.html', plano=plano, preco=preco)
 
-def send_async_email(app, msg):
-    with app.app_context():
+def send_async_email(app_obj, msg):
+    with app_obj.app_context():
         try:
             mail.send(msg)
+            print("Email enviado com sucesso!")
         except Exception as e:
-            print(f"Erro ao enviar email em background: {e}")
+            print(f"Falha ao enviar email: {e}")
 
 # ROTA DE LEADS ATUALIZADA (EMAIL E ARQUIVO)
 @app.route('/submit_lead', methods=['POST'])
@@ -405,6 +406,8 @@ def submit_lead():
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], arquivo_nome)
             with app.open_resource(file_path) as fp:
                 msg.attach(arquivo_nome, "application/octet-stream", fp.read())
+
+        app_real = app._get_current_object() if hasattr(app, '_get_current_object') else app 
 
         Thread(target=send_async_email, args=(app, msg)).start()
 

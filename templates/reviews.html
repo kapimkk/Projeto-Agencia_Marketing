@@ -1,126 +1,317 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Avaliações - Studio Indexa</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
-</head>
-<body>
+  </head>
+  <body>
     <div class="cursor"></div>
     <div class="cursor2"></div>
-    
-    <nav class="glass-nav reveal" style="position: absolute; top: 20px;">
-        <div class="logo">STUDIO INDEXA</div>
-        <ul class="nav-links" style="display: flex; gap: 30px; align-items: center; list-style: none;">
-            <li><a href="/">Home</a></li>
-            <li><a href="/#planos">Planos</a></li>
-            <li>
-                <a href="/cliente/login" class="btn-outline" style="border-color:var(--text-dark); color:var(--text-dark); padding: 8px 20px; display: inline-flex; align-items: center; gap: 8px;">
-                    <i class="fas fa-lock"></i> Área do Cliente
-                </a>
-            </li>
-            <li><a href="/#contato" class="btn-main">Orçamento <i class="fas fa-arrow-right"></i></a></li>
-        </ul>
+
+    <nav class="glass-nav reveal" style="position: absolute; top: 20px">
+      <div class="logo">STUDIO INDEXA</div>
+      <ul
+        class="nav-links"
+        style="display: flex; gap: 30px; align-items: center; list-style: none"
+      >
+        <li><a href="/">Home</a></li>
+        <li><a href="/#planos">Planos</a></li>
+        <li>
+          <a
+            href="/cliente/login"
+            class="btn-outline"
+            style="
+              border-color: var(--text-dark);
+              color: var(--text-dark);
+              padding: 8px 20px;
+              display: inline-flex;
+              align-items: center;
+              gap: 8px;
+            "
+          >
+            <i class="fas fa-lock"></i> Área do Cliente
+          </a>
+        </li>
+        <li>
+          <a href="/#contato" class="btn-main"
+            >Orçamento <i class="fas fa-arrow-right"></i
+          ></a>
+        </li>
+      </ul>
     </nav>
 
-    <section class="hero" style="min-height: 40vh; padding-bottom: 20px; padding-top: 150px;">
-        <div class="glass-card reveal" style="text-align: center; max-width: 800px; margin: 0 auto;">
-            <h1>O Que Dizem <br><span>Nossos Parceiros</span></h1>
-            <p style="margin-top: 15px; color: var(--text-grey);">Histórias reais de transformação digital.</p>
-        </div>
+    <section
+      class="hero"
+      style="min-height: 40vh; padding-bottom: 20px; padding-top: 150px"
+    >
+      <div
+        class="glass-card reveal"
+        style="text-align: center; max-width: 800px; margin: 0 auto"
+      >
+        <h1>O Que Dizem <br /><span>Nossos Parceiros</span></h1>
+        <p style="margin-top: 15px; color: var(--text-grey)">
+          Histórias reais de transformação digital.
+        </p>
+      </div>
     </section>
 
     <section>
-        <div class="reveal" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto;">
-            
-            <div class="glass-card" data-tilt style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
-                <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80" style="width: 100%; height: 200px; object-fit: cover;">
-                <div style="padding: 25px;">
-                    <h3>Tech Solutions</h3>
-                    <p style="font-size: 0.9rem; color: var(--text-grey); margin-bottom: 15px;">Aumento de 200% em leads qualificados.</p>
-                    <div style="color: #FFD700;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                </div>
+      <div
+        class="reveal"
+        style="
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 30px;
+          max-width: 1200px;
+          margin: 0 auto;
+        "
+      >
+        <div
+          class="glass-card"
+          data-tilt
+          style="
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+          "
+        >
+          <img
+            src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80"
+            style="width: 100%; height: 200px; object-fit: cover"
+          />
+          <div style="padding: 25px">
+            <h3>Tech Solutions</h3>
+            <p
+              style="
+                font-size: 0.9rem;
+                color: var(--text-grey);
+                margin-bottom: 15px;
+              "
+            >
+              Aumento de 200% em leads qualificados.
+            </p>
+            <div style="color: #ffd700">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i
+              ><i class="fas fa-star"></i><i class="fas fa-star"></i
+              ><i class="fas fa-star"></i>
             </div>
-
-            <div class="glass-card" data-tilt style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
-                <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=600&q=80" style="width: 100%; height: 200px; object-fit: cover;">
-                <div style="padding: 25px;">
-                    <h3>Grupo Alpha</h3>
-                    <p style="font-size: 0.9rem; color: var(--text-grey); margin-bottom: 15px;">Rebranding completo da marca.</p>
-                    <div style="color: #FFD700;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                </div>
-            </div>
-
-            <div class="glass-card" data-tilt style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
-                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80" style="width: 100%; height: 200px; object-fit: cover;">
-                <div style="padding: 25px;">
-                    <h3>Start Finanças</h3>
-                    <p style="font-size: 0.9rem; color: var(--text-grey); margin-bottom: 15px;">Automação de atendimento via IA.</p>
-                    <div style="color: #FFD700;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
-                </div>
-            </div>
+          </div>
         </div>
+
+        <div
+          class="glass-card"
+          data-tilt
+          style="
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+          "
+        >
+          <img
+            src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=600&q=80"
+            style="width: 100%; height: 200px; object-fit: cover"
+          />
+          <div style="padding: 25px">
+            <h3>Grupo Alpha</h3>
+            <p
+              style="
+                font-size: 0.9rem;
+                color: var(--text-grey);
+                margin-bottom: 15px;
+              "
+            >
+              Rebranding completo da marca.
+            </p>
+            <div style="color: #ffd700">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i
+              ><i class="fas fa-star"></i><i class="fas fa-star"></i
+              ><i class="fas fa-star"></i>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="glass-card"
+          data-tilt
+          style="
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+          "
+        >
+          <img
+            src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80"
+            style="width: 100%; height: 200px; object-fit: cover"
+          />
+          <div style="padding: 25px">
+            <h3>Start Finanças</h3>
+            <p
+              style="
+                font-size: 0.9rem;
+                color: var(--text-grey);
+                margin-bottom: 15px;
+              "
+            >
+              Automação de atendimento via IA.
+            </p>
+            <div style="color: #ffd700">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i
+              ><i class="fas fa-star"></i><i class="fas fa-star"></i
+              ><i class="fas fa-star-half-alt"></i>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section>
-        <div class="reveal">
-            {% if reviews %}
-                <h2 style="text-align: center; margin-bottom: 30px;">Recentes</h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto;">
-                    {% for rev in reviews %}
-                    <div class="glass-card" style="text-align: left;">
-                        <div style="color: #FFD700; margin-bottom: 10px;">
-                            {% for i in range(rev.estrelas) %}<i class="fas fa-star"></i>{% endfor %}
-                        </div>
-                        <p style="font-style: italic; color: #555;">"{{ rev.avaliacao }}"</p>
-                        <div style="font-weight: bold; margin-top:15px; font-size: 0.9rem;">
-                            - {{ rev.nome }} <span style="font-weight: normal; color: var(--text-grey);">({{ rev.empresa }})</span>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
+      <div class="reveal">
+        {% if reviews %}
+        <h2 style="text-align: center; margin-bottom: 30px">Recentes</h2>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+          "
+        >
+          {% for rev in reviews %}
+          <div class="glass-card" style="text-align: left">
+            <div style="color: #ffd700; margin-bottom: 10px">
+              {% for i in range(rev.estrelas) %}<i class="fas fa-star"></i>{%
+              endfor %}
+            </div>
+            <p style="font-style: italic; color: #555">"{{ rev.avaliacao }}"</p>
+            <div style="font-weight: bold; margin-top: 15px; font-size: 0.9rem">
+              - {{ rev.nome }}
+              <span style="font-weight: normal; color: var(--text-grey)"
+                >({{ rev.empresa }})</span
+              >
+            </div>
+          </div>
+          {% endfor %}
         </div>
+        {% endif %}
+      </div>
     </section>
 
-    <section class="contact" style="display: flex; justify-content: center; padding-bottom: 80px;">
-        <div class="glass-card reveal" style="width: 100%; max-width: 700px;">
-            <h2 style="text-align: center; margin-bottom: 10px;">Deixe sua Experiência</h2>
-            <p style="text-align: center; margin-bottom: 30px; font-size: 0.9rem; color: var(--text-grey);">Sua opinião molda o futuro dos nossos serviços.</p>
-            
-            <form id="reviewForm">
-                <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-                    <div style="flex: 1; min-width: 250px;">
-                        <input type="text" id="rev_nome" placeholder="Seu Nome" required>
-                    </div>
-                    <div style="flex: 1; min-width: 250px;">
-                        <input type="text" id="rev_empresa" placeholder="Sua Empresa" required>
-                    </div>
-                </div>
-                <input type="email" id="rev_email" placeholder="Seu Email Corporativo" required>
-                
-                <div style="text-align: center; margin-bottom: 25px;">
-                    <label style="display: block; margin-bottom: 10px; color: var(--text-dark);">Classificação Geral:</label>
-                    <div class="star-rating">
-                        <input type="radio" id="star5" name="rating" value="5"/><label for="star5" title="5 estrelas"><i class="fas fa-star"></i></label>
-                        <input type="radio" id="star4" name="rating" value="4"/><label for="star4" title="4 estrelas"><i class="fas fa-star"></i></label>
-                        <input type="radio" id="star3" name="rating" value="3"/><label for="star3" title="3 estrelas"><i class="fas fa-star"></i></label>
-                        <input type="radio" id="star2" name="rating" value="2"/><label for="star2" title="2 estrelas"><i class="fas fa-star"></i></label>
-                        <input type="radio" id="star1" name="rating" value="1"/><label for="star1" title="1 estrela"><i class="fas fa-star"></i></label>
-                    </div>
-                </div>
+    <section
+      class="contact"
+      style="display: flex; justify-content: center; padding-bottom: 80px"
+    >
+      <div class="glass-card reveal" style="width: 100%; max-width: 700px">
+        <h2 style="text-align: center; margin-bottom: 10px">
+          Deixe sua Experiência
+        </h2>
+        <p
+          style="
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+            color: var(--text-grey);
+          "
+        >
+          Sua opinião molda o futuro dos nossos serviços.
+        </p>
 
-                <textarea id="rev_texto" placeholder="Compartilhe como foi trabalhar conosco..." rows="4" required></textarea>
-                
-                <button type="submit" class="btn-main" style="width: 100%; justify-content: center;">Publicar Avaliação</button>
-            </form>
-        </div>
+        <form id="reviewForm">
+          <div style="display: flex; gap: 20px; flex-wrap: wrap">
+            <div style="flex: 1; min-width: 250px">
+              <input
+                type="text"
+                id="rev_nome"
+                placeholder="Seu Nome"
+                required
+              />
+            </div>
+            <div style="flex: 1; min-width: 250px">
+              <input
+                type="text"
+                id="rev_empresa"
+                placeholder="Sua Empresa"
+                required
+              />
+            </div>
+          </div>
+          <input
+            type="email"
+            id="rev_email"
+            placeholder="Seu Email Corporativo"
+            required
+          />
+
+          <div style="text-align: center; margin-bottom: 25px">
+            <label
+              style="
+                display: block;
+                margin-bottom: 10px;
+                color: var(--text-dark);
+              "
+              >Classificação Geral:</label
+            >
+            <div class="star-rating">
+              <input type="radio" id="star5" name="rating" value="5" /><label
+                for="star5"
+                title="5 estrelas"
+                ><i class="fas fa-star"></i
+              ></label>
+              <input type="radio" id="star4" name="rating" value="4" /><label
+                for="star4"
+                title="4 estrelas"
+                ><i class="fas fa-star"></i
+              ></label>
+              <input type="radio" id="star3" name="rating" value="3" /><label
+                for="star3"
+                title="3 estrelas"
+                ><i class="fas fa-star"></i
+              ></label>
+              <input type="radio" id="star2" name="rating" value="2" /><label
+                for="star2"
+                title="2 estrelas"
+                ><i class="fas fa-star"></i
+              ></label>
+              <input type="radio" id="star1" name="rating" value="1" /><label
+                for="star1"
+                title="1 estrela"
+                ><i class="fas fa-star"></i
+              ></label>
+            </div>
+          </div>
+
+          <textarea
+            id="rev_texto"
+            placeholder="Compartilhe como foi trabalhar conosco..."
+            rows="4"
+            required
+          ></textarea>
+
+          <button
+            type="submit"
+            class="btn-main"
+            style="width: 100%; justify-content: center"
+          >
+            Publicar Avaliação
+          </button>
+        </form>
+      </div>
     </section>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
+  </body>
 </html>

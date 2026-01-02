@@ -1,39 +1,52 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="og:title" content="Agência Digital - Performance">
-    <meta property="og:description" content="Escale suas vendas com marketing de dados.">
-    <meta property="og:image" content="{{ url_for('static', filename='og-image.jpg') }}">
-    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}"> <title>{% block title %}Agência Digital{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta property="og:title" content="Agência Digital - Performance" />
+    <meta
+      property="og:description"
+      content="Escale suas vendas com marketing de dados."
+    />
+    <meta
+      property="og:image"
+      content="{{ url_for('static', filename='og-image.jpg') }}"
+    />
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" />
+    <title>{% block title %}Agência Digital{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
     <script>
-        if (localStorage.getItem('theme') === 'dark') {
-            document.documentElement.classList.add('dark-mode');
-        }
+      if (localStorage.getItem("theme") === "dark") {
+        document.documentElement.classList.add("dark-mode");
+      }
     </script>
-</head>
-<body class="{% block body_class %}{% endblock %}">
-    
+  </head>
+  <body class="{% block body_class %}{% endblock %}">
     <div id="toast-container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="toast {{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %}
+      <div class="toast {{ category }}">{{ message }}</div>
+      {% endfor %} {% endif %} {% endwith %}
     </div>
 
     {% block content %}{% endblock %}
 
-    <a href="https://wa.me/5511999999999?text=Olá,%20gostaria%20de%20um%20orçamento" class="whatsapp-float" target="_blank">
-        <i class="fab fa-whatsapp"></i>
+    <a
+      href="https://wa.me/5511999999999?text=Olá,%20gostaria%20de%20um%20orçamento"
+      class="whatsapp-float"
+      target="_blank"
+    >
+      <i class="fab fa-whatsapp"></i>
     </a>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     {% block scripts %}{% endblock %}
-</body>
+  </body>
 </html>

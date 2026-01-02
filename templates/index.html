@@ -1,313 +1,927 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="og:title" content="Studio Indexa - Performance Digital">
-    <meta property="og:description" content="Escale suas vendas com marketing de dados.">
-    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}"> 
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta property="og:title" content="Studio Indexa - Performance Digital" />
+    <meta
+      property="og:description"
+      content="Escale suas vendas com marketing de dados."
+    />
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" />
     <title>Studio Indexa</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
     <script src="https://unpkg.com/typed.js@2.0.16/dist/typed.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
+  </head>
+  <body>
     <div class="cursor"></div>
     <div class="cursor2"></div>
-    
+
     <div id="site-wrapper">
-        
-        <nav class="glass-nav reveal">
-            <div class="logo">STUDIO INDEXA</div>
-            <ul class="nav-links" style="display: flex; gap: 30px; align-items: center; list-style: none;">
-                <li><a href="#servicos">Serviços</a></li>
-                <li><a href="#portfolio">Cases</a></li>
-                <li><a href="#planos">Planos</a></li>
-                <li><a href="/avaliacoes">Avaliações</a></li>
-                <li>
-                    <a href="/cliente/login" class="btn-outline nav-btn-client" style="border-color:var(--text-dark); color:var(--text-dark); padding: 8px 20px; display: inline-flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-lock"></i> Área do Cliente
-                    </a>
-                </li>
-                <li><a href="#contato" class="btn-main">Orçamento <i class="fas fa-arrow-right"></i></a></li>
+      <nav class="glass-nav reveal">
+        <div class="logo">STUDIO INDEXA</div>
+        <ul
+          class="nav-links"
+          style="
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            list-style: none;
+          "
+        >
+          <li><a href="#servicos">Serviços</a></li>
+          <li><a href="#portfolio">Cases</a></li>
+          <li><a href="#planos">Planos</a></li>
+          <li><a href="/avaliacoes">Avaliações</a></li>
+          <li>
+            <a
+              href="/cliente/login"
+              class="btn-outline nav-btn-client"
+              style="
+                border-color: var(--text-dark);
+                color: var(--text-dark);
+                padding: 8px 20px;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+              "
+            >
+              <i class="fas fa-lock"></i> Área do Cliente
+            </a>
+          </li>
+          <li>
+            <a href="#contato" class="btn-main"
+              >Orçamento <i class="fas fa-arrow-right"></i
+            ></a>
+          </li>
+        </ul>
+      </nav>
+
+      <section
+        id="home"
+        class="hero"
+        style="display: flex; align-items: center; min-height: 90vh"
+      >
+        <div
+          style="
+            max-width: 1300px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 50px;
+            align-items: center;
+          "
+        >
+          <div
+            class="glass-card reveal"
+            data-tilt
+            data-tilt-max="5"
+            style="padding: 60px; text-align: left"
+          >
+            <h1
+              style="
+                font-size: 3.5rem;
+                line-height: 1.1;
+                margin-bottom: 25px;
+                font-weight: 800;
+              "
+            >
+              Transforme Dados em <br />
+              <span
+                id="typed-output"
+                style="
+                  background: linear-gradient(45deg, #181818, #555);
+                  -webkit-background-clip: text;
+                  -webkit-text-fill-color: transparent;
+                "
+              ></span>
+            </h1>
+            <p
+              style="
+                font-size: 1.2rem;
+                margin-bottom: 40px;
+                color: var(--text-grey);
+              "
+            >
+              Estratégias digitais de alta performance para escalar seu negócio
+              com design premium e inteligência de dados.
+            </p>
+            <div style="display: flex; gap: 20px">
+              <a href="#planos" class="btn-main">Ver Planos</a>
+              <a href="#contato" class="btn-outline">Falar com Especialista</a>
+            </div>
+          </div>
+
+          <div
+            class="glass-card reveal"
+            style="padding: 40px; background: rgba(255, 255, 255, 0.4)"
+          >
+            <h3
+              style="
+                margin-bottom: 20px;
+                font-size: 1.5rem;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+              "
+            >
+              <i class="fas fa-fingerprint"></i> Um pouco sobre nós
+            </h3>
+            <p
+              style="
+                margin-bottom: 20px;
+                color: var(--text-dark);
+                line-height: 1.6;
+              "
+            >
+              Somos uma agência <b>Data-Driven</b>. Não acreditamos em
+              "achismos". No Studio Indexa, cada pixel e cada linha de código é
+              orientada por métricas reais de crescimento.
+            </p>
+            <ul style="list-style: none; margin-bottom: 25px">
+              <li
+                style="
+                  margin-bottom: 10px;
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                "
+              >
+                <i class="fas fa-check-circle" style="color: green"></i> +50
+                Projetos Entregues
+              </li>
+              <li
+                style="
+                  margin-bottom: 10px;
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                "
+              >
+                <i class="fas fa-check-circle" style="color: green"></i> Foco em
+                ROI e Conversão
+              </li>
+              <li
+                style="
+                  margin-bottom: 10px;
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                "
+              >
+                <i class="fas fa-check-circle" style="color: green"></i>
+                Tecnologia Proprietária
+              </li>
             </ul>
-        </nav>
+          </div>
+        </div>
+      </section>
 
-        <section id="home" class="hero" style="display: flex; align-items: center; min-height: 90vh;">
-            <div style="max-width: 1300px; margin: 0 auto; display: grid; grid-template-columns: 1.2fr 1fr; gap: 50px; align-items: center;">
-                
-                <div class="glass-card reveal" data-tilt data-tilt-max="5" style="padding: 60px; text-align: left;">
-                    <h1 style="font-size: 3.5rem; line-height: 1.1; margin-bottom: 25px; font-weight: 800;">
-                        Transforme Dados em <br>
-                        <span id="typed-output" style="background: linear-gradient(45deg, #181818, #555); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></span>
-                    </h1>
-                    <p style="font-size: 1.2rem; margin-bottom: 40px; color: var(--text-grey);">
-                        Estratégias digitais de alta performance para escalar seu negócio com design premium e inteligência de dados.
-                    </p>
-                    <div style="display:flex; gap:20px;">
-                        <a href="#planos" class="btn-main">Ver Planos</a>
-                        <a href="#contato" class="btn-outline">Falar com Especialista</a>
-                    </div>
-                </div>
-
-                <div class="glass-card reveal" style="padding: 40px; background: rgba(255,255,255,0.4);">
-                    <h3 style="margin-bottom: 20px; font-size: 1.5rem; display:flex; align-items:center; gap:10px;">
-                        <i class="fas fa-fingerprint"></i> Um pouco sobre nós
-                    </h3>
-                    <p style="margin-bottom: 20px; color: var(--text-dark); line-height: 1.6;">
-                        Somos uma agência <b>Data-Driven</b>. Não acreditamos em "achismos". No Studio Indexa, cada pixel e cada linha de código é orientada por métricas reais de crescimento.
-                    </p>
-                    <ul style="list-style: none; margin-bottom: 25px;">
-                        <li style="margin-bottom: 10px; display:flex; align-items:center; gap:10px;"><i class="fas fa-check-circle" style="color: green;"></i> +50 Projetos Entregues</li>
-                        <li style="margin-bottom: 10px; display:flex; align-items:center; gap:10px;"><i class="fas fa-check-circle" style="color: green;"></i> Foco em ROI e Conversão</li>
-                        <li style="margin-bottom: 10px; display:flex; align-items:center; gap:10px;"><i class="fas fa-check-circle" style="color: green;"></i> Tecnologia Proprietária</li>
-                    </ul>
-                </div>
+      <section id="servicos">
+        <div class="reveal">
+          <h2
+            style="
+              text-align: center;
+              font-size: 2.5rem;
+              margin-bottom: 60px;
+              color: #1d1d1d;
+            "
+          >
+            Soluções Completas
+          </h2>
+        </div>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+          "
+        >
+          <div
+            class="glass-card reveal"
+            data-tilt
+            style="text-align: center; padding: 50px 30px"
+          >
+            <div
+              style="
+                background: rgba(0, 0, 0, 0.05);
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 20px;
+              "
+            >
+              <i
+                class="fas fa-rocket"
+                style="font-size: 2.5rem; color: var(--text-dark)"
+              ></i>
             </div>
-        </section>
-
-        <section id="servicos">
-            <div class="reveal"><h2 style="text-align:center; font-size: 2.5rem; margin-bottom: 60px; color: #1d1d1d;">Soluções Completas</h2></div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; max-width: 1200px; margin: 0 auto;">
-                <div class="glass-card reveal" data-tilt style="text-align: center; padding: 50px 30px;">
-                    <div style="background: rgba(0,0,0,0.05); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                        <i class="fas fa-rocket" style="font-size: 2.5rem; color: var(--text-dark);"></i>
-                    </div>
-                    <h3>Tráfego Pago</h3>
-                    <p style="margin-top: 15px; color: var(--text-grey); line-height: 1.6;">Gestão avançada de anúncios no Google Ads e Meta Ads focada em conversão.</p>
-                </div>
-                <div class="glass-card reveal" data-tilt style="text-align: center; padding: 50px 30px;">
-                    <div style="background: rgba(0,0,0,0.05); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                        <i class="fas fa-paint-brush" style="font-size: 2.5rem; color: var(--text-dark);"></i>
-                    </div>
-                    <h3>Design & Branding</h3>
-                    <p style="margin-top: 15px; color: var(--text-grey); line-height: 1.6;">Identidade visual impactante e interfaces modernas (UI/UX) que conectam sua marca.</p>
-                </div>
-                <div class="glass-card reveal" data-tilt style="text-align: center; padding: 50px 30px;">
-                    <div style="background: rgba(0,0,0,0.05); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                        <i class="fas fa-chart-line" style="font-size: 2.5rem; color: var(--text-dark);"></i>
-                    </div>
-                    <h3>Data Intelligence</h3>
-                    <p style="margin-top: 15px; color: var(--text-grey); line-height: 1.6;">Dashboards interativos e análise de dados para tomadas de decisão.</p>
-                </div>
+            <h3>Tráfego Pago</h3>
+            <p
+              style="
+                margin-top: 15px;
+                color: var(--text-grey);
+                line-height: 1.6;
+              "
+            >
+              Gestão avançada de anúncios no Google Ads e Meta Ads focada em
+              conversão.
+            </p>
+          </div>
+          <div
+            class="glass-card reveal"
+            data-tilt
+            style="text-align: center; padding: 50px 30px"
+          >
+            <div
+              style="
+                background: rgba(0, 0, 0, 0.05);
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 20px;
+              "
+            >
+              <i
+                class="fas fa-paint-brush"
+                style="font-size: 2.5rem; color: var(--text-dark)"
+              ></i>
             </div>
-        </section>
-
-        <section id="portfolio">
-            <h2 class="reveal" style="text-align:center; font-size: 2.5rem; margin-bottom: 20px; color: #1d1d1d;">Cases de Sucesso</h2>
-            <div class="portfolio-grid reveal" style="max-width: 1200px; margin: 0 auto;">
-                <div class="portfolio-item">
-                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80" alt="Case 1">
-                    <div class="portfolio-overlay">
-                        <h3>E-commerce Tech</h3>
-                        <p>Aumento de 200% em vendas via Google Ads.</p>
-                    </div>
-                </div>
-                <div class="portfolio-item">
-                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80" alt="Case 2">
-                    <div class="portfolio-overlay">
-                        <h3>Dashboard Financeiro</h3>
-                        <p>Sistema de BI para fintech.</p>
-                    </div>
-                </div>
-                <div class="portfolio-item">
-                    <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=600&q=80" alt="Case 3">
-                    <div class="portfolio-overlay">
-                        <h3>Rebranding</h3>
-                        <p>Nova identidade visual para startup.</p>
-                    </div>
-                </div>
+            <h3>Design & Branding</h3>
+            <p
+              style="
+                margin-top: 15px;
+                color: var(--text-grey);
+                line-height: 1.6;
+              "
+            >
+              Identidade visual impactante e interfaces modernas (UI/UX) que
+              conectam sua marca.
+            </p>
+          </div>
+          <div
+            class="glass-card reveal"
+            data-tilt
+            style="text-align: center; padding: 50px 30px"
+          >
+            <div
+              style="
+                background: rgba(0, 0, 0, 0.05);
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 20px;
+              "
+            >
+              <i
+                class="fas fa-chart-line"
+                style="font-size: 2.5rem; color: var(--text-dark)"
+              ></i>
             </div>
-        </section>
+            <h3>Data Intelligence</h3>
+            <p
+              style="
+                margin-top: 15px;
+                color: var(--text-grey);
+                line-height: 1.6;
+              "
+            >
+              Dashboards interativos e análise de dados para tomadas de decisão.
+            </p>
+          </div>
+        </div>
+      </section>
 
-        <section id="planos">
-            <h2 class="reveal" style="text-align:center; font-size: 2.5rem; margin-bottom: 60px; color: #1d1d1d;">Investimento Inteligente</h2>
-            <div class="pricing-container reveal">
-                {% for plan in plans %}
-                <div class="glass-card pricing-card {{ 'featured' if plan.is_highlighted else '' }}" data-tilt>
-                    {% if plan.is_highlighted %}
-                        <div style="background:var(--text-dark); color:white; padding:5px 15px; border-radius:20px; font-size:0.8rem; margin-bottom:15px; display:inline-block;">Mais Popular</div>
-                    {% endif %}
-                    <h3>{{ plan.name }}</h3>
-                    <div class="price">R$ {{ plan.price }}</div>
-                    <ul>
-                        {% for benefit in plan.benefits_list %}
-                            <li><i class="fas fa-check"></i> {{ benefit }}</li>
-                        {% endfor %}
-                    </ul>
-                    <a href="/checkout/{{ plan.name }}" class="{{ 'btn-main' if plan.is_highlighted else 'btn-outline' }}" style="{{ 'width: 100%; justify-content: center;' if plan.is_highlighted else 'margin-top: auto;' }}">
-                        {{ 'Quero ' + plan.name if plan.is_highlighted else 'Iniciar com ' + plan.name }}
-                    </a>
-                </div>
-                {% endfor %}
+      <section id="portfolio">
+        <h2
+          class="reveal"
+          style="
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #1d1d1d;
+          "
+        >
+          Cases de Sucesso
+        </h2>
+        <div
+          class="portfolio-grid reveal"
+          style="max-width: 1200px; margin: 0 auto"
+        >
+          <div class="portfolio-item">
+            <img
+              src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80"
+              alt="Case 1"
+            />
+            <div class="portfolio-overlay">
+              <h3>E-commerce Tech</h3>
+              <p>Aumento de 200% em vendas via Google Ads.</p>
             </div>
-
-            <div class="reveal" style="text-align: center; margin-top: 50px;">
-                <button onclick="toggleComparison()" class="btn-outline" style="padding: 15px 40px;">
-                    <i class="fas fa-balance-scale-right"></i> Comparar Planos Detalhadamente
-                </button>
+          </div>
+          <div class="portfolio-item">
+            <img
+              src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80"
+              alt="Case 2"
+            />
+            <div class="portfolio-overlay">
+              <h3>Dashboard Financeiro</h3>
+              <p>Sistema de BI para fintech.</p>
             </div>
-
-            <div id="comparison-section" class="glass-card reveal" style="display: none; max-width: 1000px; margin: 40px auto 0; padding: 40px; overflow-x: auto;">
-                <h3 style="text-align: center; margin-bottom: 30px;">Comparativo de Benefícios</h3>
-                <table class="comparison-table">
-                    <thead>
-                        <tr>
-                            <th style="text-align: left;">Recurso</th>
-                            <th>Start</th>
-                            <th>Growth</th>
-                            <th>Scale</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>Canais de Anúncio</td><td>1 Canal</td><td>2 Canais</td><td>Omnichannel</td></tr>
-                        <tr><td>Landing Page</td><td><i class="fas fa-times" style="color: #999;"></i></td><td><i class="fas fa-check" style="color: var(--accent);"></i> Inclusa</td><td><i class="fas fa-check" style="color: var(--accent);"></i> Alta Performance</td></tr>
-                        <tr><td>Dashboard</td><td>Relatório PDF</td><td>Acesso 24h</td><td>BI Personalizado</td></tr>
-                        <tr><td>Reuniões</td><td>Mensal</td><td>Quinzenal</td><td>Semanal</td></tr>
-                        <tr><td>Suporte</td><td>E-mail</td><td>WhatsApp</td><td>Gerente VIP</td></tr>
-                    </tbody>
-                </table>
+          </div>
+          <div class="portfolio-item">
+            <img
+              src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=600&q=80"
+              alt="Case 3"
+            />
+            <div class="portfolio-overlay">
+              <h3>Rebranding</h3>
+              <p>Nova identidade visual para startup.</p>
             </div>
-        </section>
+          </div>
+        </div>
+      </section>
 
-        <section id="results-graph" style="padding-top: 40px;">
-            <div class="glass-card reveal" style="max-width: 1000px; margin: 0 auto; text-align: center;">
-                <h2 style="margin-bottom: 10px;">Crescimento Projetado</h2>
-                <p style="color: var(--text-grey); margin-bottom: 30px;">Estimativa de retorno sobre investimento (ROI) com a metodologia Studio Indexa.</p>
-                <div style="height: 400px; width: 100%;">
-                    <canvas id="roiChart"></canvas>
-                </div>
+      <section id="planos">
+        <h2
+          class="reveal"
+          style="
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 60px;
+            color: #1d1d1d;
+          "
+        >
+          Investimento Inteligente
+        </h2>
+        <div class="pricing-container reveal">
+          {% for plan in plans %}
+          <div
+            class="glass-card pricing-card {{ 'featured' if plan.is_highlighted else '' }}"
+            data-tilt
+          >
+            {% if plan.is_highlighted %}
+            <div
+              style="
+                background: var(--text-dark);
+                color: white;
+                padding: 5px 15px;
+                border-radius: 20px;
+                font-size: 0.8rem;
+                margin-bottom: 15px;
+                display: inline-block;
+              "
+            >
+              Mais Popular
             </div>
-        </section>
+            {% endif %}
+            <h3>{{ plan.name }}</h3>
+            <div class="price">R$ {{ plan.price }}</div>
+            <ul>
+              {% for benefit in plan.benefits_list %}
+              <li><i class="fas fa-check"></i> {{ benefit }}</li>
+              {% endfor %}
+            </ul>
+            <a
+              href="/checkout/{{ plan.name }}"
+              class="{{ 'btn-main' if plan.is_highlighted else 'btn-outline' }}"
+              style="{{ 'width: 100%; justify-content: center;' if plan.is_highlighted else 'margin-top: auto;' }}"
+            >
+              {{ 'Quero ' + plan.name if plan.is_highlighted else 'Iniciar com '
+              + plan.name }}
+            </a>
+          </div>
+          {% endfor %}
+        </div>
 
-        <section id="contato" class="contact">
-            <div class="reveal" style="max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px;">
+        <div class="reveal" style="text-align: center; margin-top: 50px">
+          <button
+            onclick="toggleComparison()"
+            class="btn-outline"
+            style="padding: 15px 40px"
+          >
+            <i class="fas fa-balance-scale-right"></i> Comparar Planos
+            Detalhadamente
+          </button>
+        </div>
+
+        <div
+          id="comparison-section"
+          class="glass-card reveal"
+          style="
+            display: none;
+            max-width: 1000px;
+            margin: 40px auto 0;
+            padding: 40px;
+            overflow-x: auto;
+          "
+        >
+          <h3 style="text-align: center; margin-bottom: 30px">
+            Comparativo de Benefícios
+          </h3>
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th style="text-align: left">Recurso</th>
+                <th>Start</th>
+                <th>Growth</th>
+                <th>Scale</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Canais de Anúncio</td>
+                <td>1 Canal</td>
+                <td>2 Canais</td>
+                <td>Omnichannel</td>
+              </tr>
+              <tr>
+                <td>Landing Page</td>
+                <td><i class="fas fa-times" style="color: #999"></i></td>
+                <td>
+                  <i class="fas fa-check" style="color: var(--accent)"></i>
+                  Inclusa
+                </td>
+                <td>
+                  <i class="fas fa-check" style="color: var(--accent)"></i> Alta
+                  Performance
+                </td>
+              </tr>
+              <tr>
+                <td>Dashboard</td>
+                <td>Relatório PDF</td>
+                <td>Acesso 24h</td>
+                <td>BI Personalizado</td>
+              </tr>
+              <tr>
+                <td>Reuniões</td>
+                <td>Mensal</td>
+                <td>Quinzenal</td>
+                <td>Semanal</td>
+              </tr>
+              <tr>
+                <td>Suporte</td>
+                <td>E-mail</td>
+                <td>WhatsApp</td>
+                <td>Gerente VIP</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="results-graph" style="padding-top: 40px">
+        <div
+          class="glass-card reveal"
+          style="max-width: 1000px; margin: 0 auto; text-align: center"
+        >
+          <h2 style="margin-bottom: 10px">Crescimento Projetado</h2>
+          <p style="color: var(--text-grey); margin-bottom: 30px">
+            Estimativa de retorno sobre investimento (ROI) com a metodologia
+            Studio Indexa.
+          </p>
+          <div style="height: 400px; width: 100%">
+            <canvas id="roiChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <section id="contato" class="contact">
+        <div
+          class="reveal"
+          style="
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 40px;
+          "
+        >
+          <div>
+            <div class="contact-info-card" data-tilt>
+              <h3 style="margin-bottom: 20px">Fale Conosco</h3>
+              <div class="info-item">
+                <i class="fas fa-envelope"></i>
                 <div>
-                    <div class="contact-info-card" data-tilt>
-                        <h3 style="margin-bottom: 20px;">Fale Conosco</h3>
-                        <div class="info-item">
-                            <i class="fas fa-envelope"></i>
-                            <div><small style="color:var(--text-grey);">E-mail</small><br>studioindexa@gmail.com</div>
-                        </div>
-                        <div class="info-item">
-                            <i class="fab fa-whatsapp"></i>
-                            <div><small style="color:var(--text-grey);">WhatsApp</small><br>(11) 99999-9999</div>
-                        </div>
-                        <div class="info-item">
-                            <i class="fab fa-instagram"></i>
-                            <div>
-                                <small style="color:var(--text-grey);">Instagram</small><br>
-                                <a href="https://instagram.com/studioindexa" target="_blank" style="color: var(--text-dark); text-decoration: none; font-weight: bold;">@studioindexa</a>
-                            </div>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-headset"></i>
-                            <div>
-                                <small style="color:var(--text-grey);">Suporte</small><br>
-                                <a href="javascript:void(0)" onclick="toggleChat()" style="color:var(--text-dark); text-decoration: underline;">Abrir Chat Online</a>
-                            </div>
-                        </div>
-                    </div>
+                  <small style="color: var(--text-grey)">E-mail</small
+                  ><br />studioindexa@gmail.com
                 </div>
-
-                <div class="glass-card" style="width: 100%;">
-                    <h2 style="text-align: left; margin-bottom: 10px;">Solicite um Orçamento</h2>
-                    <form id="leadForm" enctype="multipart/form-data">
-                        <input type="text" id="nome" name="nome" placeholder="Nome Completo" required>
-                        <input type="email" id="email" name="email" placeholder="Email Corporativo" required>
-                        <input type="tel" id="telefone" name="telefone" placeholder="Telefone / WhatsApp" required>
-                        <input type="file" id="arquivo" name="arquivo">
-                        <textarea id="projeto" name="projeto" placeholder="Conte-nos sobre seu projeto..." rows="4"></textarea>
-                        <button type="submit" class="btn-main" style="width: 100%; justify-content: center;">Enviar Solicitação</button>
-                    </form>
-                </div>
-            </div>
-        </section>
-
-        <footer>
-            <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; text-align: left;">
+              </div>
+              <div class="info-item">
+                <i class="fab fa-whatsapp"></i>
                 <div>
-                    <h3 style="margin-bottom: 15px;">STUDIO INDEXA</h3>
-                    <p style="font-size: 0.9rem; color: #ccc;">Agência focada em resultados reais através de dados e design.</p>
+                  <small style="color: var(--text-grey)">WhatsApp</small
+                  ><br />(11) 99999-9999
                 </div>
+              </div>
+              <div class="info-item">
+                <i class="fab fa-instagram"></i>
                 <div>
-                    <h4 style="margin-bottom: 15px;">Links Rápidos</h4>
-                    <ul style="list-style: none; padding: 0;">
-                        <li style="margin-bottom: 8px;"><a href="#servicos" style="color: #ccc; text-decoration: none;">Serviços</a></li>
-                        <li style="margin-bottom: 8px;"><a href="#planos" style="color: #ccc; text-decoration: none;">Planos</a></li>
-                        <li style="margin-bottom: 8px;"><a href="/avaliacoes" style="color: #ccc; text-decoration: none;">Avaliações</a></li>
-                    </ul>
+                  <small style="color: var(--text-grey)">Instagram</small><br />
+                  <a
+                    href="https://instagram.com/studioindexa"
+                    target="_blank"
+                    style="
+                      color: var(--text-dark);
+                      text-decoration: none;
+                      font-weight: bold;
+                    "
+                    >@studioindexa</a
+                  >
                 </div>
+              </div>
+              <div class="info-item">
+                <i class="fas fa-headset"></i>
                 <div>
-                    <h4 style="margin-bottom: 15px;">Legal</h4>
-                    <ul style="list-style: none; padding: 0;">
-                        <li style="margin-bottom: 8px;"><a href="/termos-e-privacidade?tab=privacidade" style="color: #ccc; text-decoration: none;">Política de Privacidade</a></li>
-                        <li style="margin-bottom: 8px;"><a href="/termos-e-privacidade?tab=termos" style="color: #ccc; text-decoration: none;">Termos de Uso</a></li>
-                    </ul>
+                  <small style="color: var(--text-grey)">Suporte</small><br />
+                  <a
+                    href="javascript:void(0)"
+                    onclick="toggleChat()"
+                    style="color: var(--text-dark); text-decoration: underline"
+                    >Abrir Chat Online</a
+                  >
                 </div>
+              </div>
             </div>
-            <div style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 30px; padding-top: 20px; font-size: 0.8rem; color: #888; text-align: center;">
-                &copy; 2025 Studio Indexa. Todos os direitos reservados.
-            </div>
-        </footer>
+          </div>
 
-    </div> 
-    
-    <a href="https://wa.me/5511999999999" class="whatsapp-float" target="_blank"><i class="fab fa-whatsapp"></i></a>
+          <div class="glass-card" style="width: 100%">
+            <h2 style="text-align: left; margin-bottom: 10px">
+              Solicite um Orçamento
+            </h2>
+            <form id="leadForm" enctype="multipart/form-data">
+              <input
+                type="text"
+                id="nome"
+                name="nome"
+                placeholder="Nome Completo"
+                required
+              />
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Email Corporativo"
+                required
+              />
+              <input
+                type="tel"
+                id="telefone"
+                name="telefone"
+                placeholder="Telefone / WhatsApp"
+                required
+              />
+              <input type="file" id="arquivo" name="arquivo" />
+              <textarea
+                id="projeto"
+                name="projeto"
+                placeholder="Conte-nos sobre seu projeto..."
+                rows="4"
+              ></textarea>
+              <button
+                type="submit"
+                class="btn-main"
+                style="width: 100%; justify-content: center"
+              >
+                Enviar Solicitação
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <div
+          style="
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            text-align: left;
+          "
+        >
+          <div>
+            <h3 style="margin-bottom: 15px">STUDIO INDEXA</h3>
+            <p style="font-size: 0.9rem; color: #ccc">
+              Agência focada em resultados reais através de dados e design.
+            </p>
+          </div>
+          <div>
+            <h4 style="margin-bottom: 15px">Links Rápidos</h4>
+            <ul style="list-style: none; padding: 0">
+              <li style="margin-bottom: 8px">
+                <a href="#servicos" style="color: #ccc; text-decoration: none"
+                  >Serviços</a
+                >
+              </li>
+              <li style="margin-bottom: 8px">
+                <a href="#planos" style="color: #ccc; text-decoration: none"
+                  >Planos</a
+                >
+              </li>
+              <li style="margin-bottom: 8px">
+                <a href="/avaliacoes" style="color: #ccc; text-decoration: none"
+                  >Avaliações</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4 style="margin-bottom: 15px">Legal</h4>
+            <ul style="list-style: none; padding: 0">
+              <li style="margin-bottom: 8px">
+                <a
+                  href="/termos-e-privacidade?tab=privacidade"
+                  style="color: #ccc; text-decoration: none"
+                  >Política de Privacidade</a
+                >
+              </li>
+              <li style="margin-bottom: 8px">
+                <a
+                  href="/termos-e-privacidade?tab=termos"
+                  style="color: #ccc; text-decoration: none"
+                  >Termos de Uso</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div
+          style="
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 30px;
+            padding-top: 20px;
+            font-size: 0.8rem;
+            color: #888;
+            text-align: center;
+          "
+        >
+          &copy; 2025 Studio Indexa. Todos os direitos reservados.
+        </div>
+      </footer>
+    </div>
+
+    <a href="https://wa.me/5511999999999" class="whatsapp-float" target="_blank"
+      ><i class="fab fa-whatsapp"></i
+    ></a>
 
     <div class="chat-widget-container">
-        <button id="chat-toggle" class="chat-btn"><i class="fas fa-comment-dots"></i></button>
-        <div class="chat-box" id="chat-box">
-            <div class="chat-header">
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <i class="fas fa-arrow-left" id="chat-back-btn" style="cursor: pointer; display: none;" title="Voltar"></i>
-                        <h3 style="margin: 0; font-size: 1.1rem; color: white;">Suporte</h3>
-                    </div>
-                    <i class="fas fa-times" onclick="toggleChat()" style="cursor: pointer;"></i>
-                </div>
-                <p id="chat-status" style="margin: 5px 0 0 0; font-size: 0.8rem; opacity: 0.8; color: white;">Suporte Online</p>
+      <button id="chat-toggle" class="chat-btn">
+        <i class="fas fa-comment-dots"></i>
+      </button>
+      <div class="chat-box" id="chat-box">
+        <div class="chat-header">
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+            "
+          >
+            <div style="display: flex; align-items: center; gap: 10px">
+              <i
+                class="fas fa-arrow-left"
+                id="chat-back-btn"
+                style="cursor: pointer; display: none"
+                title="Voltar"
+              ></i>
+              <h3 style="margin: 0; font-size: 1.1rem; color: white">
+                Suporte
+              </h3>
             </div>
-            
-            <div id="chat-menu" style="display: flex; flex-direction: column; padding: 20px; gap: 10px; overflow-y: auto;">
-                <p style="text-align: center; margin-bottom: 10px; color: var(--text-dark);">Como podemos ajudar hoje?</p>
-                <button onclick="checkAndStart('Financeiro')" class="btn-outline" style="text-align:left; padding:15px; border-radius:15px;"><i class="fas fa-file-invoice-dollar" style="margin-right:10px;"></i> Financeiro</button>
-                <button onclick="checkAndStart('Projetos')" class="btn-outline" style="text-align:left; padding:15px; border-radius:15px;"><i class="fas fa-tasks" style="margin-right:10px;"></i> Projetos</button>
-                <button onclick="checkAndStart('Suporte')" class="btn-outline" style="text-align:left; padding:15px; border-radius:15px;"><i class="fas fa-headset" style="margin-right:10px;"></i> Suporte Técnico</button>
-                <button onclick="checkAndStart('Comercial')" class="btn-outline" style="text-align:left; padding:15px; border-radius:15px;"><i class="fas fa-coffee" style="margin-right:10px;"></i> Comercial</button>
-                <div style="text-align:center; margin-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 15px;">
-                    <button onclick="showOldTickets()" style="background:none; border:none; color:var(--text-grey); cursor:pointer; font-size:0.9rem; text-decoration:underline;"><i class="fas fa-history"></i> Ver meus chamados</button>
-                </div>
-            </div>
-
-            <div id="chat-history-view" style="display: none; flex-direction: column; height: 100%;">
-                <div id="history-list" style="flex:1; overflow-y:auto; padding: 10px;"></div>
-                <button onclick="resetToMenu()" style="border:none; background:transparent; color: var(--text-dark); cursor:pointer; padding:10px;">Voltar</button>
-            </div>
-            <div id="chat-interface" style="display: none; flex-direction: column; height: 100%;">
-                <div class="chat-body" id="chat-body"></div>
-                <div class="chat-footer">
-                    <input type="text" id="chat-input" placeholder="Digite..." style="margin:0; padding: 10px;">
-                    <input type="file" id="file-input" style="display: none;">
-                    <i class="fas fa-paperclip" id="btn-attach" title="Anexar Arquivo" style="color: var(--text-dark); cursor: pointer;"></i>
-                    <i class="fas fa-microphone" id="btn-mic" title="Gravar Áudio" style="color: var(--text-dark); cursor: pointer;"></i>
-                    <i class="fas fa-paper-plane" id="btn-send" style="color: var(--text-dark); cursor: pointer;"></i>
-                </div>
-            </div>
+            <i
+              class="fas fa-times"
+              onclick="toggleChat()"
+              style="cursor: pointer"
+            ></i>
+          </div>
+          <p
+            id="chat-status"
+            style="
+              margin: 5px 0 0 0;
+              font-size: 0.8rem;
+              opacity: 0.8;
+              color: white;
+            "
+          >
+            Suporte Online
+          </p>
         </div>
+
+        <div
+          id="chat-menu"
+          style="
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 10px;
+            overflow-y: auto;
+          "
+        >
+          <p
+            style="
+              text-align: center;
+              margin-bottom: 10px;
+              color: var(--text-dark);
+            "
+          >
+            Como podemos ajudar hoje?
+          </p>
+          <button
+            onclick="checkAndStart('Financeiro')"
+            class="btn-outline"
+            style="text-align: left; padding: 15px; border-radius: 15px"
+          >
+            <i
+              class="fas fa-file-invoice-dollar"
+              style="margin-right: 10px"
+            ></i>
+            Financeiro
+          </button>
+          <button
+            onclick="checkAndStart('Projetos')"
+            class="btn-outline"
+            style="text-align: left; padding: 15px; border-radius: 15px"
+          >
+            <i class="fas fa-tasks" style="margin-right: 10px"></i> Projetos
+          </button>
+          <button
+            onclick="checkAndStart('Suporte')"
+            class="btn-outline"
+            style="text-align: left; padding: 15px; border-radius: 15px"
+          >
+            <i class="fas fa-headset" style="margin-right: 10px"></i> Suporte
+            Técnico
+          </button>
+          <button
+            onclick="checkAndStart('Comercial')"
+            class="btn-outline"
+            style="text-align: left; padding: 15px; border-radius: 15px"
+          >
+            <i class="fas fa-coffee" style="margin-right: 10px"></i> Comercial
+          </button>
+          <div
+            style="
+              text-align: center;
+              margin-top: 15px;
+              border-top: 1px solid rgba(0, 0, 0, 0.1);
+              padding-top: 15px;
+            "
+          >
+            <button
+              onclick="showOldTickets()"
+              style="
+                background: none;
+                border: none;
+                color: var(--text-grey);
+                cursor: pointer;
+                font-size: 0.9rem;
+                text-decoration: underline;
+              "
+            >
+              <i class="fas fa-history"></i> Ver meus chamados
+            </button>
+          </div>
+        </div>
+
+        <div
+          id="chat-history-view"
+          style="display: none; flex-direction: column; height: 100%"
+        >
+          <div
+            id="history-list"
+            style="flex: 1; overflow-y: auto; padding: 10px"
+          ></div>
+          <button
+            onclick="resetToMenu()"
+            style="
+              border: none;
+              background: transparent;
+              color: var(--text-dark);
+              cursor: pointer;
+              padding: 10px;
+            "
+          >
+            Voltar
+          </button>
+        </div>
+        <div
+          id="chat-interface"
+          style="display: none; flex-direction: column; height: 100%"
+        >
+          <div class="chat-body" id="chat-body"></div>
+          <div class="chat-footer">
+            <input
+              type="text"
+              id="chat-input"
+              placeholder="Digite..."
+              style="margin: 0; padding: 10px"
+            />
+            <div
+              style="
+                position: relative;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+              "
+            >
+              <input
+                type="file"
+                id="arquivo"
+                name="arquivo"
+                onchange="checkFile()"
+              />
+              <button
+                type="button"
+                id="removeFileBtn"
+                onclick="clearFile()"
+                style="
+                  display: none;
+                  background: #ff7675;
+                  border: none;
+                  color: white;
+                  width: 30px;
+                  height: 30px;
+                  border-radius: 50%;
+                  cursor: pointer;
+                "
+                title="Remover arquivo"
+              >
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <i
+              class="fas fa-paperclip"
+              id="btn-attach"
+              title="Anexar Arquivo"
+              style="color: var(--text-dark); cursor: pointer"
+            ></i>
+            <i
+              class="fas fa-microphone"
+              id="btn-mic"
+              title="Gravar Áudio"
+              style="color: var(--text-dark); cursor: pointer"
+            ></i>
+            <i
+              class="fas fa-paper-plane"
+              id="btn-send"
+              style="color: var(--text-dark); cursor: pointer"
+            ></i>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script>
-        var typed = new Typed('#typed-output', {
-            strings: ['Resultados Reais', 'Vendas', 'Lucro', 'Performance'],
-            typeSpeed: 50, backSpeed: 30, backDelay: 2000, loop: true
-        });
-        AOS.init({ duration: 1000, once: true });
+      var typed = new Typed("#typed-output", {
+        strings: ["Resultados Reais", "Vendas", "Lucro", "Performance"],
+        typeSpeed: 50,
+        backSpeed: 30,
+        backDelay: 2000,
+        loop: true,
+      });
+      AOS.init({ duration: 1000, once: true });
     </script>
-</body>
+  </body>
 </html>
+
+<script>
+  function checkFile() {
+    const fileInput = document.getElementById("arquivo");
+    const btn = document.getElementById("removeFileBtn");
+    if (fileInput.files.length > 0) {
+      btn.style.display = "block";
+    } else {
+      btn.style.display = "none";
+    }
+  }
+
+  function clearFile() {
+    const fileInput = document.getElementById("arquivo");
+    fileInput.value = ""; // Limpa o input
+    checkFile(); // Esconde o botão
+  }
+</script>
