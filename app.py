@@ -83,7 +83,7 @@ def setup_admin():
             username='admin', 
             name="Super Admin", 
             role='admin', 
-            password_hash=generate_password_hash('sua_senha_forte_aqui') # <--- Troque a senha aqui se quiser
+            password_hash=generate_password_hash('123456') # <--- Troque a senha aqui se quiser
         )
         db.session.add(admin)
         db.session.commit()
