@@ -839,20 +839,16 @@
               placeholder="Digite..."
               style="margin: 0; padding: 10px"
             />
-            <div
-              style="
-                position: relative;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-              "
-            >
+
+            <div style="display: flex; align-items: center; gap: 5px">
               <input
                 type="file"
-                id="arquivo"
+                id="file-input"
                 name="arquivo"
                 onchange="checkFile()"
+                style="display: none"
               />
+
               <button
                 type="button"
                 id="removeFileBtn"
@@ -872,6 +868,7 @@
                 <i class="fas fa-times"></i>
               </button>
             </div>
+
             <i
               class="fas fa-paperclip"
               id="btn-attach"
@@ -910,7 +907,7 @@
 
 <script>
   function checkFile() {
-    const fileInput = document.getElementById("arquivo");
+    const fileInput = document.getElementById("file-input");
     const btn = document.getElementById("removeFileBtn");
     if (fileInput.files.length > 0) {
       btn.style.display = "block";
@@ -920,8 +917,8 @@
   }
 
   function clearFile() {
-    const fileInput = document.getElementById("arquivo");
-    fileInput.value = ""; // Limpa o input
-    checkFile(); // Esconde o botão
+    const fileInput = document.getElementById("file-input");
+    fileInput.value = "";
+    checkFile();
   }
 </script>
