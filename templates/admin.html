@@ -13,7 +13,6 @@
     />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-      /* CSS Específico para o Admin */
       :root {
         --sidebar-width: 260px;
         --primary-color: #2d3436;
@@ -23,20 +22,16 @@
         --text-light: #636e72;
         --bg-admin: #f1f2f6;
       }
-
       body.admin-body {
         background-color: var(--bg-admin);
         font-family: "Poppins", sans-serif;
         overflow: hidden;
       }
-
       .admin-wrapper {
         display: flex;
         height: 100vh;
         width: 100%;
       }
-
-      /* Sidebar */
       .sidebar {
         width: var(--sidebar-width);
         background: #fff;
@@ -60,7 +55,6 @@
         color: var(--primary-color);
         margin: 0;
       }
-
       .nav-btn {
         display: flex;
         align-items: center;
@@ -87,20 +81,12 @@
         color: #fff;
         box-shadow: 0 4px 10px rgba(45, 52, 54, 0.2);
       }
-      .nav-btn i {
-        width: 20px;
-        text-align: center;
-      }
-
-      /* Área Principal */
       .main-content {
         flex: 1;
         padding: 30px;
         overflow-y: auto;
         position: relative;
       }
-
-      /* Flash Message */
       .flash-message {
         position: fixed;
         top: 20px;
@@ -127,8 +113,6 @@
           opacity: 1;
         }
       }
-
-      /* Cards e Tabelas */
       .section-header {
         display: flex;
         justify-content: space-between;
@@ -141,7 +125,6 @@
         color: var(--primary-color);
         margin: 0;
       }
-
       .stat-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -163,23 +146,6 @@
         margin: 0;
         color: var(--primary-color);
       }
-      .stat-info p {
-        margin: 0;
-        color: var(--text-light);
-        font-size: 0.85rem;
-        font-weight: 500;
-        text-transform: uppercase;
-      }
-      .stat-icon {
-        width: 45px;
-        height: 45px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-      }
-
       .table-container {
         background: #fff;
         border-radius: 12px;
@@ -187,35 +153,6 @@
         box-shadow: 0 5px 20px rgba(0, 0, 0, 0.03);
         margin-top: 20px;
       }
-      .table-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-      }
-
-      .search-box {
-        position: relative;
-        width: 250px;
-      }
-      .search-box input {
-        width: 100%;
-        padding: 8px 15px 8px 35px;
-        border-radius: 6px;
-        border: 1px solid #eee;
-        background: #f9f9f9;
-        outline: none;
-        font-size: 0.85rem;
-      }
-      .search-box i {
-        position: absolute;
-        left: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #999;
-        font-size: 0.8rem;
-      }
-
       .admin-table {
         width: 100%;
         border-collapse: collapse;
@@ -236,10 +173,6 @@
         font-size: 0.9rem;
         vertical-align: middle;
       }
-      .admin-table tr:hover {
-        background: #fcfcfc;
-      }
-
       .status-badge {
         padding: 4px 10px;
         border-radius: 15px;
@@ -247,24 +180,6 @@
         font-weight: 600;
         display: inline-block;
       }
-      .badge-green {
-        background: rgba(0, 184, 148, 0.15);
-        color: #00b894;
-      }
-      .badge-blue {
-        background: rgba(9, 132, 227, 0.15);
-        color: #0984e3;
-      }
-      .badge-gray {
-        background: rgba(99, 110, 114, 0.15);
-        color: #636e72;
-      }
-      .badge-red {
-        background: rgba(214, 48, 49, 0.15);
-        color: #d63031;
-      }
-
-      /* Chat Layout */
       .chat-layout {
         display: grid;
         grid-template-columns: 260px 1fr;
@@ -300,8 +215,6 @@
         gap: 10px;
         background: #f9f9f9;
       }
-
-      /* Modais */
       .modal-overlay {
         position: fixed;
         top: 0;
@@ -359,16 +272,6 @@
         border-color: var(--primary-color);
         background: #fff;
       }
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: scale(0.98);
-        }
-        to {
-          opacity: 1;
-          transform: scale(1);
-        }
-      }
     </style>
   </head>
   <body class="admin-body">
@@ -391,7 +294,6 @@
           </div>
           <h2>ADMIN</h2>
         </div>
-
         <nav style="flex: 1">
           <button
             class="nav-btn {{ 'active' if active_tab == 'dashboard' }}"
@@ -404,6 +306,12 @@
             onclick="openTab('plans')"
           >
             <i class="fas fa-tags"></i> Planos do Site
+          </button>
+          <button
+            class="nav-btn {{ 'active' if active_tab == 'cases' }}"
+            onclick="openTab('cases')"
+          >
+            <i class="fas fa-briefcase"></i> Cases / Portfólio
           </button>
           <button
             class="nav-btn {{ 'active' if active_tab == 'clients' }}"
@@ -429,20 +337,7 @@
           >
             <i class="fas fa-bullhorn"></i> Leads
           </button>
-          <button
-            class="nav-btn {{ 'active' if active_tab == 'financeiro' }}"
-            onclick="openTab('financeiro')"
-          >
-            <i class="fas fa-wallet"></i> Financeiro
-          </button>
-          <button
-            class="nav-btn {{ 'active' if active_tab == 'reviews' }}"
-            onclick="openTab('reviews')"
-          >
-            <i class="fas fa-star"></i> Avaliações
-          </button>
         </nav>
-
         <div
           style="
             margin-top: auto;
@@ -470,34 +365,12 @@
         <div id="dashboard" class="tab-content">
           <div class="section-header">
             <div class="section-title"><h1>Visão Geral</h1></div>
-            <div
-              style="
-                background: white;
-                padding: 8px 15px;
-                border-radius: 20px;
-                font-size: 0.8rem;
-                font-weight: 600;
-                color: #555;
-              "
-            >
-              <i class="far fa-calendar-alt"></i> <span id="currentDate"></span>
-            </div>
           </div>
-
           <div class="stat-grid">
             <div class="stat-card">
               <div class="stat-info">
                 <h3>{{ total_visits }}</h3>
                 <p>Visitas</p>
-              </div>
-              <div
-                class="stat-icon"
-                style="
-                  background: rgba(9, 132, 227, 0.1);
-                  color: var(--accent-color);
-                "
-              >
-                <i class="fas fa-eye"></i>
               </div>
             </div>
             <div class="stat-card">
@@ -505,35 +378,220 @@
                 <h3>{{ total_leads }}</h3>
                 <p>Leads</p>
               </div>
-              <div
-                class="stat-icon"
-                style="
-                  background: rgba(0, 184, 148, 0.1);
-                  color: var(--success-color);
-                "
-              >
-                <i class="fas fa-filter"></i>
-              </div>
             </div>
             <div class="stat-card">
               <div class="stat-info">
                 <h3>{{ total_sales }}</h3>
                 <p>Vendas</p>
               </div>
-              <div
-                class="stat-icon"
-                style="background: rgba(108, 92, 231, 0.1); color: #6c5ce7"
-              >
-                <i class="fas fa-shopping-bag"></i>
-              </div>
             </div>
           </div>
-
           <div class="table-container" style="height: 350px">
-            <h3 style="margin-bottom: 20px; font-size: 1rem">
-              Performance de Leads
-            </h3>
             <canvas id="leadsChart"></canvas>
+          </div>
+        </div>
+
+        <div id="plans" class="tab-content">
+          <div class="section-header">
+            <div class="section-title">
+              <h1>Planos do Site</h1>
+              <p>Gerencie preços e promoções.</p>
+            </div>
+          </div>
+          <div class="stat-grid">
+            {% for p in public_plans %}
+            <div class="stat-card" style="display: block">
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  margin-bottom: 15px;
+                "
+              >
+                <h3 style="font-size: 1.4rem">{{ p.name }}</h3>
+                <span class="status-badge" style="background: #eee"
+                  >{{ 'Destaque' if p.is_highlighted else 'Padrão' }}</span
+                >
+              </div>
+              {% if p.old_price %}
+              <div
+                style="
+                  text-decoration: line-through;
+                  color: #999;
+                  font-size: 0.9rem;
+                "
+              >
+                R$ {{ p.old_price }}
+              </div>
+              {% endif %}
+              <div
+                style="
+                  font-size: 1.5rem;
+                  font-weight: bold;
+                  color: var(--primary-color);
+                  margin-bottom: 10px;
+                "
+              >
+                R$ {{ p.price }}
+              </div>
+              <button
+                onclick="openEditPlan('{{ p.id }}', '{{ p.name }}', '{{ p.price }}', '{{ p.old_price }}', '{{ p.benefits }}')"
+                class="btn-main"
+                style="
+                  width: 100%;
+                  font-size: 0.8rem;
+                  padding: 10px;
+                  cursor: pointer;
+                  border-radius: 5px;
+                  border: none;
+                  background: #2d3436;
+                  color: white;
+                "
+              >
+                Editar Detalhes
+              </button>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div id="cases" class="tab-content">
+          <div class="section-header">
+            <div class="section-title"><h1>Cases / Portfólio</h1></div>
+            <button
+              class="btn-main"
+              onclick="toggleModal('modalNewCase')"
+              style="
+                padding: 10px 20px;
+                background: var(--primary-color);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+              "
+            >
+              <i class="fas fa-plus"></i> Novo Case
+            </button>
+          </div>
+          <div class="stat-grid">
+            {% for case in portfolio %}
+            <div
+              class="stat-card"
+              style="display: block; padding: 0; overflow: hidden"
+            >
+              <img
+                src="{{ case.image_url }}"
+                style="width: 100%; height: 150px; object-fit: cover"
+              />
+              <div style="padding: 15px">
+                <h4 style="margin: 0 0 5px 0">{{ case.title }}</h4>
+                <p style="font-size: 0.8rem; color: #666; margin-bottom: 15px">
+                  {{ case.description }}
+                </p>
+                <a
+                  href="/admin/delete_case/{{ case.id }}"
+                  onclick="return confirm('Excluir este case?')"
+                  style="
+                    color: var(--danger-color);
+                    font-size: 0.8rem;
+                    text-decoration: none;
+                  "
+                  ><i class="fas fa-trash"></i> Excluir</a
+                >
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div id="clients" class="tab-content">
+          <div class="section-header">
+            <div class="section-title"><h1>Clientes</h1></div>
+            <button
+              class="btn-main"
+              onclick="toggleModal('modalNewClient')"
+              style="
+                padding: 10px 20px;
+                background: var(--primary-color);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+              "
+            >
+              <i class="fas fa-plus"></i> Novo
+            </button>
+          </div>
+          <div class="table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Empresa</th>
+                  <th>Login</th>
+                  <th>Plano</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for c in clients %}
+                <tr>
+                  <td><strong>{{ c.name }}</strong></td>
+                  <td>{{ c.username }}</td>
+                  <td>{{ c.plan_info.plan_name if c.plan_info else 'N/A' }}</td>
+                  <td>
+                    <button
+                      onclick="openEditClient('{{ c.id }}', '{{ c.name }}', '{{ c.plan_info.plan_name }}', '{{ c.plan_info.benefits }}')"
+                      style="
+                        cursor: pointer;
+                        background: none;
+                        border: 1px solid #ddd;
+                        border-radius: 5px;
+                        padding: 2px 8px;
+                      "
+                    >
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <a
+                      href="/admin/delete_client/{{ c.id }}"
+                      onclick="return confirm('Excluir?')"
+                      style="color: var(--danger-color); margin-left: 8px"
+                      ><i class="fas fa-trash"></i
+                    ></a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="leads" class="tab-content">
+          <div class="section-header">
+            <div class="section-title"><h1>Leads</h1></div>
+          </div>
+          <div class="table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Nome</th>
+                  <th>Contato</th>
+                  <th>Projeto</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for lead in leads %}
+                <tr>
+                  <td>{{ lead.data.strftime('%d/%m') }}</td>
+                  <td><b>{{ lead.nome }}</b></td>
+                  <td>
+                    {{ lead.email }}<br /><small>{{ lead.telefone }}</small>
+                  </td>
+                  <td>{{ lead.projeto }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -552,45 +610,18 @@
                   {{ s.client_name }}
                 </div>
                 <div style="font-size: 0.75rem; color: #888">
-                  {{ s.category }} • {{ s.created_at.strftime('%H:%M') }}
+                  {{ s.category }}
                 </div>
               </div>
               {% endfor %}
             </div>
             <div class="chat-main">
               {% if active_session and active_tab == 'chat_public' %}
-              <div
-                style="
-                  padding: 10px 15px;
-                  border-bottom: 1px solid #eee;
-                  background: #fff;
-                  font-weight: bold;
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: center;
-                "
-              >
-                <span>{{ active_ticket }}</span>
-                <button
-                  onclick="closeTicket('{{ active_session }}')"
-                  style="
-                    border: none;
-                    background: none;
-                    color: red;
-                    cursor: pointer;
-                    font-size: 0.7rem;
-                    text-transform: uppercase;
-                    font-weight: bold;
-                  "
-                >
-                  Encerrar
-                </button>
-              </div>
               <div id="admin-chat-body-public" class="chat-history">
                 {% for msg in chat_history %}
                 <div
                   class="message"
-                  style="padding:8px 12px; border-radius:10px; max-width:70%; font-size:0.9rem; {{ 'background:#2d3436; color:white; align-self:flex-end;' if msg.remetente != 'user' else 'background:white; border:1px solid #eee; align-self:flex-start;' }}"
+                  style="padding:8px 12px; border-radius:10px; max-width:70%; font-size:0.9rem; margin-bottom:5px; {{ 'background:#2d3436; color:white; align-self:flex-end;' if msg.remetente != 'user' else 'background:white; border:1px solid #eee; align-self:flex-start;' }}"
                 >
                   {{ msg.conteudo }}
                 </div>
@@ -621,11 +652,18 @@
                     border-radius: 6px;
                     border: 1px solid #ddd;
                   "
+                  autocomplete="off"
                 />
                 <button
                   type="submit"
-                  class="btn-main"
-                  style="width: auto; padding: 0 15px"
+                  style="
+                    padding: 0 20px;
+                    background: var(--primary-color);
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    cursor: pointer;
+                  "
                 >
                   <i class="fas fa-paper-plane"></i>
                 </button>
@@ -638,11 +676,9 @@
                   align-items: center;
                   justify-content: center;
                   color: #ccc;
-                  flex-direction: column;
                 "
               >
-                <i class="fas fa-comments" style="font-size: 2rem"></i
-                ><br />Selecione um chat
+                Selecione um chat
               </div>
               {% endif %}
             </div>
@@ -671,21 +707,11 @@
             </div>
             <div class="chat-main">
               {% if active_session and active_tab == 'chat_client' %}
-              <div
-                style="
-                  padding: 10px 15px;
-                  border-bottom: 1px solid #eee;
-                  background: #fff;
-                  font-weight: bold;
-                "
-              >
-                {{ active_ticket }}
-              </div>
               <div id="admin-chat-body-client" class="chat-history">
                 {% for msg in chat_history %}
                 <div
                   class="message"
-                  style="padding:8px 12px; border-radius:10px; max-width:70%; font-size:0.9rem; {{ 'background:#2d3436; color:white; align-self:flex-end;' if msg.remetente != 'user' else 'background:white; border:1px solid #eee; align-self:flex-start;' }}"
+                  style="padding:8px 12px; border-radius:10px; max-width:70%; font-size:0.9rem; margin-bottom:5px; {{ 'background:#2d3436; color:white; align-self:flex-end;' if msg.remetente != 'user' else 'background:white; border:1px solid #eee; align-self:flex-start;' }}"
                 >
                   {{ msg.conteudo }}
                 </div>
@@ -716,11 +742,18 @@
                     border-radius: 6px;
                     border: 1px solid #ddd;
                   "
+                  autocomplete="off"
                 />
                 <button
                   type="submit"
-                  class="btn-main"
-                  style="width: auto; padding: 0 15px"
+                  style="
+                    padding: 0 20px;
+                    background: var(--primary-color);
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    cursor: pointer;
+                  "
                 >
                   <i class="fas fa-paper-plane"></i>
                 </button>
@@ -733,299 +766,107 @@
                   align-items: center;
                   justify-content: center;
                   color: #ccc;
-                  flex-direction: column;
                 "
               >
-                <i class="fas fa-headset" style="font-size: 2rem"></i
-                ><br />Selecione um cliente
+                Selecione um cliente
               </div>
               {% endif %}
             </div>
           </div>
         </div>
-
-        <div id="plans" class="tab-content">
-          <div class="section-header">
-            <div class="section-title">
-              <h1>Planos do Site</h1>
-              <p>Edite o que aparece na página inicial.</p>
-            </div>
-          </div>
-          <div class="stat-grid">
-            {% for p in public_plans %}
-            <div class="stat-card" style="display: block">
-              <div
-                style="
-                  display: flex;
-                  justify-content: space-between;
-                  margin-bottom: 15px;
-                "
-              >
-                <h3 style="font-size: 1.4rem">{{ p.name }}</h3>
-                <span
-                  class="status-badge {{ 'badge-green' if p.is_highlighted else 'badge-gray' }}"
-                  >{{ 'Destaque' if p.is_highlighted else 'Padrão' }}</span
-                >
-              </div>
-              <div
-                style="
-                  font-size: 1.5rem;
-                  font-weight: bold;
-                  color: var(--primary-color);
-                  margin-bottom: 10px;
-                "
-              >
-                R$ {{ p.price }}
-              </div>
-              <button
-                onclick="openEditPlan('{{ p.id }}', '{{ p.name }}', '{{ p.price }}', '{{ p.benefits }}')"
-                class="btn-main"
-                style="width: 100%; font-size: 0.8rem"
-              >
-                Editar Detalhes
-              </button>
-            </div>
-            {% endfor %}
-          </div>
-        </div>
-
-        <div id="clients" class="tab-content">
-          <div class="section-header">
-            <div class="section-title"><h1>Clientes</h1></div>
-            <button class="btn-main" onclick="toggleModal('modalNewClient')">
-              <i class="fas fa-plus"></i> Novo
-            </button>
-          </div>
-
-          <div class="table-container">
-            <div class="table-header">
-              <h3>Lista de Clientes</h3>
-              <div class="search-box">
-                <i class="fas fa-search"></i
-                ><input
-                  type="text"
-                  placeholder="Buscar..."
-                  onkeyup="searchTable(this, 'clientsTable')"
-                />
-              </div>
-            </div>
-            <table class="admin-table" id="clientsTable">
-              <thead>
-                <tr>
-                  <th>Empresa</th>
-                  <th>Login</th>
-                  <th>Plano</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for c in clients %}
-                <tr>
-                  <td><strong>{{ c.name }}</strong></td>
-                  <td>{{ c.username }}</td>
-                  <td>
-                    <span class="status-badge badge-blue"
-                      >{{ c.plan_info.plan_name if c.plan_info else 'N/A'
-                      }}</span
-                    >
-                  </td>
-                  <td>
-                    <button
-                      onclick="openEditClient('{{ c.id }}', '{{ c.name }}', '{{ c.plan_info.plan_name }}', '{{ c.plan_info.benefits }}')"
-                      class="btn-outline"
-                      style="padding: 4px 10px; font-size: 0.75rem"
-                    >
-                      <i class="fas fa-edit"></i> Editar
-                    </button>
-                    <a
-                      href="/admin/delete_client/{{ c.id }}"
-                      onclick="return confirm('Excluir?')"
-                      style="color: var(--danger-color); margin-left: 8px"
-                      ><i class="fas fa-trash"></i
-                    ></a>
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div id="leads" class="tab-content">
-          <div class="section-header">
-            <div class="section-title"><h1>Leads</h1></div>
-            <button
-              onclick="exportTableToCSV('leadsTable', 'leads.csv')"
-              class="btn-outline"
-              style="font-size: 0.8rem"
-            >
-              <i class="fas fa-download"></i> Baixar CSV
-            </button>
-          </div>
-          <div class="table-container">
-            <div class="table-header">
-              <h3>Últimos Contatos</h3>
-              <div class="search-box">
-                <i class="fas fa-search"></i
-                ><input
-                  type="text"
-                  placeholder="Buscar..."
-                  onkeyup="searchTable(this, 'leadsTable')"
-                />
-              </div>
-            </div>
-            <table class="admin-table" id="leadsTable">
-              <thead>
-                <tr>
-                  <th>Data</th>
-                  <th>Nome</th>
-                  <th>Contato</th>
-                  <th>Projeto</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for lead in leads %}
-                <tr>
-                  <td>{{ lead.data.strftime('%d/%m') }}</td>
-                  <td><b>{{ lead.nome }}</b></td>
-                  <td>
-                    {{ lead.email }}<br /><span
-                      style="font-size: 0.8rem; color: #888"
-                      >{{ lead.telefone }}</span
-                    >
-                  </td>
-                  <td>{{ lead.projeto }}</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div id="financeiro" class="tab-content">
-          <div class="section-header">
-            <div class="section-title"><h1>Financeiro</h1></div>
-            <button
-              onclick="exportTableToCSV('financeiroTable', 'vendas.csv')"
-              class="btn-outline"
-              style="font-size: 0.8rem"
-            >
-              <i class="fas fa-download"></i> Baixar CSV
-            </button>
-          </div>
-          <div class="table-container">
-            <div class="table-header">
-              <h3>Vendas</h3>
-              <div class="search-box">
-                <i class="fas fa-search"></i
-                ><input
-                  type="text"
-                  placeholder="Buscar..."
-                  onkeyup="searchTable(this, 'financeiroTable')"
-                />
-              </div>
-            </div>
-            <table class="admin-table" id="financeiroTable">
-              <thead>
-                <tr>
-                  <th>Data</th>
-                  <th>Plano</th>
-                  <th>Valor</th>
-                  <th>Método</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for order in orders %}
-                <tr>
-                  <td>{{ order.data.strftime('%d/%m %H:%M') }}</td>
-                  <td><b>{{ order.plano }}</b></td>
-                  <td>R$ {{ order.preco }}</td>
-                  <td>
-                    {% if order.metodo == 'pix' %}<i
-                      class="fab fa-pix"
-                      style="color: #00b894"
-                    ></i>
-                    PIX {% else %}<i
-                      class="far fa-credit-card"
-                      style="color: #0984e3"
-                    ></i>
-                    Cartão{% endif %}
-                  </td>
-                  <td>
-                    {% if order.status == 'Aprovado' %}
-                    <span class="status-badge badge-green"
-                      ><i class="fas fa-check"></i> Pago</span
-                    >
-                    {% elif order.status == 'Pendente' %}
-                    <span class="status-badge badge-gray"
-                      ><i class="fas fa-clock"></i> Aguardando</span
-                    >
-                    {% elif order.status == 'Rejeitado' %}
-                    <span class="status-badge badge-red">Recusado</span>
-                    {% else %}
-                    <span class="status-badge">{{ order.status }}</span>
-                    {% endif %}
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div id="reviews" class="tab-content">
-          <div class="section-header">
-            <div class="section-title"><h1>Avaliações</h1></div>
-          </div>
-          <div class="table-container">
-            <table class="admin-table">
-              <thead>
-                <tr>
-                  <th>Cliente</th>
-                  <th>Nota</th>
-                  <th>Texto</th>
-                  <th>Status</th>
-                  <th>Ação</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for r in reviews %}
-                <tr>
-                  <td>{{ r.nome }}</td>
-                  <td style="color: #f1c40f">
-                    {{ r.estrelas }} <i class="fas fa-star"></i>
-                  </td>
-                  <td style="font-size: 0.85rem; font-style: italic">
-                    "{{ r.avaliacao }}"
-                  </td>
-                  <td>
-                    <span
-                      class="status-badge {{ 'badge-green' if r.visivel else 'badge-gray' }}"
-                      >{{ 'On' if r.visivel else 'Off' }}</span
-                    >
-                  </td>
-                  <td>
-                    <a
-                      href="/admin/toggle_review/{{ r.id }}"
-                      class="btn-outline"
-                      style="padding: 4px 8px; font-size: 0.7rem"
-                      >{{ 'Ocultar' if r.visivel else 'Mostrar' }}</a
-                    >
-                    <a
-                      href="/admin/delete_review/{{ r.id }}"
-                      onclick="return confirm('Apagar?')"
-                      style="color: var(--danger-color); margin-left: 5px"
-                      ><i class="fas fa-trash"></i
-                    ></a>
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
       </main>
+    </div>
+
+    <div id="modalEditPlan" class="modal-overlay">
+      <div class="modal-card">
+        <i
+          class="fas fa-times close-modal"
+          onclick="toggleModal('modalEditPlan')"
+        ></i>
+        <h3 style="margin-bottom: 15px">Editar Plano</h3>
+        <form id="formEditPlan" action="" method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <div class="form-group">
+            <label>Nome</label
+            ><input type="text" id="planNameSite" name="name" required />
+          </div>
+          <div class="form-group">
+            <label>Preço Atual (R$)</label
+            ><input type="text" id="planPriceSite" name="price" required />
+          </div>
+          <div class="form-group">
+            <label>Preço Antigo (Promoção)</label
+            ><input
+              type="text"
+              id="planOldPriceSite"
+              name="old_price"
+              placeholder="Ex: 5000"
+            />
+          </div>
+          <div class="form-group">
+            <label>Benefícios (Vírgula)</label
+            ><textarea
+              id="planBenefitsSite"
+              name="benefits"
+              rows="4"
+            ></textarea>
+          </div>
+          <button
+            class="nav-btn"
+            style="
+              background: #2d3436;
+              color: white;
+              justify-content: center;
+              width: 100%;
+            "
+          >
+            Salvar
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div id="modalNewCase" class="modal-overlay">
+      <div class="modal-card">
+        <i
+          class="fas fa-times close-modal"
+          onclick="toggleModal('modalNewCase')"
+        ></i>
+        <h3>Novo Case</h3>
+        <form
+          action="/admin/create_case"
+          method="POST"
+          enctype="multipart/form-data"
+        >
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <div class="form-group">
+            <label>Título</label><input type="text" name="title" required />
+          </div>
+          <div class="form-group">
+            <label>Descrição Curta</label
+            ><input type="text" name="description" required />
+          </div>
+          <div class="form-group">
+            <label>Imagem (Upload)</label
+            ><input type="file" name="image_file" />
+          </div>
+          <div class="form-group">
+            <label>Ou URL da Imagem</label
+            ><input type="text" name="image_url" />
+          </div>
+          <button
+            class="nav-btn"
+            style="
+              background: #2d3436;
+              color: white;
+              justify-content: center;
+              width: 100%;
+            "
+          >
+            Adicionar
+          </button>
+        </form>
+      </div>
     </div>
 
     <div id="modalNewClient" class="modal-overlay">
@@ -1034,7 +875,7 @@
           class="fas fa-times close-modal"
           onclick="toggleModal('modalNewClient')"
         ></i>
-        <h3 style="margin-bottom: 20px">Novo Cliente</h3>
+        <h3>Novo Cliente</h3>
         <form action="/admin/create_client" method="POST">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           <div class="form-group">
@@ -1048,258 +889,157 @@
             ><input type="password" name="password" required />
           </div>
           <div class="form-group">
-            <label>Plano Inicial</label
-            ><input
-              type="text"
-              name="plan_name"
-              placeholder="Ex: Growth"
-              required
-            />
+            <label>Plano</label><input type="text" name="plan_name" required />
           </div>
-          <button class="btn-main" style="width: 100%; margin-top: 10px">
-            Criar Acesso
+          <button
+            class="nav-btn"
+            style="
+              background: #2d3436;
+              color: white;
+              justify-content: center;
+              width: 100%;
+            "
+          >
+            Criar
           </button>
         </form>
       </div>
     </div>
 
-    <div id="modalEditPlan" class="modal-overlay">
-      <div class="modal-card">
-        <i
-          class="fas fa-times close-modal"
-          onclick="toggleModal('modalEditPlan')"
-        ></i>
-        <h3 style="margin-bottom: 15px">Editar Plano (Site)</h3>
-        <form id="formEditPlan" action="" method="POST">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <div class="form-group">
-            <label>Nome</label
-            ><input type="text" id="planNameSite" name="name" required />
-          </div>
-          <div class="form-group">
-            <label>Preço (R$)</label
-            ><input type="text" id="planPriceSite" name="price" required />
-          </div>
-          <div class="form-group">
-            <label>Benefícios (Separe por vírgula)</label
-            ><textarea
-              id="planBenefitsSite"
-              name="benefits"
-              rows="4"
-            ></textarea>
-          </div>
-          <button class="btn-main" style="width: 100%">Salvar</button>
-        </form>
-      </div>
-    </div>
-
-    <div id="modalEditClient" class="modal-overlay">
-      <div class="modal-card">
-        <i
-          class="fas fa-times close-modal"
-          onclick="toggleModal('modalEditClient')"
-        ></i>
-        <h3 style="margin-bottom: 15px">Editar Cliente</h3>
-        <form id="formEditClient" action="" method="POST">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <div class="form-group">
-            <label>Plano / Promoção</label
-            ><input
-              type="text"
-              id="editPlanName"
-              name="plan_name"
-              placeholder="Growth - BLACK FRIDAY"
-            />
-          </div>
-          <div class="form-group">
-            <label>Benefícios (Vírgula)</label
-            ><textarea
-              id="editBenefits"
-              name="benefits"
-              rows="2"
-              style="resize: none"
-            ></textarea>
-          </div>
-          <div
-            style="
-              background: #f8f9fa;
-              padding: 10px;
-              border-radius: 8px;
-              margin-bottom: 15px;
-            "
-          >
-            <label
-              style="
-                font-size: 0.7rem;
-                font-weight: bold;
-                margin-bottom: 5px;
-                display: block;
-              "
-              >Gráfico (4 Meses)</label
-            >
-            <div
-              style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px"
-            >
-              <input type="text" name="labels[]" placeholder="Mês 1" />
-              <input type="number" name="values[]" placeholder="Val" />
-              <input type="text" name="labels[]" placeholder="Mês 2" />
-              <input type="number" name="values[]" placeholder="Val" />
-              <input type="text" name="labels[]" placeholder="Mês 3" />
-              <input type="number" name="values[]" placeholder="Val" />
-              <input type="text" name="labels[]" placeholder="Mês 4" />
-              <input type="number" name="values[]" placeholder="Val" />
-            </div>
-          </div>
-          <button class="btn-main" style="width: 100%">Salvar</button>
-        </form>
-      </div>
-    </div>
-
     <script>
-              document.getElementById('currentDate').innerText = new Date().toLocaleDateString('pt-BR');
+      function openTab(tabName) {
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((t) => (t.style.display = "none"));
+        document
+          .querySelectorAll(".nav-btn")
+          .forEach((b) => b.classList.remove("active"));
+        const content = document.getElementById(tabName);
+        if (content) content.style.display = "block";
+        const url = new URL(window.location);
+        url.searchParams.set("tab", tabName);
+        window.history.pushState({}, "", url);
+        // Re-highlight button
+        const btns = document.querySelectorAll(".nav-btn");
+        btns.forEach((b) => {
+          if (b.getAttribute("onclick").includes(tabName))
+            b.classList.add("active");
+        });
+      }
+      const currentTab =
+        new URLSearchParams(window.location.search).get("tab") || "dashboard";
+      openTab(currentTab);
 
-              function openTab(tabName) {
-                  document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
-                  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-                  document.getElementById(tabName).style.display = 'block';
+      function toggleModal(id) {
+        document.getElementById(id).classList.toggle("active");
+      }
 
-                  // Ativa o botão correspondente
-                  const buttons = document.querySelectorAll('.nav-btn');
-                  buttons.forEach(btn => {
-                      if(btn.getAttribute('onclick').includes("'" + tabName + "'")) {
-                          btn.classList.add('active');
-                      }
+      function openEditPlan(id, name, price, oldPrice, benefits) {
+        document.getElementById(
+          "formEditPlan"
+        ).action = `/admin/update_plan/${id}`;
+        document.getElementById("planNameSite").value = name;
+        document.getElementById("planPriceSite").value = price;
+        document.getElementById("planOldPriceSite").value =
+          oldPrice && oldPrice !== "None" ? oldPrice : "";
+        document.getElementById("planBenefitsSite").value = benefits.replace(
+          /[\[\]"]/g,
+          ""
+        );
+        toggleModal("modalEditPlan");
+      }
+
+      // CHAT LOGIC CORRIGIDA
+      document.addEventListener("DOMContentLoaded", () => {
+        const activeTab = "{{ active_tab }}";
+        const formId =
+          activeTab === "chat_client" ? "replyFormClient" : "replyFormPublic";
+        const bodyId =
+          activeTab === "chat_client"
+            ? "admin-chat-body-client"
+            : "admin-chat-body-public";
+
+        const chatForm = document.getElementById(formId);
+        const chatBody = document.getElementById(bodyId);
+
+        if (chatForm && chatBody) {
+          chatBody.scrollTop = chatBody.scrollHeight;
+
+          chatForm.addEventListener("submit", async (e) => {
+            e.preventDefault(); // IMPEDE O RELOAD
+            const fd = new FormData(chatForm);
+            const msg = fd.get("message").trim();
+            if (!msg) return;
+
+            const input = chatForm.querySelector('input[name="message"]');
+            input.value = ""; // Limpa input
+
+            // Adiciona mensagem visualmente antes de enviar
+            const div = document.createElement("div");
+            div.style.cssText =
+              "background:#2d3436; color:white; align-self:flex-end; padding:8px 12px; border-radius:10px; max-width:70%; font-size:0.9rem; margin-bottom:5px;";
+            div.innerText = msg;
+            chatBody.appendChild(div);
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            try {
+              await fetch("/send_chat", { method: "POST", body: fd });
+            } catch (err) {
+              console.error("Erro ao enviar:", err);
+            }
+          });
+
+          // Auto-refresh
+          const sessId = "{{ active_session }}";
+          if (sessId) {
+            setInterval(async () => {
+              try {
+                const res = await fetch(`/get_messages/${sessId}`);
+                const data = await res.json();
+                if (data.messages.length > chatBody.children.length) {
+                  chatBody.innerHTML = "";
+                  data.messages.forEach((m) => {
+                    const d = document.createElement("div");
+                    d.className = "message";
+                    d.style.cssText = `padding:8px 12px; border-radius:10px; max-width:70%; font-size:0.9rem; margin-bottom:5px; ${
+                      m.remetente !== "user"
+                        ? "background:#2d3436; color:white; align-self:flex-end;"
+                        : "background:white; border:1px solid #eee; align-self:flex-start;"
+                    }`;
+                    if (m.tipo === "audio")
+                      d.innerHTML = `<audio controls src="/static/uploads/${m.conteudo}" style="height:30px;"></audio>`;
+                    else if (m.tipo === "arquivo")
+                      d.innerHTML = `<a href="/static/uploads/${m.conteudo}" target="_blank">Ver Arquivo</a>`;
+                    else d.innerText = m.conteudo;
+                    chatBody.appendChild(d);
                   });
-
-                  // Atualiza URL sem recarregar
-                  const url = new URL(window.location);
-                  url.searchParams.set('tab', tabName);
-                  window.history.pushState({}, '', url);
-              }
-
-              const urlParams = new URLSearchParams(window.location.search);
-              const currentTab = urlParams.get('tab') || 'dashboard';
-              openTab(currentTab);
-
-              function toggleModal(modalId) { document.getElementById(modalId).classList.toggle('active'); }
-
-              function openEditClient(id, name, plan, benefits) {
-                  document.getElementById('formEditClient').action = `/admin/update_client_stats/${id}`;
-                  document.getElementById('editPlanName').value = plan;
-                  document.getElementById('editBenefits').value = benefits.replace(/[\[\]"]/g, '');
-                  toggleModal('modalEditClient');
-              }
-
-              function openEditPlan(id, name, price, benefits) {
-                  document.getElementById('formEditPlan').action = `/admin/update_plan/${id}`;
-                  document.getElementById('planNameSite').value = name;
-                  document.getElementById('planPriceSite').value = price;
-                  document.getElementById('planBenefitsSite').value = benefits.replace(/[\[\]"]/g, '');
-                  toggleModal('modalEditPlan');
-              }
-
-              // Auto-close flash message after 3s
-              const flashMsg = document.getElementById('flash-message');
-              if(flashMsg) {
-                  setTimeout(() => {
-                      flashMsg.style.opacity = '0';
-                      flashMsg.style.transition = 'opacity 0.5s';
-                      setTimeout(() => flashMsg.remove(), 500);
-                  }, 3000);
-              }
-
-              function searchTable(input, tableId) {
-                  const filter = input.value.toUpperCase();
-                  const tr = document.getElementById(tableId).getElementsByTagName("tr");
-                  for (let i = 1; i < tr.length; i++) {
-                      tr[i].style.display = (tr[i].textContent || tr[i].innerText).toUpperCase().indexOf(filter) > -1 ? "" : "none";
-                  }
-              }
-
-              function exportTableToCSV(tableId, filename) {
-                  let csv = [];
-                  const rows = document.getElementById(tableId).querySelectorAll("tr");
-                  for (let i = 0; i < rows.length; i++) {
-                      let row = [], cols = rows[i].querySelectorAll("td, th");
-                      for (let j = 0; j < cols.length; j++) row.push(cols[j].innerText.replace(/,/g, ""));
-                      csv.push(row.join(","));
-                  }
-                  const link = document.createElement("a");
-                  link.download = filename;
-                  link.href = window.URL.createObjectURL(new Blob([csv.join("\n")], {type: "text/csv"}));
-                  link.style.display = "none";
-                  document.body.appendChild(link);
-                  link.click();
-              }
-
-              const leadsEl = document.getElementById('leadsChart');
-              if(leadsEl) {
-                  const data = JSON.parse('{{ leads_chart|safe }}');
-                  new Chart(leadsEl, {
-                      type: 'bar',
-                      data: { labels: data.labels, datasets: [{ label: 'Leads', data: data.values, backgroundColor: '#0984e3', borderRadius: 5 }] },
-                      options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
-                  });
-              }
-
-              {% if active_session %}
-                  const formId = "{{ active_tab }}" == 'chat_client' ? 'replyFormClient' : 'replyFormPublic';
-                  const bodyId = "{{ active_tab }}" == 'chat_client' ? 'admin-chat-body-client' : 'admin-chat-body-public';
-                  const chatBody = document.getElementById(bodyId);
-                  if(chatBody) {
-                      chatBody.scrollTop = chatBody.scrollHeight;
-                      document.getElementById(formId).addEventListener('submit', async (e) => {
-                          e.preventDefault(); const fd = new FormData(e.target); await fetch('/send_chat', {method:'POST', body:fd}); e.target.reset();
-                          const div = document.createElement('div'); div.style.cssText = "background:var(--primary-color); color:white; align-self:flex-end; padding:8px 12px; border-radius:10px; max-width:70%; font-size:0.9rem; margin-top:5px;"; div.innerText = fd.get('message'); chatBody.appendChild(div); chatBody.scrollTop = chatBody.scrollHeight;
-                      });
-                      setInterval(async () => {
-          // Só busca mensagens se tiver uma sessão ativa
-                          const activeSession = "{{ active_session }}";
-                          if (!activeSession) return;
-
-          try {
-              const res = await fetch('/get_messages/' + activeSession);
-              const data = await res.json();
-
-              // Pega o container das mensagens
-              const bodyId = "{{ active_tab }}" == 'chat_client' ? 'admin-chat-body-client' : 'admin-chat-body-public';
-              const chatBody = document.getElementById(bodyId);
-
-              // Se houver mais mensagens no banco do que na tela, atualiza
-              if (chatBody && data.messages.length > chatBody.children.length) {
-                  chatBody.innerHTML = ''; // Limpa atual
-
-                  // Reconstrói as mensagens
-                  data.messages.forEach(msg => {
-                      const div = document.createElement('div');
-                      // Define o estilo baseado no remetente
-                      let style = "padding:8px 12px; border-radius:10px; max-width:70%; font-size:0.9rem; margin-bottom: 5px; ";
-                      if (msg.remetente !== 'user') { // Se for Admin ou System
-                          style += "background:#2d3436; color:white; align-self:flex-end;";
-                      } else { // Se for Cliente
-                          style += "background:white; border:1px solid #eee; align-self:flex-start;";
-                      }
-                      div.style.cssText = style;
-
-                      // Trata conteúdo (Texto, Áudio, Arquivo)
-                      if(msg.tipo === 'audio') {
-                          div.innerHTML = `<audio controls src="/static/uploads/${msg.conteudo}" style="height:30px; max-width:200px;"></audio>`;
-                      } else if(msg.tipo === 'arquivo') {
-                          div.innerHTML = `<a href="/static/uploads/${msg.conteudo}" target="_blank" style="color:inherit; text-decoration:underline;">📎 Ver Arquivo</a>`;
-                      } else {
-                          div.innerText = msg.conteudo;
-                      }
-
-                      chatBody.appendChild(div);
-                  });
-                  // Rola para o final
                   chatBody.scrollTop = chatBody.scrollHeight;
-              }
-          } catch(e) { console.error("Erro ao atualizar chat", e); }
-      }, 3000);
-                  }
-                  async function closeTicket(uuid) { if(confirm('Encerrar este atendimento?')) { await fetch('/close_ticket/' + uuid, {method:'POST'}); location.href = '/admin?tab={{ active_tab }}'; } }
-              {% endif %}
+                }
+              } catch (e) {}
+            }, 3000);
+          }
+        }
+
+        // Chart Leads
+        const ctx = document.getElementById("leadsChart");
+        if (ctx) {
+          const data = JSON.parse("{{ leads_chart|safe }}");
+          new Chart(ctx, {
+            type: "bar",
+            data: {
+              labels: data.labels,
+              datasets: [
+                {
+                  label: "Leads",
+                  data: data.values,
+                  backgroundColor: "#0984e3",
+                },
+              ],
+            },
+            options: { responsive: true, maintainAspectRatio: false },
+          });
+        }
+      });
     </script>
   </body>
 </html>

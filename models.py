@@ -23,9 +23,10 @@ class PublicPlan(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
     price = db.Column(db.String(20))
+    old_price = db.Column(db.String(20)) # NOVO CAMPO: Preço "De" (Riscado)
     benefits = db.Column(db.Text) # Lista JSON
-    is_highlighted = db.Column(db.Boolean, default=False) # Se é o destaque (Growth)
-    order_index = db.Column(db.Integer, default=0) # Ordem de exibição
+    is_highlighted = db.Column(db.Boolean, default=False)
+    order_index = db.Column(db.Integer, default=0)
 
 # Tabela de Planos dos Clientes (Área Logada)
 class ClientPlan(db.Model):
@@ -91,7 +92,6 @@ class ChatMessage(db.Model):
     remetente = db.Column(db.String(20))
     data = db.Column(db.DateTime, default=datetime.utcnow)
 
-# --- NOVAS TABELAS PARA O CMS ---
 class PortfolioItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100))

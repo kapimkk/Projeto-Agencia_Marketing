@@ -103,6 +103,7 @@
                 style="
                   background: linear-gradient(45deg, #181818, #555);
                   -webkit-background-clip: text;
+                  background-clip: text;
                   -webkit-text-fill-color: transparent;
                 "
               ></span>
@@ -376,12 +377,40 @@
           Investimento Inteligente
         </h2>
         <div class="pricing-container reveal">
-          {% for plan in plans %}
-          <div
-            class="glass-card pricing-card {{ 'featured' if plan.is_highlighted else '' }}"
-            data-tilt
-          >
-            {% if plan.is_highlighted %}
+          <div class="glass-card pricing-card" data-tilt>
+            <h3>Starter</h3>
+            <p style="font-size: 0.9rem; color: #666">Visibilidade Local</p>
+            <div class="price">
+              <span
+                style="
+                  font-size: 1.2rem;
+                  text-decoration: line-through;
+                  color: #999;
+                  margin-right: 10px;
+                "
+                >R$ 4.700</span
+              >
+              <br />R$ 2.000
+              <span style="font-size: 0.9rem; font-weight: normal; color: #666"
+                >/mês</span
+              >
+            </div>
+            <ul>
+              <li><i class="fas fa-check"></i> Social Media Essencial</li>
+              <li><i class="fas fa-check"></i> Gestão de Tráfego</li>
+              <li><i class="fas fa-check"></i> Landing Page</li>
+            </ul>
+            <a
+              href="https://wa.me/5511999999999?text=Olá,%20tenho%20interesse%20no%20plano%20Starter%20(Visibilidade%20Local)%20por%20R$%202.000."
+              target="_blank"
+              class="btn-outline"
+              style="margin-top: auto"
+            >
+              <i class="fab fa-whatsapp"></i> Contratar Agora
+            </a>
+          </div>
+
+          <div class="glass-card pricing-card featured" data-tilt>
             <div
               style="
                 background: var(--text-dark);
@@ -393,33 +422,87 @@
                 display: inline-block;
               "
             >
-              Mais Popular
+              Recomendado
             </div>
-            {% endif %}
-            <h3>{{ plan.name }}</h3>
-            <div class="price">R$ {{ plan.price }}</div>
+            <h3>Growth</h3>
+            <p style="font-size: 0.9rem; color: #666">Crescimento e Leads</p>
+            <div class="price">
+              <span
+                style="
+                  font-size: 1.2rem;
+                  text-decoration: line-through;
+                  color: #999;
+                  margin-right: 10px;
+                "
+                >R$ 9.200</span
+              >
+              <br />R$ 3.200
+              <span style="font-size: 0.9rem; font-weight: normal; color: #666"
+                >/mês</span
+              >
+            </div>
             <ul>
-              {% for benefit in plan.benefits_list %}
-              <li><i class="fas fa-check"></i> {{ benefit }}</li>
-              {% endfor %}
+              <li><i class="fas fa-check"></i> Social Media Crescimento</li>
+              <li><i class="fas fa-check"></i> Tráfego Pago Avançado</li>
+              <li>
+                <i class="fas fa-check"></i> Identidade Visual simplificada
+              </li>
             </ul>
             <a
-              href="/checkout/{{ plan.name }}"
-              class="{{ 'btn-main' if plan.is_highlighted else 'btn-outline' }}"
-              style="{{ 'width: 100%; justify-content: center;' if plan.is_highlighted else 'margin-top: auto;' }}"
+              href="https://wa.me/5511999999999?text=Olá,%20tenho%20interesse%20no%20plano%20Growth%20(Crescimento)%20por%20R$%203.200."
+              target="_blank"
+              class="btn-main"
+              style="width: 100%; justify-content: center"
             >
-              {{ 'Quero ' + plan.name if plan.is_highlighted else 'Iniciar com '
-              + plan.name }}
+              <i class="fab fa-whatsapp"></i> Contratar Agora
             </a>
           </div>
-          {% endfor %}
+
+          <div class="glass-card pricing-card" data-tilt>
+            <h3>Performance</h3>
+            <p style="font-size: 0.9rem; color: #666">Escala e Vendas</p>
+            <div class="price">
+              <span
+                style="
+                  font-size: 1.2rem;
+                  text-decoration: line-through;
+                  color: #999;
+                  margin-right: 10px;
+                "
+                >R$ 16.500</span
+              >
+              <br />R$ 4.500
+              <span style="font-size: 0.9rem; font-weight: normal; color: #666"
+                >/mês</span
+              >
+            </div>
+            <ul>
+              <li><i class="fas fa-check"></i> Estratégia Completa</li>
+              <li><i class="fas fa-check"></i> Foco Total em Vendas</li>
+              <li><i class="fas fa-check"></i> Conversão Acelerada</li>
+            </ul>
+            <a
+              href="https://wa.me/5511999999999?text=Olá,%20tenho%20interesse%20no%20plano%20Performance%20(Escala)%20por%20R$%204.500."
+              target="_blank"
+              class="btn-outline"
+              style="margin-top: auto"
+            >
+              <i class="fab fa-whatsapp"></i> Contratar Agora
+            </a>
+          </div>
         </div>
 
         <div class="reveal" style="text-align: center; margin-top: 50px">
+          <p
+            style="font-size: 1.1rem; color: var(--text-dark); font-weight: 600"
+          >
+            <i class="fas fa-handshake"></i> Estamos abertos a negociações.
+            Entre em contato para um plano personalizado.
+          </p>
           <button
             onclick="toggleComparison()"
             class="btn-outline"
-            style="padding: 15px 40px"
+            style="padding: 15px 40px; margin-top: 20px"
           >
             <i class="fas fa-balance-scale-right"></i> Comparar Planos
             Detalhadamente
@@ -444,47 +527,50 @@
             <thead>
               <tr>
                 <th style="text-align: left">Recurso</th>
-                <th>Start</th>
+                <th>Starter</th>
                 <th>Growth</th>
-                <th>Scale</th>
+                <th>Performance</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Canais de Anúncio</td>
-                <td>1 Canal</td>
-                <td>2 Canais</td>
-                <td>Omnichannel</td>
+                <td>Social Media</td>
+                <td>Essencial</td>
+                <td>Crescimento</td>
+                <td>Completo</td>
+              </tr>
+              <tr>
+                <td>Tráfego Pago</td>
+                <td>Gestão Básica</td>
+                <td>Avançado</td>
+                <td>Escala Agressiva</td>
               </tr>
               <tr>
                 <td>Landing Page</td>
-                <td><i class="fas fa-times" style="color: #999"></i></td>
                 <td>
                   <i class="fas fa-check" style="color: var(--accent)"></i>
                   Inclusa
                 </td>
                 <td>
+                  <i class="fas fa-check" style="color: var(--accent)"></i>
+                  Otimizada
+                </td>
+                <td>
                   <i class="fas fa-check" style="color: var(--accent)"></i> Alta
-                  Performance
+                  Conversão
                 </td>
               </tr>
               <tr>
-                <td>Dashboard</td>
-                <td>Relatório PDF</td>
-                <td>Acesso 24h</td>
-                <td>BI Personalizado</td>
-              </tr>
-              <tr>
-                <td>Reuniões</td>
-                <td>Mensal</td>
-                <td>Quinzenal</td>
-                <td>Semanal</td>
+                <td>Identidade Visual</td>
+                <td>-</td>
+                <td>Simplificada</td>
+                <td>Completa</td>
               </tr>
               <tr>
                 <td>Suporte</td>
                 <td>E-mail</td>
                 <td>WhatsApp</td>
-                <td>Gerente VIP</td>
+                <td>Gerente Dedicado</td>
               </tr>
             </tbody>
           </table>
